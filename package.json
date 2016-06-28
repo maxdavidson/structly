@@ -1,0 +1,64 @@
+{
+  "name": "structly",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "Convert binary data types into JavaScript values/objects and vice versa",
+  "author": "Max Davidson <davidsonmax@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxdavidson/structly.git"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "main": "dist/structly.js",
+  "jsnext:main": "dist/structly.mjs",
+  "typings": "src/index.d.ts",
+  "scripts": {
+    "build": "rollup -c",
+    "clean": "rimraf dist coverage .nyc_output",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "nyc ava",
+    "test:coveralls": "nyc report -r text-lcov | coveralls",
+    "prebuild": "npm run clean",
+    "pretest": "cross-env NODE_ENV=test npm run build",
+    "preversion": "npm test",
+    "prepublish": "cross-env NODE_ENV=production npm run build",
+    "postversion": "git push && git push --tags && npm publish"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "binary",
+    "pod",
+    "struct",
+    "record",
+    "serialize",
+    "encode",
+    "decode",
+    "convert",
+    "pack",
+    "unpack"
+  ],
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false
+  },
+  "devDependencies": {
+    "ava": "^0.15.2",
+    "babel-eslint": "^6.1.0",
+    "babel-plugin-__coverage__": "^11.0.0",
+    "babel-preset-es2015-rollup": "^1.1.1",
+    "cross-env": "^1.0.8",
+    "eslint": "^2.13.1",
+    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-plugin-import": "^1.9.2",
+    "nyc": "^6.6.1",
+    "rimraf": "^2.5.2",
+    "rollup": "^0.33.0",
+    "rollup-plugin-babel": "^2.6.1"
+  }
+}
