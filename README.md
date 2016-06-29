@@ -113,7 +113,7 @@ export interface Type {
   byteAlignment: number;
 }
 
-export interface ScalarType extends Type {
+export interface NumberType extends Type {
   littleEndian: boolean;
 }
 
