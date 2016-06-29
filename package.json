@@ -53,6 +53,7 @@
     "babel-eslint": "^6.1.0",
     "babel-plugin-__coverage__": "^11.0.0",
     "babel-preset-es2015-rollup": "^1.1.1",
+    "coveralls": "^2.11.9",
     "cross-env": "^1.0.8",
     "eslint": "^2.13.1",
     "eslint-config-airbnb-base": "^3.0.1",
