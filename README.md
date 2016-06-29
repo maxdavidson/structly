@@ -1,5 +1,11 @@
 # structly
 
+[![NPM](https://img.shields.io/npm/v/structly.svg)](https://www.npmjs.com/package/structly)
+[![Build Status](https://img.shields.io/travis/maxdavidson/structly/master.svg)](https://travis-ci.org/maxdavidson/structly)
+[![Coverage Status](https://img.shields.io/coveralls/maxdavidson/structly/master.svg)](https://coveralls.io/github/maxdavidson/structly?branch=master)
+[![Dependency Status](https://img.shields.io/david/maxdavidson/structly.svg)](https://david-dm.org/maxdavidson/structly)
+[![devDependency Status](https://img.shields.io/david/dev/maxdavidson/structly.svg)](https://david-dm.org/maxdavidson/structly#info=devDependencies)
+
 Structly is a tool for working with binary data types in JavaScript, making
 it possible to convert array buffers into JavaScript objects/values, and vice versa.
 It works great both in Node (4+) and modern browsers. It currently supports
