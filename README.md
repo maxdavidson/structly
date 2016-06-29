@@ -21,7 +21,7 @@ to prevent misaligned accesses.
 ## Usage
 
 ```javascript
-import { encode, decode, struct, array, float32 } from 'struct';
+import { encode, decode, struct, array, float32 } from 'structly';
 
 // Define a point type with three float32 (single-precision) members.
 const point = struct({
