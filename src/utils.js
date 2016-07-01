@@ -36,7 +36,7 @@ export function createMask(bits) {
 }
 
 /* eslint-disable no-param-reassign, prefer-rest-params, no-restricted-syntax */
-export const assign = Object.assign || function assign(target) {
+export const assign = Object.assign ||/* istanbul ignore next */ function assign(target) {
   if (target == null) {
     throw new TypeError('Cannot convert undefined or null to object');
   }
@@ -66,6 +66,7 @@ export function getDataView(data) {
 
 /* eslint-disable no-console */
 export const decodeBytes = (() => {
+  /* istanbul ignore next */
   if (typeof TextDecoder === 'function') {
     const decoders = {};
     return (bytes, encoding) => {
@@ -83,13 +84,15 @@ export const decodeBytes = (() => {
     return (bytes, encoding) => fixCString(new Buffer(bytes).toString(encoding));
   }
 
+/* istanbul ignore next */
   console.warn('TextDecoder API is not available! String decoding will not work correctly.');
 
+/* istanbul ignore next */
   return bytes => fixCString(String.fromCharCode.apply(String, bytes));
 })();
 
-/* eslint-disable no-new-wrappers */
 export const encodeString = (() => {
+  /* istanbul ignore next */
   if (typeof TextEncoder === 'function') {
     const encoders = {};
     return (string, encoding) => {
@@ -105,8 +108,11 @@ export const encodeString = (() => {
     };
   }
 
+  /* istanbul ignore next */
   console.warn('TextEncoder API is not available! String encoding will not work correctly.');
 
+  /* eslint-disable no-new-wrappers */
+  /* istanbul ignore next */
   return string => {
     const boxedString = new String(string);
     const len = boxedString.length;
