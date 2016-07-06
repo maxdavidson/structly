@@ -51,9 +51,9 @@ const decoded = decode(points, bytes);
 
 ```typescript
 // Converters:
-export function decode(schema: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
-export function encode(schema: Type, data: any): ArrayBuffer;
-export function encode<T extends ArrayBuffer | ArrayBufferView>(schema: Type, data: any, buffer: T, startOffset?: number): T;
+export function decode(type: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
+export function encode(type: Type, data: any): ArrayBuffer;
+export function encode<T extends ArrayBuffer | ArrayBufferView>(type: Type, data: any, buffer: T, startOffset?: number): T;
 
 
 // Type factories:
