@@ -7,6 +7,7 @@ export const systemLittleEndian = new Uint8Array(new Uint16Array([0xFF00]).buffe
  * Gets the closest multiple of byteAlignment from byteOffset (base-2 only)
  */
 export function align(byteOffset, byteAlignment) {
+  /* eslint-disable no-mixed-operators */
   return (byteOffset + byteAlignment - 1) & ~(byteAlignment - 1);
 }
 
