@@ -23,6 +23,7 @@
     "test:coveralls": "nyc report -r text-lcov | coveralls",
     "prebuild": "npm run clean",
     "pretest": "cross-env NODE_ENV=test npm run build",
+    "posttest": "npm run lint",
     "preversion": "npm test",
     "prepublish": "cross-env NODE_ENV=production npm run build",
     "postversion": "git push && git push --tags && npm publish"
