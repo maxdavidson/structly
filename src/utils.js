@@ -65,8 +65,8 @@ export function getDataView(data) {
   throw new TypeError('Invalid input data');
 }
 
-/* eslint-disable no-console */
 export const decodeBytes = (() => {
+  /* eslint-disable no-undef */
   /* istanbul ignore next */
   if (typeof TextDecoder === 'function') {
     const decoders = {};
@@ -75,6 +75,7 @@ export const decodeBytes = (() => {
       return decoder.decode(bytes);
     };
   }
+  /* eslint-enable */
 
   function fixCString(str) {
     const endIndex = str.indexOf('\u0000');
@@ -85,14 +86,17 @@ export const decodeBytes = (() => {
     return (bytes, encoding) => fixCString(new Buffer(bytes).toString(encoding));
   }
 
-/* istanbul ignore next */
+  /* eslint-disable no-console */
+  /* istanbul ignore next */
   console.warn('TextDecoder API is not available! String decoding will not work correctly.');
+  /* eslint-enable */
 
-/* istanbul ignore next */
+  /* istanbul ignore next */
   return bytes => fixCString(String.fromCharCode.apply(String, bytes));
 })();
 
 export const encodeString = (() => {
+  /* eslint-disable no-undef */
   /* istanbul ignore next */
   if (typeof TextEncoder === 'function') {
     const encoders = {};
@@ -101,6 +105,7 @@ export const encodeString = (() => {
       return encoder.encode(string);
     };
   }
+  /* eslint-enable */
 
   if (typeof Buffer === 'function') {
     return (string, encoding) => {
@@ -109,8 +114,10 @@ export const encodeString = (() => {
     };
   }
 
+  /* eslint-disable no-console */
   /* istanbul ignore next */
   console.warn('TextEncoder API is not available! String encoding will not work correctly.');
+  /* eslint-enable */
 
   /* eslint-disable no-new-wrappers */
   /* istanbul ignore next */
