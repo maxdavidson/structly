@@ -91,8 +91,10 @@ export const decodeBytes = (() => {
   console.warn('TextDecoder API is not available! String decoding will not work correctly.');
   /* eslint-enable */
 
+  /* eslint-disable prefer-spread */
   /* istanbul ignore next */
   return bytes => fixCString(String.fromCharCode.apply(String, bytes));
+  /* eslint-enable */
 })();
 
 export const encodeString = (() => {
