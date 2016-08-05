@@ -8,7 +8,7 @@
   "env": {
     "test": {
       "plugins": [
-        ["istanbul", { "ignore": "test/" }]
+        "istanbul"
       ]
     }
   }
