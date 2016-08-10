@@ -86,7 +86,7 @@ export const readVisitor = {
     for (let i = 0, len = members.length; i < len; ++i) {
       const { name, bits } = members[i];
       result[name] = value & createMask(bits);
-      value >>= bits;
+      value >>>= bits;
     }
     return result;
   },
