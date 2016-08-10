@@ -35,8 +35,8 @@ export const readVisitor = {
       result.lo = dataView.getUint32(byteOffset, true);
       result.hi = dataView.getUint32(byteOffset + 4, true);
     } else {
-      result.hi = dataView.getUint32(byteOffset, true);
-      result.lo = dataView.getUint32(byteOffset + 4, true);
+      result.hi = dataView.getUint32(byteOffset, false);
+      result.lo = dataView.getUint32(byteOffset + 4, false);
     }
     return result;
   },
