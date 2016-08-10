@@ -36,6 +36,10 @@ export function createMask(bits) {
   return (bits <= 0) ? 0 : 0xFFFFFFFF >>> (32 - bits);
 }
 
+export function createVariable(name, stackDepth = 0) {
+  return `${name}${stackDepth}`;
+}
+
 /* eslint-disable no-param-reassign, prefer-rest-params, no-restricted-syntax */
 export const assign = Object.assign ||/* istanbul ignore next */ function assign(target) {
   if (target == null) {
