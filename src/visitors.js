@@ -58,7 +58,7 @@ export const readVisitor = {
     const stride = strideof(element, byteAlignment);
     const readElement = readVisitor[element.tag];
     for (let i = 0, totalOffset = byteOffset; i < length; ++i, totalOffset += stride) {
-      result[i] = readElement(element, dataView, totalOffset);
+      result[i] = readElement(element, dataView, totalOffset, result[i]);
     }
     return result;
   },
@@ -67,7 +67,7 @@ export const readVisitor = {
     for (let i = 0, len = members.length; i < len; ++i) {
       const { element, byteOffset: tupleByteOffset } = members[i];
       const totalOffset = byteOffset + tupleByteOffset;
-      result[i] = readVisitor[element.tag](element, dataView, totalOffset);
+      result[i] = readVisitor[element.tag](element, dataView, totalOffset, result[i]);
     }
     return result;
   },
@@ -76,7 +76,7 @@ export const readVisitor = {
     for (let i = 0, len = members.length; i < len; ++i) {
       const { name, element, byteOffset: structByteOffset } = members[i];
       const totalOffset = byteOffset + structByteOffset;
-      result[name] = readVisitor[element.tag](element, dataView, totalOffset);
+      result[name] = readVisitor[element.tag](element, dataView, totalOffset, result[name]);
     }
     return result;
   },
