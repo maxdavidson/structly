@@ -1,5 +1,8 @@
-import { readVisitor, writeVisitor, generateReaderVisitor, generateWriterVisitor } from './visitors';
 import { getDataView, sizeof, createVariable } from './utils';
+import {
+  readVisitor, writeVisitor,
+  generateReaderVisitor, generateWriterVisitor,
+} from './visitors';
 
 /**
  * Use a type to decode a buffer, optionally into a target object.
@@ -69,11 +72,10 @@ export class Converter {
       ${generateWriterVisitor[type.tag](type, stackDepth)}
     `;
 
+    /* eslint-disable no-new-func */
     this._reader = new Function('dataView', byteOffsetVar, resultVar, readerSource);
     this._writer = new Function('dataView', byteOffsetVar, dataVar, writerSource);
-
-    console.log('Reader: ', this._reader.toString());
-    console.log('Writer: ', this._writer.toString());
+    /* eslint-enable no-new-func */
   }
 
   decode(buffer, outData, startOffset = 0) {
