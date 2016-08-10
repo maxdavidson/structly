@@ -2,7 +2,7 @@
 import { systemLittleEndian, align, assign, alignof } from './utils';
 
 function createNumberType(tag, size, littleEndian = systemLittleEndian) {
-  return { tag, byteLength: size, byteAlignment: size, littleEndian };
+  return Object.freeze({ tag, byteLength: size, byteAlignment: size, littleEndian });
 }
 
 export const bool = createNumberType('Bool', 1);
@@ -45,12 +45,12 @@ export function string(maxLength, encoding = 'utf8') {
     throw new TypeError('You must specify a max length for the string!');
   }
 
-  return {
+  return Object.freeze({
     tag: 'String',
     byteLength: maxLength,
     byteAlignment: 1,
     encoding,
-  };
+  });
 }
 
 /**
@@ -64,20 +64,20 @@ export function array(element, length, { pack } = {}) {
     throw new TypeError('You must specify a length of the array!');
   }
 
-  return {
+  return Object.freeze({
     tag: 'Array',
     byteLength: length * element.byteLength,
     byteAlignment: pack || element.byteAlignment,
     length,
     element,
-  };
+  });
 }
 
 function offsetHelper(tag, elements, inject, pack = 0) {
   let byteOffset = 0;
   let maxByteAlignment = 0;
 
-  const members = elements.map(element => {
+  const members = Object.freeze(elements.map(element => {
     const { byteLength, byteAlignment } = element;
 
     byteOffset = align(byteOffset, pack || byteAlignment);
@@ -91,15 +91,15 @@ function offsetHelper(tag, elements, inject, pack = 0) {
     byteOffset += byteLength;
     maxByteAlignment = Math.max(maxByteAlignment, byteAlignment);
 
-    return result;
-  });
+    return Object.freeze(result);
+  }));
 
-  return {
+  return Object.freeze({
     tag,
     byteLength: byteOffset,
     byteAlignment: pack || maxByteAlignment,
     members,
-  };
+  });
 }
 
 /**
@@ -148,11 +148,11 @@ export function bitfield(members, element = uint32) {
     throw new RangeError('Sum of bitfield widths is too large for storage element');
   }
 
-  return {
+  return Object.freeze({
     tag: 'Bitfield',
     byteLength: element.byteLength,
     byteAlignment: element.byteAlignment,
-    members: memberNames.map(name => ({ name, bits: members[name] })),
+    members: Object.freeze(memberNames.map(name => Object.freeze({ name, bits: members[name] }))),
     element,
-  };
+  });
 }
