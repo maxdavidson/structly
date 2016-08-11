@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0
+
+* Code generation! The code for reading and writing to buffers is now created on demand from the type schemas. This means that all type handlers are inlined, bypassing the need for runtime lookup!
+* All built-in type schemas are made immutable using Object.freeze
+* Uint64 and Bool types have been removed
+
+## 0.1.2
+
+* More build system changes
+
+## 0.1.1
+
+* Minor build system changes
+
 ## 0.1.0
 
 * First public release 🎉
