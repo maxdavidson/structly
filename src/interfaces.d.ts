@@ -5,6 +5,7 @@ export interface Type {
 }
 
 export interface NumberType extends Type {
+  kind: string;
   littleEndian: boolean;
 }
 
