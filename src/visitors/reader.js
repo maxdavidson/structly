@@ -92,7 +92,15 @@ export const readerVisitor = Object.freeze({
       if (${indexVar} >= 0) {
         ${arrayVar} = ${arrayVar}.subarray(0, ${indexVar});
       }
-      ${resultVar} = String.fromCharCode.apply(String, ${arrayVar});
+      ${(() => {
+        if (typeof TextDecoder === 'function') {
+          return `${resultVar} = new TextDecoder("utf-8").decode(${arrayVar});`;
+        }
+        if (typeof Buffer === 'function') {
+          return `${resultVar} = new Buffer(${arrayVar}).toString("utf-8");`;
+        }
+        return `${resultVar} = String.fromCharCode.apply(String, ${arrayVar});`;
+      })()}
     `;
   },
 
