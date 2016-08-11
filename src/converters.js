@@ -25,11 +25,12 @@ class Converter {
     }
 
     const dataView = getDataView(buffer);
-    this._writer(dataView, startOffset, sourceData);
 
     if (sizeof(dataView) + startOffset < sizeof(this.type)) {
       throw new RangeError('The provided buffer is too small to store the encoded type');
     }
+
+    this._writer(dataView, startOffset, sourceData);
 
     return buffer;
   }
