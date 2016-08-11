@@ -21,12 +21,14 @@ export const writerVisitor = Object.freeze({
       `;
     }
 
+    /* istanbul ignore next */
     if (typeof TextEncoder === 'function') {
       return `
         new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength).set(new TextDecoder("utf-8").encode(${dataVar}));
       `;
     }
 
+    /* istanbul ignore next */
     return `
       ${dataVar} = new String(${dataVar});
       for (var ${indexVar} = 0, ${lengthVar} = ${dataVar}.length; ${indexVar} < ${lengthVar}; ++${indexVar}) {

@@ -22,12 +22,16 @@ export const readerVisitor = Object.freeze({
         ${arrayVar} = ${arrayVar}.subarray(0, ${indexVar});
       }
       ${(() => {
-        if (typeof TextDecoder === 'function') {
-          return `${resultVar} = new TextDecoder("utf-8").decode(${arrayVar});`;
-        }
         if (typeof Buffer === 'function') {
           return `${resultVar} = new Buffer(${arrayVar}).toString("utf-8");`;
         }
+
+        /* istanbul ignore next */
+        if (typeof TextDecoder === 'function') {
+          return `${resultVar} = new TextDecoder("utf-8").decode(${arrayVar});`;
+        }
+
+        /* istanbul ignore next */
         return `${resultVar} = String.fromCharCode.apply(String, ${arrayVar});`;
       })()}
     `;
