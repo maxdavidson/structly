@@ -3,23 +3,12 @@ import { getDataView, sizeof } from './utils';
 import { createReader } from './visitors/reader';
 import { createWriter } from './visitors/writer';
 
-let converterCache;
-if (typeof WeakMap === 'function') {
-  converterCache = new WeakMap();
-}
+export { createProxy } from './visitors/proxy';
 
-export class Converter {
-  constructor(type, { cache = true } = {}) {
+class Converter {
+  constructor(type) {
     if (type === undefined) {
       throw new TypeError('You must specify a type to convert with');
-    }
-
-    // Only enable caching if WeakMap is available
-    if (cache && converterCache) {
-      if (converterCache.has(type)) {
-        return converterCache.get(type);
-      }
-      converterCache.set(type, this);
     }
 
     this.type = type;
@@ -48,12 +37,35 @@ export class Converter {
   }
 }
 
+
+let converterCache;
+if (typeof WeakMap === 'function') {
+  converterCache = new WeakMap();
+}
+
+export function createConverter(type, { cache = true } = {}) {
+  // Only enable caching if WeakMap is available
+  if (cache && converterCache) {
+    if (converterCache.has(type)) {
+      return converterCache.get(type);
+    }
+  }
+
+  const converter = new Converter(type);
+
+  if (cache && converterCache) {
+    converterCache.set(type, converter);
+  }
+
+  return converter;
+}
+
 /**
  * Use a type to decode a buffer, optionally into a target object.
  * @deprecated
  */
 export function decode(type, buffer, data, startOffset) {
-  return new Converter(type).decode(buffer, data, startOffset);
+  return createConverter(type).decode(buffer, data, startOffset);
 }
 
 /**
@@ -61,5 +73,5 @@ export function decode(type, buffer, data, startOffset) {
  * @deprecated
  */
 export function encode(type, data, buffer, startOffset) {
-  return new Converter(type).encode(data, buffer, startOffset);
+  return createConverter(type).encode(data, buffer, startOffset);
 }
