@@ -1,7 +1,11 @@
 /**
  * Whether the running system is little endian (true = LE, false = BE)
  */
-export const systemLittleEndian = new Uint8Array(new Uint16Array([0xFF00]).buffer)[0] === 0x00;
+export const systemLittleEndian = (typeof os === 'object')
+  /* eslint-disable no-undef */
+  ? os.endianness() === 'LE'
+  /* eslint-enable no-undef */
+  : new Uint32Array(new Uint8Array([0x11, 0x22, 0x33, 0x44]).buffer)[0] === 0x44332211;
 
 /**
  * Gets the closest multiple of byteAlignment from byteOffset (base-2 only)
