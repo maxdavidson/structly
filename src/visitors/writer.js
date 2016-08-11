@@ -1,7 +1,7 @@
 /* eslint-disable max-len, no-new-func */
 import { strideof, createMask, createVariable } from '../utils';
 
-export const writerVisitor = {
+export const writerVisitor = Object.freeze({
   Bool(_, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
@@ -168,7 +168,7 @@ export const writerVisitor = {
       ${writerVisitor[element.tag](element, innerStackDepth)}
     `;
   },
-};
+});
 
 export function createWriter(type) {
   const dataVar = createVariable('data');
