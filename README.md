@@ -21,29 +21,32 @@ to prevent misaligned accesses.
 ## Usage
 
 ```javascript
-import { encode, decode, struct, array, float32 } from 'structly';
+import { createConverter, struct, array, float32 } from 'structly';
 
-// Define a point type with three float32 (single-precision) members.
+// A point type with three float32 (single-precision) members.
 const point = struct({
   x: float32,
   y: float32,
   z: float32
 });
 
-// Define an array of points with length 2
+// An array of two points
 const points = array(point, 2);
 
-// The data to encode
+// Prepare some data
 const data = [
   { x: 0, y: 1, z: 2 },
   { x: 3, y: 4, z: 5 }
 ];
 
-// Encode the data into an array buffer using the points type
-const bytes = encode(points, data);
+// Create a converter for encoding and decoding data
+const converter = createConverter(points);
 
-// Decode the data in the array buffer using the points type
-const decoded = decode(points, bytes);
+// Encode the JavaScript object into an array buffer
+const bytes = converter.encode(data);
+
+// Decode the bytes in the array buffer into a JavaScript object
+const decoded = converter.decode(bytes);
 ```
 
 
@@ -51,6 +54,15 @@ const decoded = decode(points, bytes);
 
 ```typescript
 // Converters:
+declare class Converter<T extends Type> {
+  constructor(type: T, options?: { cache?: boolean; });
+  decode(buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
+  encode(data: any): ArrayBuffer;
+  encode<BufferType extends ArrayBuffer | ArrayBufferView>(data: any, buffer: BufferType, startOffset?: number): BufferType;
+}
+
+export function createConverter<T extends Type>(type: T): Converter<T>;
+
 export function decode(type: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
 export function encode(type: Type, data: any): ArrayBuffer;
 export function encode<T extends ArrayBuffer | ArrayBufferView>(type: Type, data: any, buffer: T, startOffset?: number): T;
@@ -65,7 +77,6 @@ export function bitfield(members: { [name: string]: number; }, element?: NumberT
 
 
 // Type constants:
-export const bool: NumberType;
 export const int8: NumberType;
 export const uint8: NumberType;
 
@@ -84,10 +95,6 @@ export const int32be: NumberType;
 export const uint32: NumberType;
 export const uint32le: NumberType;
 export const uint32be: NumberType;
-
-export const uint64: NumberType;
-export const uint64le: NumberType;
-export const uint64be: NumberType;
 
 export const float32: NumberType;
 export const float32le: NumberType;
@@ -114,6 +121,7 @@ export interface Type {
 }
 
 export interface NumberType extends Type {
+  kind: string;
   littleEndian: boolean;
 }
 
