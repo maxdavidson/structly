@@ -1,33 +1,34 @@
 /* eslint-disable no-param-reassign  */
 import { systemLittleEndian, align, assign, alignof } from './utils';
 
-function createNumberType(tag, size, littleEndian = systemLittleEndian) {
-  return Object.freeze({ tag, byteLength: size, byteAlignment: size, littleEndian });
+function createNumberType(kind, size, littleEndian = systemLittleEndian) {
+  return Object.freeze({
+    tag: 'Number',
+    kind,
+    byteLength: size,
+    byteAlignment: size,
+    littleEndian,
+  });
 }
 
-export const bool = createNumberType('Bool', 1);
 export const int8 = createNumberType('Int8', 1);
-export const uint8 = createNumberType('UInt8', 1);
+export const uint8 = createNumberType('Uint8', 1);
 
 export const int16 = createNumberType('Int16', 2);
 export const int16le = createNumberType('Int16', 2, true);
 export const int16be = createNumberType('Int16', 2, false);
 
-export const uint16 = createNumberType('UInt16', 2);
-export const uint16le = createNumberType('UInt16', 2, true);
-export const uint16be = createNumberType('UInt16', 2, false);
+export const uint16 = createNumberType('Uint16', 2);
+export const uint16le = createNumberType('Uint16', 2, true);
+export const uint16be = createNumberType('Uint16', 2, false);
 
 export const int32 = createNumberType('Int32', 4);
 export const int32le = createNumberType('Int32', 4, true);
 export const int32be = createNumberType('Int32', 4, false);
 
-export const uint32 = createNumberType('UInt32', 4);
-export const uint32le = createNumberType('UInt32', 4, true);
-export const uint32be = createNumberType('UInt32', 4, false);
-
-export const uint64 = createNumberType('UInt64', 8);
-export const uint64le = createNumberType('UInt64', 8, true);
-export const uint64be = createNumberType('UInt64', 8, false);
+export const uint32 = createNumberType('Uint32', 4);
+export const uint32le = createNumberType('Uint32', 4, true);
+export const uint32be = createNumberType('Uint32', 4, false);
 
 export const float32 = createNumberType('Float32', 4);
 export const float32le = createNumberType('Float32', 4, true);

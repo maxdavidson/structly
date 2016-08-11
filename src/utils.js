@@ -1,7 +1,11 @@
 /**
  * Whether the running system is little endian (true = LE, false = BE)
  */
-export const systemLittleEndian = new Uint8Array(new Uint16Array([0xFF00]).buffer)[0] === 0x00;
+export const systemLittleEndian = (typeof os === 'object')
+  /* eslint-disable no-undef */
+  ? os.endianness() === 'LE'
+  /* eslint-enable no-undef */
+  : new Uint32Array(new Uint8Array([0x11, 0x22, 0x33, 0x44]).buffer)[0] === 0x44332211;
 
 /**
  * Gets the closest multiple of byteAlignment from byteOffset (base-2 only)
@@ -36,6 +40,10 @@ export function createMask(bits) {
   return (bits <= 0) ? 0 : 0xFFFFFFFF >>> (32 - bits);
 }
 
+export function createVariable(name, stackDepth = 0) {
+  return `${name}${stackDepth}`;
+}
+
 /* eslint-disable no-param-reassign, prefer-rest-params, no-restricted-syntax */
 export const assign = Object.assign ||/* istanbul ignore next */ function assign(target) {
   if (target == null) {
@@ -64,72 +72,3 @@ export function getDataView(data) {
   }
   throw new TypeError('Invalid input data');
 }
-
-export const decodeBytes = (() => {
-  /* eslint-disable no-undef */
-  /* istanbul ignore next */
-  if (typeof TextDecoder === 'function') {
-    const decoders = {};
-    return (bytes, encoding) => {
-      const decoder = decoders[encoding] || (decoders[encoding] = new TextDecoder(encoding));
-      return decoder.decode(bytes);
-    };
-  }
-  /* eslint-enable */
-
-  function fixCString(str) {
-    const endIndex = str.indexOf('\u0000');
-    return endIndex === -1 ? str : str.slice(0, endIndex);
-  }
-
-  if (typeof Buffer === 'function') {
-    return (bytes, encoding) => fixCString(new Buffer(bytes).toString(encoding));
-  }
-
-  /* eslint-disable no-console */
-  /* istanbul ignore next */
-  console.warn('TextDecoder API is not available! String decoding will not work correctly.');
-  /* eslint-enable */
-
-  /* eslint-disable prefer-spread */
-  /* istanbul ignore next */
-  return bytes => fixCString(String.fromCharCode.apply(String, bytes));
-  /* eslint-enable */
-})();
-
-export const encodeString = (() => {
-  /* eslint-disable no-undef */
-  /* istanbul ignore next */
-  if (typeof TextEncoder === 'function') {
-    const encoders = {};
-    return (string, encoding) => {
-      const encoder = encoders[encoding] || (encoders[encoding] = new TextEncoder(encoding));
-      return encoder.encode(string);
-    };
-  }
-  /* eslint-enable */
-
-  if (typeof Buffer === 'function') {
-    return (string, encoding) => {
-      const { buffer, byteOffset, byteLength } = new Buffer(string, encoding);
-      return new Uint8Array(buffer, byteOffset, byteLength);
-    };
-  }
-
-  /* eslint-disable no-console */
-  /* istanbul ignore next */
-  console.warn('TextEncoder API is not available! String encoding will not work correctly.');
-  /* eslint-enable */
-
-  /* eslint-disable no-new-wrappers */
-  /* istanbul ignore next */
-  return string => {
-    const boxedString = new String(string);
-    const len = boxedString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; ++i) {
-      bytes[i] = boxedString.charCodeAt(i);
-    }
-    return bytes;
-  };
-})();

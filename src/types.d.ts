@@ -1,6 +1,5 @@
 import { Type, NumberType, StringType, ArrayType, StructType, TupleType, BitfieldType } from './interfaces';
 
-export const bool: NumberType;
 export const int8: NumberType;
 export const uint8: NumberType;
 
@@ -19,10 +18,6 @@ export const int32be: NumberType;
 export const uint32: NumberType;
 export const uint32le: NumberType;
 export const uint32be: NumberType;
-
-export const uint64: NumberType;
-export const uint64le: NumberType;
-export const uint64be: NumberType;
 
 export const float32: NumberType;
 export const float32le: NumberType;
