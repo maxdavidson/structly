@@ -3,12 +3,11 @@ import {
   encode, decode, systemLittleEndian,
   sizeof, alignof, strideof,
   array, struct, tuple, bitfield, string,
-  bool, int8, uint8,
+  int8, uint8,
   int16, int16le, int16be,
   uint16, uint16le, uint16be,
   int32, int32le, int32be,
   uint32, uint32le, uint32be,
-  uint64, uint64le, uint64be,
   float32, float32le, float32be,
   float64, float64le, float64be,
 } from '../';
@@ -54,22 +53,11 @@ function swap8(arrayBuffer) {
   }
 }
 
-test('bool', t => {
-  const type = bool;
-
-  t.is(type.tag, 'Bool');
-  t.is(sizeof(type), 1);
-  t.is(alignof(type), 1);
-  t.is(type.littleEndian, systemLittleEndian);
-
-  t.true(decode(type, encode(type, true)));
-  t.false(decode(type, encode(type, false)));
-});
-
 test('int8', t => {
   const type = int8;
 
-  t.is(type.tag, 'Int8');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int8');
   t.is(sizeof(type), 1);
   t.is(alignof(type), 1);
   t.is(type.littleEndian, systemLittleEndian);
@@ -95,7 +83,8 @@ test('int8', t => {
 test('uint8', t => {
   const type = uint8;
 
-  t.is(type.tag, 'UInt8');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint8');
   t.is(sizeof(type), 1);
   t.is(alignof(type), 1);
   t.is(type.littleEndian, systemLittleEndian);
@@ -119,7 +108,8 @@ test('uint8', t => {
 test('int16', t => {
   const type = int16;
 
-  t.is(type.tag, 'Int16');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int16');
   t.is(sizeof(type), 2);
   t.is(alignof(type), 2);
   t.is(type.littleEndian, systemLittleEndian);
@@ -157,7 +147,8 @@ test('int16', t => {
 test('int16le', t => {
   const type = int16le;
 
-  t.is(type.tag, 'Int16');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int16');
   t.is(sizeof(type), 2);
   t.is(alignof(type), 2);
   t.is(type.littleEndian, true);
@@ -167,7 +158,8 @@ test('int16le', t => {
 test('int16be', t => {
   const type = int16be;
 
-  t.is(type.tag, 'Int16');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int16');
   t.is(sizeof(type), 2);
   t.is(alignof(type), 2);
   t.is(type.littleEndian, false);
@@ -177,7 +169,8 @@ test('int16be', t => {
 test('uint16', t => {
   const type = uint16;
 
-  t.is(type.tag, 'UInt16');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint16');
   t.is(sizeof(type), 2);
   t.is(alignof(type), 2);
   t.is(type.littleEndian, systemLittleEndian);
@@ -211,7 +204,8 @@ test('uint16', t => {
 test('uint16le', t => {
   const type = uint16le;
 
-  t.is(type.tag, 'UInt16');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint16');
   t.is(sizeof(type), 2);
   t.is(alignof(type), 2);
   t.is(type.littleEndian, true);
@@ -221,7 +215,8 @@ test('uint16le', t => {
 test('uint16be', t => {
   const type = uint16be;
 
-  t.is(type.tag, 'UInt16');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint16');
   t.is(sizeof(type), 2);
   t.is(alignof(type), 2);
   t.is(type.littleEndian, false);
@@ -231,7 +226,8 @@ test('uint16be', t => {
 test('int32', t => {
   const type = int32;
 
-  t.is(type.tag, 'Int32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, systemLittleEndian);
@@ -267,7 +263,8 @@ test('int32', t => {
 test('int32le', t => {
   const type = int32le;
 
-  t.is(type.tag, 'Int32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, true);
@@ -277,7 +274,8 @@ test('int32le', t => {
 test('int32be', t => {
   const type = int32be;
 
-  t.is(type.tag, 'Int32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Int32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, false);
@@ -287,7 +285,8 @@ test('int32be', t => {
 test('uint32', t => {
   const type = uint32;
 
-  t.is(type.tag, 'UInt32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, systemLittleEndian);
@@ -321,7 +320,8 @@ test('uint32', t => {
 test('int32le', t => {
   const type = uint32le;
 
-  t.is(type.tag, 'UInt32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, true);
@@ -331,67 +331,18 @@ test('int32le', t => {
 test('uint32be', t => {
   const type = uint32be;
 
-  t.is(type.tag, 'UInt32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Uint32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, false);
 });
 
-test('uint64', t => {
-  const type = uint64;
-
-  t.is(type.tag, 'UInt64');
-  t.is(sizeof(type), 8);
-  t.is(alignof(type), 8);
-  t.is(type.littleEndian, systemLittleEndian);
-
-  const data = { hi: 0xFFFFFFFF, lo: 0 };
-
-  const encoded = encode(type, data);
-  const decoded = decode(type, encoded);
-
-  t.deepEqual(decoded, data);
-});
-
-
-test('uint64le', t => {
-  const type = uint64le;
-
-  t.is(type.tag, 'UInt64');
-  t.is(sizeof(type), 8);
-  t.is(alignof(type), 8);
-  t.is(type.littleEndian, true);
-
-  const data = { hi: 0xFFFFFFFF, lo: 0 };
-
-  const encoded = encode(type, data);
-  const decoded = decode(type, encoded);
-
-  t.deepEqual(decoded, data);
-});
-
-
-test('uint64be', t => {
-  const type = uint64be;
-
-  t.is(type.tag, 'UInt64');
-  t.is(sizeof(type), 8);
-  t.is(alignof(type), 8);
-  t.is(type.littleEndian, false);
-
-  const data = { hi: 0xFFFFFFFF, lo: 0 };
-
-  const encoded = encode(type, data);
-  const decoded = decode(type, encoded);
-
-  t.deepEqual(decoded, data);
-});
-
-
 test('float32', t => {
   const type = float32;
 
-  t.is(type.tag, 'Float32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Float32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, systemLittleEndian);
@@ -427,7 +378,8 @@ test('float32', t => {
 test('float32le', t => {
   const type = float32le;
 
-  t.is(type.tag, 'Float32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Float32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, true);
@@ -437,7 +389,8 @@ test('float32le', t => {
 test('float32be', t => {
   const type = float32be;
 
-  t.is(type.tag, 'Float32');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Float32');
   t.is(sizeof(type), 4);
   t.is(alignof(type), 4);
   t.is(type.littleEndian, false);
@@ -447,7 +400,8 @@ test('float32be', t => {
 test('float64', t => {
   const type = float64;
 
-  t.is(type.tag, 'Float64');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Float64');
   t.is(sizeof(type), 8);
   t.is(alignof(type), 8);
   t.is(type.littleEndian, systemLittleEndian);
@@ -480,7 +434,8 @@ test('float64', t => {
 test('float64le', t => {
   const type = float64le;
 
-  t.is(type.tag, 'Float64');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Float64');
   t.is(sizeof(type), 8);
   t.is(alignof(type), 8);
   t.is(type.littleEndian, true);
@@ -490,7 +445,8 @@ test('float64le', t => {
 test('float64be', t => {
   const type = float64be;
 
-  t.is(type.tag, 'Float64');
+  t.is(type.tag, 'Number');
+  t.is(type.kind, 'Float64');
   t.is(sizeof(type), 8);
   t.is(alignof(type), 8);
   t.is(type.littleEndian, false);
@@ -507,7 +463,8 @@ test('array', t => {
   t.is(type.length, 10);
   t.is(sizeof(type), 20);
   t.is(alignof(type), 2);
-  t.is(type.element.tag, 'UInt16');
+  t.is(type.element.tag, 'Number');
+  t.is(type.element.kind, 'Uint16');
   t.is(type.element.byteLength, 2);
   t.is(type.element.byteAlignment, 2);
 });
@@ -596,13 +553,16 @@ test('struct, same types', t => {
   const [x, y, z] = type.members;
 
   t.is(x.byteOffset, 0);
-  t.is(x.element.tag, 'Float32');
+  t.is(x.element.tag, 'Number');
+  t.is(x.element.kind, 'Float32');
 
   t.is(y.byteOffset, 4);
-  t.is(y.element.tag, 'Float32');
+  t.is(y.element.tag, 'Number');
+  t.is(y.element.kind, 'Float32');
 
   t.is(z.byteOffset, 8);
-  t.is(z.element.tag, 'Float32');
+  t.is(z.element.tag, 'Number');
+  t.is(z.element.kind, 'Float32');
 
   const data = {
     x: -1,
@@ -637,19 +597,23 @@ test('struct, different types', t => {
 
   t.is(a.name, 'a');
   t.is(a.byteOffset, 0);
-  t.is(a.element.tag, 'UInt8');
+  t.is(a.element.tag, 'Number');
+  t.is(a.element.kind, 'Uint8');
 
   t.is(b.name, 'b');
   t.is(b.byteOffset, 2);
-  t.is(b.element.tag, 'Int16');
+  t.is(b.element.tag, 'Number');
+  t.is(b.element.kind, 'Int16');
 
   t.is(c.name, 'c');
   t.is(c.byteOffset, 4);
-  t.is(c.element.tag, 'Int32');
+  t.is(c.element.tag, 'Number');
+  t.is(c.element.kind, 'Int32');
 
   t.is(d.name, 'd');
   t.is(d.byteOffset, 8);
-  t.is(d.element.tag, 'UInt8');
+  t.is(d.element.tag, 'Number');
+  t.is(d.element.kind, 'Uint8');
 });
 
 
@@ -669,19 +633,23 @@ test('struct, manually reordered', t => {
 
   t.is(a.name, 'a');
   t.is(a.byteOffset, 0);
-  t.is(a.element.tag, 'UInt8');
+  t.is(a.element.tag, 'Number');
+  t.is(a.element.kind, 'Uint8');
 
   t.is(d.name, 'd');
   t.is(d.byteOffset, 1);
-  t.is(d.element.tag, 'UInt8');
+  t.is(d.element.tag, 'Number');
+  t.is(d.element.kind, 'Uint8');
 
   t.is(b.name, 'b');
   t.is(b.byteOffset, 2);
-  t.is(b.element.tag, 'Int16');
+  t.is(b.element.tag, 'Number');
+  t.is(b.element.kind, 'Int16');
 
   t.is(c.name, 'c');
   t.is(c.byteOffset, 4);
-  t.is(c.element.tag, 'Int32');
+  t.is(c.element.tag, 'Number');
+  t.is(c.element.kind, 'Int32');
 });
 
 
