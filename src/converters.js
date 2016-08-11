@@ -1,37 +1,30 @@
-import { getDataView, sizeof, createVariable } from './utils';
-import { generateReaderVisitor, generateWriterVisitor } from './visitors';
+/* eslint-disable consistent-return */
+import { getDataView, sizeof } from './utils';
+import { createReader } from './visitors/reader';
+import { createWriter } from './visitors/writer';
 
-/**
- *
- */
+let converterCache;
+if (typeof WeakMap === 'function') {
+  converterCache = new WeakMap();
+}
+
 export class Converter {
-  constructor(type) {
+  constructor(type, { cache = true } = {}) {
     if (type === undefined) {
       throw new TypeError('You must specify a type to convert with');
     }
 
+    // Only enable caching if WeakMap is available
+    if (cache && converterCache) {
+      if (converterCache.has(type)) {
+        return converterCache.get(type);
+      }
+      converterCache.set(type, this);
+    }
+
     this.type = type;
-
-    const stackDepth = 0;
-    const resultVar = createVariable('result', stackDepth);
-    const byteOffsetVar = createVariable('byteOffset', stackDepth);
-    const dataVar = createVariable('data', stackDepth);
-
-    const readerSource = `
-      "use strict";
-      ${generateReaderVisitor[type.tag](type, stackDepth)}
-      return ${resultVar};
-    `;
-
-    const writerSource = `
-      "use strict";
-      ${generateWriterVisitor[type.tag](type, stackDepth)}
-    `;
-
-    /* eslint-disable no-new-func */
-    this._reader = new Function('dataView', byteOffsetVar, resultVar, readerSource);
-    this._writer = new Function('dataView', byteOffsetVar, dataVar, writerSource);
-    /* eslint-enable no-new-func */
+    this._reader = createReader(type);
+    this._writer = createWriter(type);
   }
 
   decode(buffer, outData, startOffset = 0) {
