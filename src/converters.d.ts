@@ -8,6 +8,7 @@ declare class Converter<T extends Type> {
 }
 
 export function createConverter<T extends Type>(type: T, options?: { cache?: boolean; }): Converter<T>;
+export function createProxy<T extends Type>(type: T): any;
 
 export function decode(type: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
 export function encode(type: Type, data: any): ArrayBuffer;
