@@ -526,15 +526,19 @@ test('string, default args', t => {
 });
 
 
-test('string', t => {
+test('string, ascii', t => {
   const type = string(10, 'ascii');
 
   t.is(type.tag, 'String');
   t.is(sizeof(type), 10);
   t.is(alignof(type), 1);
   t.is(type.encoding, 'ascii');
-});
 
+  const utfString = '🍔💩';
+  const newString = decode(type, encode(type, utfString));
+
+  t.not(utfString, newString);
+});
 
 test('struct, same types', t => {
   t.throws(() => struct());
