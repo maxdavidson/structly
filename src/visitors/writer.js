@@ -17,14 +17,14 @@ export const writerVisitor = Object.freeze({
 
     if (typeof Buffer === 'function') {
       return `
-        new Buffer(${dataVar}, "utf8").copy(new Buffer(dataView.buffer, dataView.byteOffset, dataView.byteLength), ${byteOffsetVar});
+        new Buffer(${dataVar}, ${JSON.stringify(encoding)}).copy(new Buffer(dataView.buffer, dataView.byteOffset, dataView.byteLength), ${byteOffsetVar});
       `;
     }
 
     /* istanbul ignore next */
     if (typeof TextEncoder === 'function') {
       return `
-        new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength).set(new TextDecoder("utf-8").encode(${dataVar}));
+        new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength).set(new TextDecoder(${JSON.stringify(encoding)}).encode(${dataVar}));
       `;
     }
 

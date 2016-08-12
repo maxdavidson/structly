@@ -23,12 +23,12 @@ export const readerVisitor = Object.freeze({
       }
       ${(() => {
         if (typeof Buffer === 'function') {
-          return `${resultVar} = new Buffer(${arrayVar}).toString("utf-8");`;
+          return `${resultVar} = new Buffer(${arrayVar}).toString(${JSON.stringify(encoding)});`;
         }
 
         /* istanbul ignore next */
         if (typeof TextDecoder === 'function') {
-          return `${resultVar} = new TextDecoder("utf-8").decode(${arrayVar});`;
+          return `${resultVar} = new TextDecoder(${JSON.stringify(encoding)}).decode(${arrayVar});`;
         }
 
         /* istanbul ignore next */
