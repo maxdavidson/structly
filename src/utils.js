@@ -72,3 +72,22 @@ export function getDataView(data) {
   }
   throw new TypeError('Invalid input data');
 }
+
+// Memoize if WeakMap if supported, otherwise passthrough
+export const maybeMemoize = (() => {
+  if (typeof WeakMap === 'function') {
+    return function memoize(fn) {
+      const cache = new WeakMap();
+      return function memoized(key) {
+        if (!cache.has(key)) {
+          cache.set(key, fn(key));
+        }
+        return cache.get(key);
+      };
+    };
+  }
+  /* istanbul ignore next */
+  return function passthrough(fn) {
+    return fn;
+  };
+})();
