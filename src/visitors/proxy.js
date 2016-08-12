@@ -47,7 +47,7 @@ function createArrayProxy(length, { get, set, useProxy = true } = {}) {
           }
         }
         // Don't allow any other properties to be changed
-        return false;
+        return true;
       },
     });
   }
@@ -101,7 +101,7 @@ function createObjectProxy(keys, { get, set, useProxy = true } = {}) {
           return set(key, value) || true;
         }
         // Don't allow any other properties to be changed
-        return false;
+        return true;
       },
     });
   }
