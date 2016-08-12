@@ -726,7 +726,8 @@ test('encode', t => {
   const returnedArray = encode(type, data, floatArray);
   t.is(returnedArray, floatArray);
   t.notDeepEqual(returnedArray, clonedArray);
-  t.deepEqual(returnedArray, Object.keys(data).map(key => data[key]));
+  const expectedArray = new Float32Array(Object.keys(data).map(key => data[key]));
+  t.deepEqual(returnedArray, expectedArray);
 });
 
 
