@@ -2,11 +2,13 @@ import { createReader } from './reader';
 import { createWriter } from './writer';
 import { strideof, getDataView, assign, createMask } from '../utils';
 
-function createArrayProxy(length, { get, set, useProxy = true } = {}) {
+const SUPPORTS_PROXY = typeof Proxy === 'function';
+
+function createArrayProxy(length, { get, set, useProxy = SUPPORTS_PROXY } = {}) {
   const array = new Array(length);
 
   // Lazily compute properties if proxy is available
-  if (useProxy && typeof Proxy === 'function') {
+  if (useProxy) {
     return new Proxy(array, {
       has(target, key) {
         if (typeof key !== 'symbol' && !isNaN(key)) {
@@ -65,11 +67,11 @@ function createArrayProxy(length, { get, set, useProxy = true } = {}) {
   return Object.freeze(array);
 }
 
-function createObjectProxy(keys, { get, set, useProxy = true } = {}) {
+function createObjectProxy(keys, { get, set, useProxy = SUPPORTS_PROXY } = {}) {
   const object = {};
 
   // Lazily compute properties if proxy is available
-  if (useProxy && typeof Proxy === 'function') {
+  if (useProxy) {
     // Pre-allocate all properties in object
     for (let i = 0, len = keys.length; i < len; ++i) {
       object[keys[i]] = undefined;
