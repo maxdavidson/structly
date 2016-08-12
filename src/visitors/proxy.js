@@ -1,6 +1,6 @@
 import { createReader } from './reader';
 import { createWriter } from './writer';
-import { strideof, getDataView, assign, createMask } from '../utils';
+import { sizeof, strideof, getDataView, assign, createMask } from '../utils';
 
 const SUPPORTS_PROXY = typeof Proxy === 'function';
 
@@ -127,12 +127,13 @@ export const proxyVisitor = Object.freeze({
     return dataView[`get${kind}`](byteOffset, littleEndian);
   },
 
-  Array({ length, element }, dataView, byteOffset) {
+  Array({ length, element }, dataView, byteOffset, useProxy) {
     const elementProxyHandler = proxyVisitor[element.tag];
     const elementWriter = createWriter(element);
     const byteStride = strideof(element);
 
     return createArrayProxy(length, {
+      useProxy,
       get(i) {
         const elementByteOffset = byteOffset + (byteStride * i);
         return elementProxyHandler(element, dataView, elementByteOffset);
@@ -144,7 +145,7 @@ export const proxyVisitor = Object.freeze({
     });
   },
 
-  Tuple({ members }, dataView, byteOffset) {
+  Tuple({ members }, dataView, byteOffset, useProxy) {
     const handlers = members.map(member => ({
       element: member.element,
       proxyHandler: proxyVisitor[member.element.tag],
@@ -153,6 +154,7 @@ export const proxyVisitor = Object.freeze({
     }));
 
     return createArrayProxy(members.length, {
+      useProxy,
       get(i) {
         const { element, proxyHandler, totalByteOffset } = handlers[i];
         return proxyHandler(element, dataView, totalByteOffset);
@@ -164,7 +166,7 @@ export const proxyVisitor = Object.freeze({
     });
   },
 
-  Struct({ members }, dataView, byteOffset) {
+  Struct({ members }, dataView, byteOffset, useProxy) {
     const names = members.map(member => member.name);
     const membersByName = members.reduce((obj, member) => {
       /* eslint-disable no-param-reassign */
@@ -178,6 +180,7 @@ export const proxyVisitor = Object.freeze({
     }, Object.create(null));
 
     return createObjectProxy(names, {
+      useProxy,
       get(name) {
         const { element, proxyHandler, totalByteOffset } = membersByName[name];
         return proxyHandler(element, dataView, totalByteOffset);
@@ -189,7 +192,7 @@ export const proxyVisitor = Object.freeze({
     });
   },
 
-  Bitfield({ element, members }, dataView, byteOffset) {
+  Bitfield({ element, members }, dataView, byteOffset, useProxy) {
     const reader = createReader(element);
     const writer = createWriter(element);
 
@@ -208,6 +211,7 @@ export const proxyVisitor = Object.freeze({
     }, Object.create(null));
 
     return createObjectProxy(names, {
+      useProxy,
       get(name) {
         const { bitOffset, mask } = infoByName[name];
         const elementValue = reader(dataView, byteOffset);
@@ -224,9 +228,9 @@ export const proxyVisitor = Object.freeze({
   },
 });
 
-export function createProxy(type, buffer = new ArrayBuffer(type.byteLength), startOffset = 0) {
+export function createProxy(type, buffer = new ArrayBuffer(sizeof(type)), offset = 0, useProxy) {
   const dataView = getDataView(buffer);
-  const proxy = proxyVisitor[type.tag](type, dataView, startOffset);
+  const proxy = proxyVisitor[type.tag](type, dataView, offset, useProxy);
   return {
     proxy,
     buffer: new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength),
