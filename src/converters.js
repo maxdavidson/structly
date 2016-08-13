@@ -3,7 +3,7 @@ import { getDataView, sizeof } from './utils';
 import { createReader } from './visitors/reader';
 import { createWriter } from './visitors/writer';
 
-export { createProxy } from './visitors/proxy';
+export { createView } from './visitors/view';
 
 class Converter {
   constructor(type) {

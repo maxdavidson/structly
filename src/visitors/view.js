@@ -77,48 +77,9 @@ function createArrayProxy(length, { get, set, useProxy = SUPPORTS_PROXY } = {}) 
   return Object.freeze(array);
 }
 
-function createObjectProxy(keys, { get, set, useProxy = SUPPORTS_PROXY } = {}) {
+function createObjectProxy(keys, { get, set } = {}) {
   const object = {};
 
-  // Lazily compute properties if proxy is available
-  if (useProxy) {
-    // Pre-allocate all properties in object
-    for (let i = 0, len = keys.length; i < len; ++i) {
-      object[keys[i]] = undefined;
-    }
-
-    return new Proxy(object, {
-      has(target, key) {
-        return key in target;
-      },
-
-      get(target, key) {
-        if (key in target) {
-          let cache = target[key];
-          if (cache === undefined) {
-            cache = get(key);
-            if (typeof cache === 'object') {
-              /* eslint-disable no-param-reassign */
-              target[key] = cache;
-              /* eslint-enable */
-            }
-          }
-          return cache;
-        }
-        return target[key];
-      },
-
-      set(target, key, value) {
-        if (key in target) {
-          return set(key, value) || true;
-        }
-        // Don't allow any other properties to be changed
-        return false;
-      },
-    });
-  }
-
-  // Eagerly compute properties using Object.defineProperty
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
     let cache;
@@ -142,13 +103,13 @@ function createObjectProxy(keys, { get, set, useProxy = SUPPORTS_PROXY } = {}) {
   return Object.freeze(object);
 }
 
-export const proxyVisitor = Object.freeze({
+export const viewVisitor = Object.freeze({
   Number({ littleEndian, kind }, dataView, byteOffset) {
     return dataView[`get${kind}`](byteOffset, littleEndian);
   },
 
-  Array({ length, element }, dataView, byteOffset, useProxy) {
-    const elementProxyHandler = proxyVisitor[element.tag];
+  Array({ length, element }, dataView, byteOffset, useProxy = length > 20) {
+    const elementProxyHandler = viewVisitor[element.tag];
     const elementWriter = createWriter(element);
     const byteStride = strideof(element);
 
@@ -165,16 +126,16 @@ export const proxyVisitor = Object.freeze({
     });
   },
 
-  Tuple({ members }, dataView, byteOffset, useProxy) {
+  Tuple({ members }, dataView, byteOffset) {
     const handlers = members.map(member => ({
       element: member.element,
-      proxyHandler: proxyVisitor[member.element.tag],
+      proxyHandler: viewVisitor[member.element.tag],
       writer: createWriter(member.element),
       totalByteOffset: byteOffset + member.byteOffset,
     }));
 
     return createArrayProxy(members.length, {
-      useProxy,
+      useProxy: false,
       get(i) {
         const { element, proxyHandler, totalByteOffset } = handlers[i];
         return proxyHandler(element, dataView, totalByteOffset);
@@ -186,21 +147,20 @@ export const proxyVisitor = Object.freeze({
     });
   },
 
-  Struct({ members }, dataView, byteOffset, useProxy) {
+  Struct({ members }, dataView, byteOffset) {
     const names = members.map(member => member.name);
     const membersByName = members.reduce((obj, member) => {
       /* eslint-disable no-param-reassign */
       obj[member.name] = assign({}, member, {
         writer: createWriter(member.element),
         totalByteOffset: byteOffset + member.byteOffset,
-        proxyHandler: proxyVisitor[member.element.tag],
+        proxyHandler: viewVisitor[member.element.tag],
       });
       /* eslint-enable */
       return obj;
     }, Object.create(null));
 
     return createObjectProxy(names, {
-      useProxy,
       get(name) {
         const { element, proxyHandler, totalByteOffset } = membersByName[name];
         return proxyHandler(element, dataView, totalByteOffset);
@@ -212,7 +172,7 @@ export const proxyVisitor = Object.freeze({
     });
   },
 
-  Bitfield({ element, members }, dataView, byteOffset, useProxy) {
+  Bitfield({ element, members }, dataView, byteOffset) {
     const reader = createReader(element);
     const writer = createWriter(element);
 
@@ -231,7 +191,6 @@ export const proxyVisitor = Object.freeze({
     }, Object.create(null));
 
     return createObjectProxy(names, {
-      useProxy,
       get(name) {
         const { bitOffset, mask } = infoByName[name];
         const elementValue = reader(dataView, byteOffset);
@@ -248,11 +207,36 @@ export const proxyVisitor = Object.freeze({
   },
 });
 
-export function createProxy(type, buffer = new ArrayBuffer(sizeof(type)), offset = 0, useProxy) {
+export function createView(type, buffer = new ArrayBuffer(sizeof(type)), byteOffset = 0, useProxy) {
   const dataView = getDataView(buffer);
-  const proxy = proxyVisitor[type.tag](type, dataView, offset, useProxy);
-  return {
-    proxy,
-    buffer: new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength),
+
+  const viewHandler = viewVisitor[type.tag];
+  const writer = createWriter(type);
+
+  const view = {
+    buffer: dataView.buffer,
+    byteOffset: dataView.byteOffset,
+    byteLength: dataView.byteLength,
   };
+
+  let cache;
+  Object.defineProperty(view, 'value', {
+    enumerable: true,
+    configurable: false,
+    get() {
+      if (cache) {
+        return cache;
+      }
+      const result = viewHandler(type, dataView, byteOffset, useProxy);
+      if (typeof result === 'object') {
+        cache = result;
+      }
+      return result;
+    },
+    set(value) {
+      writer(dataView, byteOffset, value);
+    },
+  });
+
+  return Object.seal(view);
 }
