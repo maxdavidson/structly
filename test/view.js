@@ -1,8 +1,8 @@
 import test from 'ava';
-import { struct, array, tuple, bitfield, uint8, createView as createViewRaw } from '../';
+import { struct, array, tuple, bitfield, uint8, createView } from '../';
 
-function createView(type, buffer) {
-  return createViewRaw(type, buffer, true);
+function createViewForceProxy(type, buffer) {
+  return createView(type, buffer, typeof Proxy === 'function');
 }
 
 test('number', t => {
@@ -49,7 +49,7 @@ test('struct', t => {
 test('array', t => {
   const type = array(uint8, 3);
 
-  const view = createView(type);
+  const view = createViewForceProxy(type);
 
   t.true('length' in view.value);
   t.is(view.value.length, 3);
@@ -142,7 +142,7 @@ test('bitfield', t => {
 test('array of structs', t => {
   const type = array(struct({ x: uint8 }), 3);
 
-  const view = createView(type);
+  const view = createViewForceProxy(type);
 
   // Caching
   t.is(view.value[0], view.value[0]);
@@ -151,7 +151,7 @@ test('array of structs', t => {
 test('struct of arrays', t => {
   const type = struct({ x: array(uint8, 3) });
 
-  const view = createView(type);
+  const view = createViewForceProxy(type);
 
   // Caching
   t.is(view.value.x, view.value.x);

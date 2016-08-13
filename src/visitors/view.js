@@ -117,7 +117,7 @@ export const viewVisitor = Object.freeze({
       useProxy,
       get(i) {
         const elementByteOffset = byteOffset + (byteStride * i);
-        return elementProxyHandler(element, dataView, elementByteOffset);
+        return elementProxyHandler(element, dataView, elementByteOffset, useProxy);
       },
       set(i, value) {
         const elementByteOffset = byteOffset + (byteStride * i);
@@ -126,7 +126,7 @@ export const viewVisitor = Object.freeze({
     });
   },
 
-  Tuple({ members }, dataView, byteOffset) {
+  Tuple({ members }, dataView, byteOffset, useProxy) {
     const handlers = members.map(member => ({
       element: member.element,
       proxyHandler: viewVisitor[member.element.tag],
@@ -138,7 +138,7 @@ export const viewVisitor = Object.freeze({
       useProxy: false,
       get(i) {
         const { element, proxyHandler, totalByteOffset } = handlers[i];
-        return proxyHandler(element, dataView, totalByteOffset);
+        return proxyHandler(element, dataView, totalByteOffset, useProxy);
       },
       set(i, value) {
         const { writer, totalByteOffset } = handlers[i];
@@ -147,7 +147,7 @@ export const viewVisitor = Object.freeze({
     });
   },
 
-  Struct({ members }, dataView, byteOffset) {
+  Struct({ members }, dataView, byteOffset, useProxy) {
     const names = members.map(member => member.name);
     const membersByName = members.reduce((obj, member) => {
       /* eslint-disable no-param-reassign */
@@ -163,7 +163,7 @@ export const viewVisitor = Object.freeze({
     return createObjectProxy(names, {
       get(name) {
         const { element, proxyHandler, totalByteOffset } = membersByName[name];
-        return proxyHandler(element, dataView, totalByteOffset);
+        return proxyHandler(element, dataView, totalByteOffset, useProxy);
       },
       set(name, value) {
         const { writer, totalByteOffset } = membersByName[name];
