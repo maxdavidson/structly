@@ -1,12 +1,12 @@
 import { Type } from './types';
 
 interface Decoder<T extends Type> {
-  (buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
+  (buffer: ArrayBuffer | ArrayBufferView, data?: any): any;
 }
 
 interface Encoder<T extends Type> {
   (data: any): ArrayBuffer;
-  <BufferType extends ArrayBuffer | ArrayBufferView>(data: any, buffer: BufferType, startOffset?: number): BufferType;
+  <BufferType extends ArrayBuffer | ArrayBufferView>(data: any, buffer: BufferType): BufferType;
 }
 
 interface Converter<T extends Type> {
@@ -40,17 +40,17 @@ export function createConverter<T extends Type>(type: T): Converter<T>;
 /**
  * Create a view object that automatically updates the buffer on modification
  */
-export function createView<T extends Type>(type: T, buffer: ArrayBuffer | ArrayBufferView, startOffset?: number): View<T>;
+export function createView<T extends Type>(type: T, buffer: ArrayBuffer | ArrayBufferView): View<T>;
 
 /**
  * Convert a buffer into its JavaScript representation
  * @deprecated
  */
-export function decode(type: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any, startOffset?: number): any;
+export function decode(type: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any): any;
 
 /**
  * Serialize a JavaScript object or value into a buffer
  * @deprecated
  */
 export function encode(type: Type, data: any): ArrayBuffer;
-export function encode<T extends ArrayBuffer | ArrayBufferView>(type: Type, data: any, buffer: T, startOffset?: number): T;
+export function encode<T extends ArrayBuffer | ArrayBufferView>(type: Type, data: any, buffer: T): T;

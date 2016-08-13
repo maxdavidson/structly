@@ -1,8 +1,8 @@
 import test from 'ava';
 import { struct, array, tuple, bitfield, uint8, createView as createViewRaw } from '../';
 
-function createView(type, buffer, offset) {
-  return createViewRaw(type, buffer, offset, true);
+function createView(type, buffer) {
+  return createViewRaw(type, buffer, true);
 }
 
 test('number', t => {

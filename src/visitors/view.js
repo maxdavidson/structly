@@ -207,7 +207,7 @@ export const viewVisitor = Object.freeze({
   },
 });
 
-export function createView(type, buffer = new ArrayBuffer(sizeof(type)), byteOffset = 0, useProxy) {
+export function createView(type, buffer = new ArrayBuffer(sizeof(type)), useProxy) {
   const dataView = getDataView(buffer);
 
   const viewHandler = viewVisitor[type.tag];
@@ -227,14 +227,14 @@ export function createView(type, buffer = new ArrayBuffer(sizeof(type)), byteOff
       if (cache) {
         return cache;
       }
-      const result = viewHandler(type, dataView, byteOffset, useProxy);
+      const result = viewHandler(type, dataView, 0, useProxy);
       if (typeof result === 'object') {
         cache = result;
       }
       return result;
     },
     set(value) {
-      writer(dataView, byteOffset, value);
+      writer(dataView, 0, value);
     },
   });
 

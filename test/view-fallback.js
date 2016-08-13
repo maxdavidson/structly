@@ -1,8 +1,8 @@
 import test from 'ava';
 import { struct, array, uint8, createView as createViewRaw } from '../';
 
-function createView(type, buffer, offset) {
-  return createViewRaw(type, buffer, offset, false);
+function createView(type, buffer) {
+  return createViewRaw(type, buffer, false);
 }
 
 test('array', t => {

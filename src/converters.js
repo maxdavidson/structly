@@ -17,12 +17,12 @@ export function createDecoder(type) {
     throw new TypeError('You must specify a type to convert with');
   }
   const reader = createReaderMemoized(type);
-  return function decode(buffer, data, startOffset = 0) {
+  return function decode(buffer, data) {
     if (buffer === undefined) {
       throw new TypeError('You must specify the buffer the decode');
     }
     const dataView = getDataView(buffer);
-    return reader(dataView, startOffset, data);
+    return reader(dataView, 0, data);
   };
 }
 
@@ -34,15 +34,15 @@ export function createEncoder(type) {
     throw new TypeError('You must specify a type to convert with');
   }
   const writer = createWriterMemoized(type);
-  return function encode(data, buffer = new ArrayBuffer(sizeof(type)), startOffset = 0) {
+  return function encode(data, buffer = new ArrayBuffer(sizeof(type))) {
     if (data === undefined) {
       throw new TypeError('You must specify the data to encode');
     }
     const dataView = getDataView(buffer);
-    if (sizeof(dataView) + startOffset < sizeof(type)) {
+    if (sizeof(dataView) < sizeof(type)) {
       throw new RangeError('The provided buffer is too small to store the encoded type');
     }
-    writer(dataView, startOffset, data);
+    writer(dataView, 0, data);
     return buffer;
   };
 }
@@ -63,16 +63,16 @@ export function createConverter(type) {
  * Converting a buffer into its JavaScript representation
  * @deprecated
  */
-export function decode(type, buffer, data, startOffset) {
+export function decode(type, buffer, data) {
   const decode = createDecoder(type);
-  return decode(buffer, data, startOffset);
+  return decode(buffer, data);
 }
 
 /**
  * Serialize a JavaScript object or value into a buffer
  * @deprecated
  */
-export function encode(type, data, buffer, startOffset) {
+export function encode(type, data, buffer) {
   const encode = createEncoder(type);
-  return encode(data, buffer, startOffset);
+  return encode(data, buffer);
 }
