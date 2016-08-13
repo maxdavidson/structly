@@ -56,10 +56,20 @@ function createArrayProxy(length, { get, set, useProxy = SUPPORTS_PROXY } = {}) 
 
   // Eagerly compute properties using Object.defineProperty
   for (let i = 0; i < length; ++i) {
+    let cache;
     Object.defineProperty(array, i, {
       enumerable: true,
       configurable: false,
-      get: get.bind(undefined, i),
+      get() {
+        if (cache) {
+          return cache;
+        }
+        const result = get(i);
+        if (typeof result === 'object') {
+          cache = result;
+        }
+        return result;
+      },
       set: set.bind(undefined, i),
     });
   }
@@ -111,10 +121,20 @@ function createObjectProxy(keys, { get, set, useProxy = SUPPORTS_PROXY } = {}) {
   // Eagerly compute properties using Object.defineProperty
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
+    let cache;
     Object.defineProperty(object, key, {
       enumerable: true,
       configurable: false,
-      get: get.bind(undefined, key),
+      get() {
+        if (cache) {
+          return cache;
+        }
+        const result = get(key);
+        if (typeof result === 'object') {
+          cache = result;
+        }
+        return result;
+      },
       set: set.bind(undefined, key),
     });
   }
