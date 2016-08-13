@@ -2,7 +2,7 @@
   "name": "structly",
   "version": "0.2.1",
   "license": "MIT",
-  "description": "Convert binary data types into JavaScript values/objects and vice versa",
+  "description": "Tool for working with binary data types in JavaScript",
   "author": "Max Davidson <davidsonmax@gmail.com>",
   "repository": {
     "type": "git",

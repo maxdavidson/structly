@@ -6,16 +6,20 @@
 [![Dependency Status](https://img.shields.io/david/maxdavidson/structly.svg)](https://david-dm.org/maxdavidson/structly)
 [![devDependency Status](https://img.shields.io/david/dev/maxdavidson/structly.svg)](https://david-dm.org/maxdavidson/structly#info=devDependencies)
 
-Structly is a tool for working with binary data types in JavaScript, making
-it possible to convert array buffers into JavaScript objects/values, and vice versa.
-It works great both in Node (4+) and modern browsers. It currently supports
-numbers, arrays, structs, tuples, bitfields and strings.
+Structly is a tool for working with binary data types in JavaScript.
 
-All numeric types use the endianness of your system by default. To force either
-little or big endian, use the provided type constants with the -be or -le suffix.
+With Structly, you define your data types using a friendly, functional API.
+These data types are then used to generate optimized code for quickly converting
+JavaScript objects into their binary representation, and the other way around.
+Object instances can even be reused, to avoid excessive object allocations
+and minimize garbage collection!
 
-Structly makes sure all data is [properly aligned](https://en.wikipedia.org/wiki/Data_structure_alignment),
-to prevent misaligned accesses.
+You can also create "view" objects from your type schemas that automatically update
+their underlying buffer storage on modification, like magic! This concept is shamelessly inspired
+by [Typed Objects](http://wiki.ecmascript.org/doku.php?id=harmony:typed_objects).
+
+Structly works great both in Node (>=4) and most browsers.
+It supports numbers, arrays, structs, tuples, bitfields and strings.
 
 
 ## Usage
@@ -48,6 +52,17 @@ const bytes = converter.encode(data);
 // Decode the bytes in the array buffer into a JavaScript object
 const decoded = converter.decode(bytes);
 ```
+
+
+## Notes
+
+All numeric types use the endianness of your system by default. To force either
+little or big endian, use the provided type constants with the -be or -le suffix.
+
+By default, Structly makes sure accesses are [properly aligned](https://en.wikipedia.org/wiki/Data_structure_alignment).
+This result is structs being padded with empty space for performance.
+You can override the byte alignment of the struct by passing
+`{ pack: n }` as a second argument to the `struct` type factory, similary to `#pragma pack(n)`.
 
 
 ## API
