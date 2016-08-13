@@ -49,7 +49,7 @@ function createArrayProxy(length, { get, set, useProxy = SUPPORTS_PROXY } = {}) 
           }
         }
         // Don't allow any other properties to be changed
-        return true;
+        return false;
       },
     });
   }
@@ -113,7 +113,7 @@ function createObjectProxy(keys, { get, set, useProxy = SUPPORTS_PROXY } = {}) {
           return set(key, value) || true;
         }
         // Don't allow any other properties to be changed
-        return true;
+        return false;
       },
     });
   }
