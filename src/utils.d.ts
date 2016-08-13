@@ -1,4 +1,4 @@
-import { Type } from './interfaces';
+import { Type } from './types';
 
 export const systemLittleEndian: boolean;
 
