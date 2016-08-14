@@ -1,6 +1,6 @@
 import { createReader } from './reader';
 import { createWriter } from './writer';
-import { sizeof, strideof, getDataView, assign, createMask } from '../utils';
+import { sizeof, strideof, getDataView, createMask } from '../utils';
 
 const SUPPORTS_PROXY = typeof Proxy === 'function';
 
@@ -180,11 +180,12 @@ export const viewVisitor = Object.freeze({
     const names = members.map(member => member.name);
     const membersByName = members.reduce((obj, member) => {
       /* eslint-disable no-param-reassign */
-      obj[member.name] = assign({}, member, {
+      obj[member.name] = {
+        element: member.element,
         writer: createWriter(member.element),
         totalByteOffset: byteOffset + member.byteOffset,
         proxyHandler: viewVisitor[member.element.tag],
-      });
+      };
       /* eslint-enable */
       return obj;
     }, Object.create(null));
