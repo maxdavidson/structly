@@ -70,6 +70,37 @@ test('struct', t => {
   t.deepEqual(new Uint8Array(view.buffer), new Uint8Array([4, 2, 9]));
 });
 
+test('complex struct', t => {
+  const view = createView(struct({
+    a: struct({
+      b: struct({
+        c: struct({
+          d: struct({
+            e: struct({
+              f: uint8,
+            }),
+          }),
+        }),
+      }),
+    }),
+  }));
+
+  // Make sure instances are cached by comparing equality of references
+  t.is(view.value, view.value);
+  t.is(view.value.a, view.value.a);
+  t.is(view.value.a.b, view.value.a.b);
+  t.is(view.value.a.b.c, view.value.a.b.c);
+  t.is(view.value.a.b.c.d, view.value.a.b.c.d);
+  t.is(view.value.a.b.c.d.e, view.value.a.b.c.d.e);
+  t.is(view.value.a.b.c.d.e.f, view.value.a.b.c.d.e.f);
+
+  t.is(view.byteLength, 1);
+  t.is(view.value.a.b.c.d.e.f, 0);
+  view.value.a.b.c.d.e.f = 255;
+  t.is(view.value.a.b.c.d.e.f, 255);
+  t.deepEqual(new Uint8Array(view.buffer), new Uint8Array([255]));
+});
+
 test('array', t => {
   const type = array(uint8, 3);
 
