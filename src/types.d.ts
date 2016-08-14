@@ -9,6 +9,9 @@ export interface NumberType extends Type {
   littleEndian: boolean;
 }
 
+export interface BooleanType extends Type {
+}
+
 export interface ArrayType<T extends Type> extends Type {
   length: number;
   element: T;
@@ -40,6 +43,9 @@ export interface BitfieldType extends Type {
     bits: number;
   }[];
 }
+
+export const boolean: BooleanType;
+export const bool: BooleanType;
 
 export const int8: NumberType;
 export const uint8: NumberType;

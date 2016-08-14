@@ -9,6 +9,13 @@ export const readerVisitor = Object.freeze({
     return `${resultVar} = dataView.get${kind}(${byteOffsetVar}, ${littleEndian});`;
   },
 
+  Boolean(_, stackDepth) {
+    const resultVar = createVariable('result', stackDepth);
+    const byteOffsetVar = createVariable('byteOffset', stackDepth);
+
+    return `${resultVar} = Boolean(dataView.getUint8(${byteOffsetVar}));`;
+  },
+
   String({ byteLength, encoding }, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
     const arrayVar = createVariable('array', stackDepth);

@@ -19,7 +19,7 @@ their underlying buffer storage on modification, like magic! This concept is sha
 by [Typed Objects](http://wiki.ecmascript.org/doku.php?id=harmony:typed_objects).
 
 Structly works great both in Node (>=4) and most browsers.
-It supports numbers, arrays, structs, tuples, bitfields and strings.
+It supports numbers, booleans, arrays, structs, tuples, bitfields and strings.
 
 
 ## Usage

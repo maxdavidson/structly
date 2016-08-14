@@ -1,9 +1,18 @@
 import test from 'ava';
-import { struct, array, tuple, bitfield, uint8, createView } from '../';
+import { struct, array, tuple, bitfield, bool, uint8, createView } from '../';
 
 function createViewForceProxy(type, buffer) {
   return createView(type, buffer, typeof Proxy === 'function');
 }
+
+test('bool', t => {
+  const view = createView(bool);
+  t.is(view.value, false);
+  t.deepEqual(new Uint8Array(view.buffer), new Uint8Array([0]));
+  view.value = true;
+  t.is(view.value, true);
+  t.deepEqual(new Uint8Array(view.buffer), new Uint8Array([1]));
+});
 
 test('number', t => {
   const view = createView(uint8);

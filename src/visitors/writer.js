@@ -9,6 +9,13 @@ export const writerVisitor = Object.freeze({
     return `dataView.set${kind}(${byteOffsetVar}, ${dataVar}, ${littleEndian});`;
   },
 
+  Boolean(_, stackDepth) {
+    const dataVar = createVariable('data', stackDepth);
+    const byteOffsetVar = createVariable('byteOffset', stackDepth);
+
+    return `dataView.setUint8(${byteOffsetVar}, Number(${dataVar}));`;
+  },
+
   String({ byteLength, encoding }, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);

@@ -108,6 +108,10 @@ export const viewVisitor = Object.freeze({
     return dataView[`get${kind}`](byteOffset, littleEndian);
   },
 
+  Boolean(_, dataView, byteOffset) {
+    return Boolean(dataView.getUint8(byteOffset));
+  },
+
   Array({ length, element }, dataView, byteOffset, useProxy = length > 20) {
     const elementProxyHandler = viewVisitor[element.tag];
     const elementWriter = createWriter(element);

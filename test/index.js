@@ -3,7 +3,7 @@ import {
   encode, decode, systemLittleEndian,
   sizeof, alignof, strideof,
   array, struct, tuple, bitfield, string,
-  int8, uint8,
+  bool, int8, uint8,
   int16, int16le, int16be,
   uint16, uint16le, uint16be,
   int32, int32le, int32be,
@@ -11,7 +11,6 @@ import {
   float32, float32le, float32be,
   float64, float64le, float64be,
 } from '../';
-
 
 /* eslint-disable no-param-reassign */
 function testEncodeDecode(t, type, input, expectedEncoded, expectedDecoded) {
@@ -52,6 +51,23 @@ function swap8(arrayBuffer) {
     dv.setUint32(i + 4, lo, false);
   }
 }
+
+test('bool', t => {
+  const type = bool;
+
+  t.is(type.tag, 'Boolean');
+  t.is(sizeof(type), 1);
+  t.is(alignof(type), 1);
+
+  const inputData = [false, true];
+
+  const expectedBytes = new Uint8Array(new Int8Array(inputData).buffer);
+
+  const decodedData = [false, true];
+
+  testEncodeDecode(t, array(type, inputData.length), inputData, expectedBytes, decodedData);
+});
+
 
 test('int8', t => {
   const type = int8;

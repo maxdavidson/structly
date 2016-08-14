@@ -11,6 +11,9 @@ function createNumberType(kind, size, littleEndian = systemLittleEndian) {
   });
 }
 
+export const boolean = Object.freeze({ tag: 'Boolean', byteLength: 1, byteAlignment: 1 });
+export const bool = boolean;
+
 export const int8 = createNumberType('Int8', 1);
 export const uint8 = createNumberType('Uint8', 1);
 
