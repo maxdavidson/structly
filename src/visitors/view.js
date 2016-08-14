@@ -112,6 +112,31 @@ export const viewVisitor = Object.freeze({
     return Boolean(dataView.getUint8(byteOffset));
   },
 
+  String({ byteLength, encoding }, dataView, byteOffset) {
+    let array = new Uint8Array(dataView.buffer, byteOffset, byteLength);
+
+    const index = array.indexOf(0);
+    if (index >= 0) {
+      array = array.subarray(0, index);
+    }
+
+    if (typeof Buffer === 'function') {
+      return new Buffer(array).toString(encoding);
+    }
+
+    /* eslint-disable no-undef */
+    /* istanbul ignore next */
+    if (typeof TextDecoder === 'function') {
+      return new TextDecoder(encoding).decode(array);
+    }
+    /* eslint-enable no-undef */
+
+    /* eslint-disable prefer-spread */
+    /* istanbul ignore next */
+    return String.fromCharCode.apply(String, array);
+    /* eslint-enable prefer-spread */
+  },
+
   Array({ length, element }, dataView, byteOffset, useProxy = length > 20) {
     const elementProxyHandler = viewVisitor[element.tag];
     const elementWriter = createWriter(element);
