@@ -1,9 +1,17 @@
 import test from 'ava';
-import { struct, array, tuple, bitfield, string, bool, uint8, createView } from '../';
+import { struct, array, tuple, bitfield, string, buffer, bool, uint8, createView } from '../';
 
-function createViewForceProxy(type, buffer) {
-  return createView(type, buffer, typeof Proxy === 'function');
+function createViewForceProxy(type, buf) {
+  return createView(type, buf, typeof Proxy === 'function');
 }
+
+test('buffer', t => {
+  const view = createView(buffer(100));
+  t.true(view.value instanceof Uint8Array);
+  t.is(view.buffer, view.value.buffer);
+  t.is(view.byteLength, view.value.byteLength);
+  t.is(view.byteOffset, view.value.byteOffset);
+});
 
 test('bool', t => {
   const view = createView(bool);

@@ -234,6 +234,10 @@ export const viewVisitor = Object.freeze({
       },
     });
   },
+
+  Buffer({ byteLength }, dataView, byteOffset) {
+    return new Uint8Array(dataView.buffer, byteOffset, byteLength);
+  },
 });
 
 export function createView(type, buffer = new ArrayBuffer(sizeof(type)), useProxy) {

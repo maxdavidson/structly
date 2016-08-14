@@ -160,3 +160,15 @@ export function bitfield(members, element = uint32) {
     element,
   });
 }
+
+export function buffer(length) {
+  if (length === undefined || typeof length !== 'number') {
+    throw new TypeError('You must specify a length of the buffer!');
+  }
+
+  return Object.freeze({
+    tag: 'Buffer',
+    byteLength: length,
+    byteAlignment: 1,
+  });
+}

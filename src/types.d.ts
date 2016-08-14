@@ -44,6 +44,9 @@ export interface BitfieldType extends Type {
   }[];
 }
 
+export interface BufferType extends Type {
+}
+
 export const boolean: BooleanType;
 export const bool: BooleanType;
 
@@ -79,3 +82,4 @@ export function array<T extends Type>(element: T, length: number, options?: { pa
 export function struct(members: { [name: string]: Type; }, options?: { reorder?: boolean; pack?: boolean | number; }): StructType;
 export function tuple(...elements: Type[]): TupleType;
 export function bitfield(members: { [name: string]: number; }, element?: NumberType): BitfieldType;
+export function buffer(length: number): BufferType;

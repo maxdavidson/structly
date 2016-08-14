@@ -19,7 +19,7 @@ their underlying buffer storage on modification, like magic! This concept is sha
 by [Typed Objects](http://wiki.ecmascript.org/doku.php?id=harmony:typed_objects).
 
 Structly works great both in Node (>=4) and most browsers.
-It supports numbers, booleans, arrays, structs, tuples, bitfields and strings.
+It supports numbers, booleans, arrays, structs, tuples, bitfields, strings and buffers.
 
 
 ## Usage
@@ -108,6 +108,7 @@ export function array<T extends Type>(element: T, length: number, options?: { pa
 export function struct(members: { [name: string]: Type; }, options?: { reorder?: boolean; pack?: boolean | number; }): StructType;
 export function tuple(...elements: Type[]): TupleType;
 export function bitfield(members: { [name: string]: number; }, element?: NumberType): BitfieldType;
+export function buffer(length: number): BufferType;
 
 
 // Type constants:
@@ -211,5 +212,8 @@ export interface BitfieldType extends Type {
     name: string;
     bits: number;
   }[];
+}
+
+export interface BufferType extends Type {
 }
 ```

@@ -129,6 +129,20 @@ export const readerVisitor = Object.freeze({
       `).join('\n')}
     `;
   },
+
+  Buffer({ byteLength }, stackDepth) {
+    const resultVar = createVariable('result', stackDepth);
+    const byteOffsetVar = createVariable('byteOffset', stackDepth);
+
+    return `
+      if (${resultVar} === void 0 ||
+          ${resultVar}.buffer !== dataView.buffer ||
+          ${resultVar}.byteLength !== ${byteOffsetVar} ||
+          ${resultVar}.byteOffset !== ${byteLength}) {
+        ${resultVar} = new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength});
+      }
+    `;
+  },
 });
 
 export function createReader(type) {

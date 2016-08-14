@@ -2,8 +2,8 @@ import test from 'ava';
 import {
   encode, decode, systemLittleEndian,
   sizeof, alignof, strideof,
-  array, struct, tuple, bitfield, string,
-  bool, int8, uint8,
+  array, struct, tuple, bitfield, buffer,
+  string, bool, int8, uint8,
   int16, int16le, int16be,
   uint16, uint16le, uint16be,
   int32, int32le, int32be,
@@ -51,6 +51,24 @@ function swap8(arrayBuffer) {
     dv.setUint32(i + 4, lo, false);
   }
 }
+
+test('buffer', t => {
+  t.throws(() => buffer());
+
+  const type = buffer(100);
+  t.is(type.tag, 'Buffer');
+  t.is(sizeof(type), 100);
+  t.is(alignof(type), 1);
+
+  const data = new Uint8Array(100);
+  data[1] = 5;
+  data[8] = 2346;
+
+  const encoded = encode(type, data);
+  const decoded = decode(type, encoded);
+
+  t.deepEqual(data, decoded);
+});
 
 test('bool', t => {
   const type = bool;
@@ -724,9 +742,9 @@ test('encode', t => {
   t.throws(() => encode(type, data, 5));
   t.throws(() => encode(type, data, [1, 2, 3]));
 
-  const buffer = encode(type, data);
-  t.true(buffer instanceof ArrayBuffer);
-  t.is(buffer.byteLength, sizeof(type));
+  const encoded = encode(type, data);
+  t.true(encoded instanceof ArrayBuffer);
+  t.is(encoded.byteLength, sizeof(type));
 
   const existingBuffer = new ArrayBuffer(sizeof(type));
   const clonedBuffer = existingBuffer.slice(0);
@@ -754,16 +772,16 @@ test('decode', t => {
     z: float32,
   });
 
-  const buffer = new Float32Array([1, 2, 3]).buffer;
+  const data = new Float32Array([1, 2, 3]).buffer;
 
   const expected = { x: 1, y: 2, z: 3 };
 
-  const decoded = decode(type, buffer);
+  const decoded = decode(type, data);
   t.deepEqual(decoded, expected);
 
   const targetObject = {};
   const initialState = {};
-  const decoded2 = decode(type, buffer, targetObject);
+  const decoded2 = decode(type, data, targetObject);
   t.is(decoded2, targetObject);
   t.notDeepEqual(decoded2, initialState);
 

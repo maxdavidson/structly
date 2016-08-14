@@ -112,6 +112,19 @@ export const writerVisitor = Object.freeze({
       ${writerVisitor[element.tag](element, innerStackDepth)}
     `;
   },
+
+  Buffer({ byteLength }, stackDepth) {
+    const dataVar = createVariable('data', stackDepth);
+    const byteOffsetVar = createVariable('byteOffset', stackDepth);
+
+    return `
+      if (${dataVar}.buffer !== dataView.buffer ||
+          ${dataVar}.byteLength !== ${byteOffsetVar} ||
+          ${dataVar}.byteOffset !== ${byteLength}) {
+        new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength}).set(${dataVar});
+      }
+    `;
+  },
 });
 
 export function createWriter(type) {
