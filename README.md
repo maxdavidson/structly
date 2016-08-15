@@ -149,22 +149,22 @@ export function strideof(type: Type, byteAlignment?: number): number;
 
 
 // Interfaces:
-interface Decoder<T extends Type> {
+export interface Decoder<T extends Type> {
   (buffer: ArrayBuffer | ArrayBufferView, data?: any): any;
 }
 
-interface Encoder<T extends Type> {
+export interface Encoder<T extends Type> {
   (data: any): ArrayBuffer;
   <BufferType extends ArrayBuffer | ArrayBufferView>(data: any, buffer: BufferType): BufferType;
 }
 
-interface Converter<T extends Type> {
+export interface Converter<T extends Type> {
   type: T;
   decode: Decoder<T>;
   encode: Encoder<T>;
 }
 
-interface View<T> {
+export interface View<T> {
   value: any;
   buffer: ArrayBuffer;
   byteOffset: number;
