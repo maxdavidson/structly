@@ -86,7 +86,7 @@ export function createConverter<T extends Type>(type: T): Converter<T>;
 /**
  * Create a view object that automatically updates the buffer on modification
  */
-export function createView<T extends Type>(type: T, buffer: ArrayBuffer | ArrayBufferView): View<T>;
+export function createView<T extends Type>(type: T, buffer?: ArrayBuffer | ArrayBufferView): View<T>;
 
 /**
  * Convert a buffer into its JavaScript representation
