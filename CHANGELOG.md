@@ -9,12 +9,12 @@
 ## 0.3.0
 
 * Typed views! With `createView`, you can now create objects from your type schemas that automagically update their buffer storage on modification!
-* Removed `startOffset` in converter functions. Use a typed array instead.
+* Removed `startOffset` in converter functions. Use an ArrayBufferView (typed array) instead.
 * New `createDecoder` and `createEncoder` functions
 
 ## 0.2.0
 
-* Code generation! The code for reading and writing to buffers is now created on demand from the type schemas. This means that all type handlers are inlined, bypassing the need for runtime lookup!
+* Code generation! The code for reading and writing to buffers is now created on the fly from the type schemas. This means that all type handlers are inlined, bypassing the need for runtime lookup!
 * All built-in type schemas are made immutable using `Object.freeze`
 * `Uint64` and `Bool` types have been removed
 

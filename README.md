@@ -60,9 +60,9 @@ All numeric types use the endianness of your system by default. To force either
 little or big endian, use the provided type constants with the -be or -le suffix.
 
 By default, Structly makes sure accesses are [properly aligned](https://en.wikipedia.org/wiki/Data_structure_alignment).
-This result is structs being padded with empty space for performance.
+This results in structs being padded with empty space for performance reasons.
 You can override the byte alignment of the struct by passing
-`{ pack: n }` as a second argument to the `struct` type factory, similary to `#pragma pack(n)`.
+`{ pack: n }` as a second argument to the `struct` type factory, similar to `#pragma pack(n)`.
 
 
 ## API
