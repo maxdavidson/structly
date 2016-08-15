@@ -23,7 +23,7 @@ function createArrayProxy(length, { get, set, useProxy = SUPPORTS_PROXY } = {}) 
           const index = parseInt(key, 10);
           if ((index >= 0) && (index < length)) {
             let cache;
-            if (Reflect.has(target, key)) {
+            if (key in target) {
               cache = target[key];
             } else {
               cache = get(index);
