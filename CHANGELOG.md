@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2
+
+* Remove usage of `Reflect`
+* Fix incorrect TypeScript declaration of `createView`
+* Export all TypeScript interfaces
+
 ## 0.3.1
 
 * Introduce `Buffer` type
