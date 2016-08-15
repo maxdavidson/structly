@@ -64,7 +64,9 @@ export const assign = Object.assign ||/* istanbul ignore next */ function assign
 };
 
 export function getDataView(data) {
-  if (data instanceof ArrayBuffer) {
+  if (data instanceof DataView) {
+    return data;
+  } else if (data instanceof ArrayBuffer) {
     return new DataView(data);
   } else if (ArrayBuffer.isView(data)) {
     const { buffer, byteOffset, byteLength } = data;
@@ -72,7 +74,6 @@ export function getDataView(data) {
   }
   throw new TypeError('Invalid input data');
 }
-
 // Memoize if WeakMap if supported, otherwise passthrough
 export const maybeMemoize = (() => {
   if (typeof WeakMap === 'function') {
