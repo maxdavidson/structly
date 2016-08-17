@@ -792,3 +792,47 @@ test('decode', t => {
   t.throws(() => decode(type));
   t.throws(() => decode(type, null));
 });
+
+test('passthrough buffers', t => {
+  const type = array(uint8, 8);
+
+  const data = [0, 0, 0, 0, 0, 0, 0, 0];
+
+  t.throws(() => {
+    const arr = new Array(type.byteLength);
+    t.is(arr, encode(type, data, arr));
+  });
+
+  const buf = new ArrayBuffer(sizeof(type));
+  t.is(buf, encode(type, data, buf));
+
+  const dv = new DataView(buf);
+  t.is(dv, encode(type, data, dv));
+
+  const u8 = new Uint8Array(buf);
+  t.is(u8, encode(type, data, u8));
+
+  const u8clamped = new Uint8ClampedArray(buf);
+  t.is(u8clamped, encode(type, data, u8clamped));
+
+  const u16 = new Uint16Array(buf);
+  t.is(u16, encode(type, data, u16));
+
+  const u32 = new Uint32Array(buf);
+  t.is(u32, encode(type, data, u32));
+
+  const i8 = new Int8Array(buf);
+  t.is(i8, encode(type, data, i8));
+
+  const i16 = new Int16Array(buf);
+  t.is(i16, encode(type, data, i16));
+
+  const i32 = new Int32Array(buf);
+  t.is(i32, encode(type, data, i32));
+
+  const f32 = new Float32Array(buf);
+  t.is(f32, encode(type, data, f32));
+
+  const f64 = new Float64Array(buf);
+  t.is(f64, encode(type, data, f64));
+});
