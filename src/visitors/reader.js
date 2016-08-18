@@ -28,21 +28,28 @@ export const readerVisitor = Object.freeze({
     return `
       var ${arrayVar} = new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength});
       var ${indexVar} = ${arrayVar}.indexOf(0);
-      if (${indexVar} >= 0) {
-        ${arrayVar} = ${arrayVar}.subarray(0, ${indexVar});
-      }
       ${(() => {
         if (typeof Buffer === 'function') {
-          return `${resultVar} = new Buffer(${arrayVar}).toString(${JSON.stringify(encoding)});`;
+          return `${resultVar} = new Buffer(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar} >= 0 ? ${indexVar} : ${byteLength}).toString(${JSON.stringify(encoding)});`;
         }
 
         /* istanbul ignore next */
         if (typeof TextDecoder === 'function') {
-          return `${resultVar} = new TextDecoder(${JSON.stringify(encoding)}).decode(${arrayVar});`;
+          return `
+            if (${indexVar} >= 0) {
+              ${arrayVar} = new Uint8Array(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar});
+            }
+            ${resultVar} = new TextDecoder(${JSON.stringify(encoding)}).decode(${arrayVar});
+          `;
         }
 
         /* istanbul ignore next */
-        return `${resultVar} = String.fromCharCode.apply(String, ${arrayVar});`;
+        return `
+          if (${indexVar} >= 0) {
+            ${arrayVar} = new Uint8Array(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar});
+          }
+          ${resultVar} = String.fromCharCode.apply(String, ${arrayVar});
+        `;
       })()}
     `;
   },
