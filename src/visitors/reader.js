@@ -147,8 +147,8 @@ export const readerVisitor = Object.freeze({
     return `
       if (${resultVar} === void 0 ||
           ${resultVar}.buffer !== dataView.buffer ||
-          ${resultVar}.byteLength !== ${byteOffsetVar} ||
-          ${resultVar}.byteOffset !== ${byteLength}) {
+          ${resultVar}.byteOffset !== ${byteOffsetVar} ||
+          ${resultVar}.byteLength !== ${byteLength}) {
         ${resultVar} = new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength});
       }
     `;

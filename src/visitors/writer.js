@@ -122,8 +122,8 @@ export const writerVisitor = Object.freeze({
 
     return `
       if (${dataVar}.buffer !== dataView.buffer ||
-          ${dataVar}.byteLength !== ${byteOffsetVar} ||
-          ${dataVar}.byteOffset !== ${byteLength}) {
+          ${dataVar}.byteOffset !== ${byteOffsetVar} ||
+          ${dataVar}.byteLength !== ${byteLength}) {
         new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength}).set(${dataVar});
       }
     `;
