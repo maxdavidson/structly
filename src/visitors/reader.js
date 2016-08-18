@@ -30,7 +30,11 @@ export const readerVisitor = Object.freeze({
       var ${indexVar} = Array.prototype.indexOf.call(${arrayVar}, 0);
       ${(() => {
         if (typeof Buffer === 'function') {
-          return `${resultVar} = new Buffer(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar} >= 0 ? ${indexVar} : ${byteLength}).toString(${JSON.stringify(encoding)});`;
+          return `
+            ${resultVar} = new Buffer(${arrayVar}.buffer)
+              .slice(${byteOffsetVar}, ${byteOffsetVar} + (${indexVar} >= 0 ? ${indexVar} : ${byteLength}))
+              .toString(${JSON.stringify(encoding)});
+          `;
         }
 
         /* istanbul ignore next */
