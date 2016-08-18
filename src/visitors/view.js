@@ -115,7 +115,7 @@ export const viewVisitor = Object.freeze({
   String({ byteLength, encoding }, dataView, byteOffset) {
     let array = new Uint8Array(dataView.buffer, byteOffset, byteLength);
 
-    const index = array.indexOf(0);
+    const index = Array.prototype.indexOf.call(array, 0);
     if (index >= 0) {
       array = array.subarray(0, index);
     }

@@ -27,7 +27,7 @@ export const readerVisitor = Object.freeze({
 
     return `
       var ${arrayVar} = new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength});
-      var ${indexVar} = ${arrayVar}.indexOf(0);
+      var ${indexVar} = Array.prototype.indexOf.call(${arrayVar}, 0);
       ${(() => {
         if (typeof Buffer === 'function') {
           return `${resultVar} = new Buffer(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar} >= 0 ? ${indexVar} : ${byteLength}).toString(${JSON.stringify(encoding)});`;
