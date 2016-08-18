@@ -1,5 +1,6 @@
 /* eslint-disable max-len, no-new-func */
 import { strideof, createMask, createVariable } from '../utils';
+import { uint8 } from '../types';
 
 export const writerVisitor = Object.freeze({
   Number({ littleEndian, kind }, stackDepth) {
@@ -11,9 +12,11 @@ export const writerVisitor = Object.freeze({
 
   Boolean(_, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
-    const byteOffsetVar = createVariable('byteOffset', stackDepth);
 
-    return `dataView.setUint8(${byteOffsetVar}, Number(${dataVar}));`;
+    return `
+      ${dataVar} = Number(${dataVar});
+      ${writerVisitor.Number(uint8, stackDepth)}
+    `;
   },
 
   String({ byteLength, encoding }, stackDepth) {
