@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+* Fix bug in `buffer` code generation
+* Better compatibility with older browsers
+* Minor performance improvements
+
 ## 0.3.2
 
 * Remove usage of `Reflect`
@@ -8,8 +14,8 @@
 
 ## 0.3.1
 
-* Introduce `Buffer` type
-* Add back `Bool` type
+* Introduce `buffer` type
+* Add back `bool` type
 * Fix missing string handler for views
 
 ## 0.3.0
@@ -22,7 +28,7 @@
 
 * Code generation! The code for reading and writing to buffers is now created on the fly from the type schemas. This means that all type handlers are inlined, bypassing the need for runtime lookup!
 * All built-in type schemas are made immutable using `Object.freeze`
-* `Uint64` and `Bool` types have been removed
+* `uint64` and `bool` types have been removed
 
 ## 0.1.2
 
