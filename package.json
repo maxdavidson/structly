@@ -50,11 +50,11 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
-    "babel-core": "^6.13.2",
+    "babel-core": "^6.14.0",
     "babel-eslint": "^6.1.0",
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-plugin-istanbul": "^2.0.0",
-    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-latest": "^6.14.0",
     "coveralls": "^2.11.9",
     "cross-env": "^2.0.0",
     "eslint": "^3.0.0",
