@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import { getDataView, sizeof, maybeMemoize } from './utils';
+import { getBuffer, sizeof, maybeMemoize } from './utils';
 import { createReader } from './visitors/reader';
 import { createWriter } from './visitors/writer';
 
@@ -17,12 +17,13 @@ export function createDecoder(type) {
     throw new TypeError('You must specify a type to convert with');
   }
   const reader = createReaderMemoized(type);
+
   return function decode(buffer, data) {
     if (buffer === undefined) {
       throw new TypeError('You must specify the buffer the decode');
     }
-    const dataView = getDataView(buffer);
-    return reader(dataView, 0, data);
+    const realBuffer = getBuffer(buffer);
+    return reader(realBuffer, 0, data);
   };
 }
 
@@ -34,15 +35,16 @@ export function createEncoder(type) {
     throw new TypeError('You must specify a type to convert with');
   }
   const writer = createWriterMemoized(type);
+
   return function encode(data, buffer = new ArrayBuffer(sizeof(type))) {
     if (data === undefined) {
       throw new TypeError('You must specify the data to encode');
     }
-    const dataView = getDataView(buffer);
-    if (sizeof(dataView) < sizeof(type)) {
+    const realBuffer = getBuffer(buffer);
+    if (sizeof(realBuffer) < sizeof(type)) {
       throw new RangeError('The provided buffer is too small to store the encoded type');
     }
-    writer(dataView, 0, data);
+    writer(realBuffer, 0, data);
     return buffer;
   };
 }

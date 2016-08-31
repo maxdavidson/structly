@@ -1,13 +1,14 @@
 /* eslint-disable max-len, no-new-func */
-import { strideof, createMask, createVariable } from '../utils';
+import { strideof, createMask, createVariable, getBufferKind } from '../utils';
 import { uint8 } from '../types';
 
 export const readerVisitor = Object.freeze({
   Number({ littleEndian, kind }, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
+    const bufferKind = getBufferKind(kind, littleEndian);
 
-    return `${resultVar} = dataView.get${kind}(${byteOffsetVar}, ${littleEndian});`;
+    return `${resultVar} = buffer.read${bufferKind}(${byteOffsetVar}, true);`;
   },
 
   Boolean(_, stackDepth) {
@@ -21,40 +22,15 @@ export const readerVisitor = Object.freeze({
 
   String({ byteLength, encoding }, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
-    const arrayVar = createVariable('array', stackDepth);
-    const indexVar = createVariable('i', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
+    const indexVar = createVariable('i', stackDepth);
 
     return `
-      var ${arrayVar} = new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength});
-      var ${indexVar} = Array.prototype.indexOf.call(${arrayVar}, 0);
-      ${(() => {
-        if (typeof Buffer === 'function') {
-          return `
-            ${resultVar} = new Buffer(${arrayVar}.buffer)
-              .slice(${byteOffsetVar}, ${byteOffsetVar} + (${indexVar} >= 0 ? ${indexVar} : ${byteLength}))
-              .toString(${JSON.stringify(encoding)});
-          `;
-        }
-
-        /* istanbul ignore next */
-        if (typeof TextDecoder === 'function') {
-          return `
-            if (${indexVar} >= 0) {
-              ${arrayVar} = new Uint8Array(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar});
-            }
-            ${resultVar} = new TextDecoder(${JSON.stringify(encoding)}).decode(${arrayVar});
-          `;
-        }
-
-        /* istanbul ignore next */
-        return `
-          if (${indexVar} >= 0) {
-            ${arrayVar} = new Uint8Array(${arrayVar}.buffer, ${byteOffsetVar}, ${indexVar});
-          }
-          ${resultVar} = String.fromCharCode.apply(String, ${arrayVar});
-        `;
-      })()}
+      var ${indexVar} = buffer.indexOf(0, ${byteOffsetVar});
+      if (${indexVar} < 0 || ${indexVar} > ${byteOffsetVar} + ${byteLength}) {
+        ${indexVar} = ${byteOffsetVar} + ${byteLength};
+      }
+      ${resultVar} = buffer.slice(${byteOffsetVar}, ${indexVar}).toString(${JSON.stringify(encoding)});
     `;
   },
 
@@ -150,10 +126,10 @@ export const readerVisitor = Object.freeze({
 
     return `
       if (${resultVar} === void 0 ||
-          ${resultVar}.buffer !== dataView.buffer ||
+          ${resultVar}.buffer !== buffer.buffer ||
           ${resultVar}.byteOffset !== ${byteOffsetVar} ||
           ${resultVar}.byteLength !== ${byteLength}) {
-        ${resultVar} = new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength});
+        ${resultVar} = buffer.slice(${byteOffsetVar}, ${byteOffsetVar} + ${byteLength});
       }
     `;
   },
@@ -163,7 +139,7 @@ export function createReader(type) {
   const resultVar = createVariable('result');
   const byteOffsetVar = createVariable('byteOffset');
 
-  return new Function('dataView', byteOffsetVar, resultVar, `
+  return new Function('buffer', byteOffsetVar, resultVar, `
     "use strict";
     ${readerVisitor[type.tag](type, 0)}
     return ${resultVar};

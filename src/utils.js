@@ -64,14 +64,14 @@ export const assign = Object.assign ||/* istanbul ignore next */ function assign
 };
 /* eslint-enable */
 
-export function getDataView(data) {
-  if (data instanceof DataView) {
+export function getBuffer(data) {
+  if (data instanceof Buffer) {
     return data;
   } else if (data instanceof ArrayBuffer) {
-    return new DataView(data);
-  } else if (ArrayBuffer.isView(data)) {
+    return new Buffer(data);
+  } else if ('buffer' in data && 'byteOffset' in data && 'byteLength' in data) {
     const { buffer, byteOffset, byteLength } = data;
-    return new DataView(buffer, byteOffset, byteLength);
+    return new Buffer(buffer).slice(byteOffset, byteOffset + byteLength);
   }
   throw new TypeError('Invalid input data');
 }

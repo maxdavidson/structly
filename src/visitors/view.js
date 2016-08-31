@@ -1,7 +1,8 @@
 /* eslint-disable no-plusplus */
 import { createReader } from './reader';
 import { createWriter } from './writer';
-import { sizeof, strideof, getDataView, createMask } from '../utils';
+import { sizeof, strideof, getBuffer, createMask, getBufferKind } from '../utils';
+import { uint8 } from '../types';
 
 const SUPPORTS_PROXY = typeof Proxy === 'function';
 
@@ -105,37 +106,23 @@ function createObjectProxy(keys, { get, set } = {}) {
 }
 
 export const viewVisitor = Object.freeze({
-  Number({ littleEndian, kind }, dataView, byteOffset) {
-    return dataView[`get${kind}`](byteOffset, littleEndian);
+  Number({ littleEndian, kind }, buffer, byteOffset) {
+    const bufferKind = getBufferKind(kind, littleEndian);
+    return buffer[`read${bufferKind}`](byteOffset, true);
   },
 
-  Boolean(_, dataView, byteOffset) {
-    return Boolean(dataView.getUint8(byteOffset));
+  Boolean(_, buffer, byteOffset) {
+    return Boolean(viewVisitor.Number(uint8, buffer, byteOffset));
   },
 
-  String({ byteLength, encoding }, dataView, byteOffset) {
-    let array = new Uint8Array(dataView.buffer, byteOffset, byteLength);
+  String({ byteLength, encoding }, buffer, byteOffset) {
+    let index = buffer.indexOf(0, byteOffset);
 
-    const index = Array.prototype.indexOf.call(array, 0);
-    if (index >= 0) {
-      array = array.subarray(0, index);
+    if (index < 0 || index >= byteOffset + byteLength) {
+      index = byteOffset + byteLength;
     }
 
-    if (typeof Buffer === 'function') {
-      return new Buffer(array).toString(encoding);
-    }
-
-    /* eslint-disable no-undef */
-    /* istanbul ignore next */
-    if (typeof TextDecoder === 'function') {
-      return new TextDecoder(encoding).decode(array);
-    }
-    /* eslint-enable no-undef */
-
-    /* eslint-disable prefer-spread */
-    /* istanbul ignore next */
-    return String.fromCharCode.apply(String, array);
-    /* eslint-enable prefer-spread */
+    return buffer.slice(byteOffset, index).toString(encoding);
   },
 
   Array({ length, element }, dataView, byteOffset, useProxy = length > 20) {
@@ -237,13 +224,13 @@ export const viewVisitor = Object.freeze({
     });
   },
 
-  Buffer({ byteLength }, dataView, byteOffset) {
-    return new Uint8Array(dataView.buffer, byteOffset, byteLength);
+  Buffer({ byteLength }, buffer, byteOffset) {
+    return buffer.slice(byteOffset, byteOffset + byteLength);
   },
 });
 
 export function createView(type, buffer = new ArrayBuffer(sizeof(type)), useProxy) {
-  const dataView = getDataView(buffer);
+  const dataView = getBuffer(buffer);
 
   const viewHandler = viewVisitor[type.tag];
   const writer = createWriter(type);

@@ -1,13 +1,14 @@
 /* eslint-disable max-len, no-new-func */
-import { strideof, createMask, createVariable } from '../utils';
+import { strideof, createMask, createVariable, getBufferKind } from '../utils';
 import { uint8 } from '../types';
 
 export const writerVisitor = Object.freeze({
   Number({ littleEndian, kind }, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
+    const bufferKind = getBufferKind(kind, littleEndian);
 
-    return `dataView.set${kind}(${byteOffsetVar}, ${dataVar}, ${littleEndian});`;
+    return `buffer.write${bufferKind}(${dataVar}, ${byteOffsetVar}, true);`;
   },
 
   Boolean(_, stackDepth) {
@@ -22,28 +23,9 @@ export const writerVisitor = Object.freeze({
   String({ byteLength, encoding }, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
-    const indexVar = createVariable('i', stackDepth);
-    const lengthVar = createVariable('length', stackDepth);
 
-    if (typeof Buffer === 'function') {
-      return `
-        new Buffer(${dataVar}, ${JSON.stringify(encoding)}).copy(new Buffer(dataView.buffer, dataView.byteOffset, dataView.byteLength), ${byteOffsetVar});
-      `;
-    }
-
-    /* istanbul ignore next */
-    if (typeof TextEncoder === 'function') {
-      return `
-        new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength).set(new TextDecoder(${JSON.stringify(encoding)}).encode(${dataVar}));
-      `;
-    }
-
-    /* istanbul ignore next */
     return `
-      ${dataVar} = new String(${dataVar});
-      for (var ${indexVar} = 0, ${lengthVar} = ${dataVar}.length; ${indexVar} < ${lengthVar}; ++${indexVar}) {
-        dataView.setUint8(${byteOffsetVar} + ${indexVar}, ${dataVar}.charCodeAt(${indexVar}));
-      }
+      new Buffer(${dataVar}, ${JSON.stringify(encoding)}).copy(buffer, ${byteOffsetVar}, 0, ${byteLength});
     `;
   },
 
@@ -121,10 +103,10 @@ export const writerVisitor = Object.freeze({
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
 
     return `
-      if (${dataVar}.buffer !== dataView.buffer ||
+      if (${dataVar}.buffer !== buffer.buffer ||
           ${dataVar}.byteOffset !== ${byteOffsetVar} ||
           ${dataVar}.byteLength !== ${byteLength}) {
-        new Uint8Array(dataView.buffer, ${byteOffsetVar}, ${byteLength}).set(${dataVar});
+        new Buffer(${dataVar}).copy(buffer, ${byteOffsetVar}, 0, ${byteLength});
       }
     `;
   },
@@ -134,7 +116,7 @@ export function createWriter(type) {
   const dataVar = createVariable('data');
   const byteOffsetVar = createVariable('byteOffset');
 
-  return new Function('dataView', byteOffsetVar, dataVar, `
+  return new Function('buffer', byteOffsetVar, dataVar, `
     "use strict";
     ${writerVisitor[type.tag](type, 0)}
   `);

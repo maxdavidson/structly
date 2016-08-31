@@ -569,7 +569,8 @@ test('string, ascii', t => {
   t.is(type.encoding, 'ascii');
 
   const utfString = '🍔💩';
-  const newString = decode(type, encode(type, utfString));
+  const encoded = encode(type, utfString);
+  const newString = decode(type, encoded);
 
   t.not(utfString, newString);
 });
@@ -836,3 +837,4 @@ test('passthrough buffers', t => {
   const f64 = new Float64Array(buf);
   t.is(f64, encode(type, data, f64));
 });
+
