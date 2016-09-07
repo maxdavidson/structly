@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import { createReader } from './reader';
 import { createWriter } from './writer';
 import { sizeof, strideof, getDataView, createMask } from '../utils';

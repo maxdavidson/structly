@@ -44,14 +44,14 @@ export function createVariable(name, stackDepth = 0) {
   return `${name}${stackDepth}`;
 }
 
-/* eslint-disable no-param-reassign, prefer-rest-params, no-restricted-syntax */
+/* eslint-disable no-param-reassign, prefer-rest-params, no-restricted-syntax, no-plusplus */
 export const assign = Object.assign ||/* istanbul ignore next */ function assign(target) {
   if (target == null) {
     throw new TypeError('Cannot convert undefined or null to object');
   }
   target = Object(target);
-  for (let index = 1, len = arguments.length; index < len; index++) {
-    const source = Object(arguments[index]);
+  for (let i = 1, len = arguments.length; i < len; ++i) {
+    const source = Object(arguments[i]);
     if (source != null) {
       for (const key in source) {
         if (Object.prototype.hasOwnProperty.call(source, key)) {
@@ -62,6 +62,7 @@ export const assign = Object.assign ||/* istanbul ignore next */ function assign
   }
   return target;
 };
+/* eslint-enable */
 
 export function getDataView(data) {
   if (data instanceof DataView) {
