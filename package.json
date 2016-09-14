@@ -59,7 +59,7 @@
     "cross-env": "^2.0.0",
     "eslint": "^3.0.0",
     "eslint-config-airbnb-base": "^7.0.0",
-    "eslint-plugin-import": "^1.9.2",
+    "eslint-plugin-import": "^1.15.0",
     "nyc": "^8.0.0",
     "rimraf": "^2.5.2",
     "rollup": "^0.35.7",
