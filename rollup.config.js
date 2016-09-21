@@ -1,16 +1,13 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import babel from 'rollup-plugin-babel';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
 export default {
-  entry: 'src/index.js',
-  moduleId: 'structly',
-  moduleName: 'Structly',
+  entry: 'js/index.js',
   sourceMap: true,
   plugins: [
-    babel(),
+    sourcemaps()
   ],
   targets: [
-    { dest: 'dist/structly.js', format: 'umd' },
-    { dest: 'dist/structly.mjs', format: 'es' },
-  ],
+    { dest: 'dist/structly.js', format: 'cjs' },
+    { dest: 'dist/structly.es.js', format: 'es' }
+  ]
 };

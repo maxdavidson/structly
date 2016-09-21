@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "es2015",
+    "outDir": "js",
+    "newLine": "LF",
+    "lib": ["es2015"],
+    "moduleResolution": "node",
+    "declarationDir": "typings",
+    "declaration": true,
+    "pretty": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "strictNullChecks": true,
+    "preserveConstEnums": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
