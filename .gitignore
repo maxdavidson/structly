@@ -1,7 +1,10 @@
-.vscode
-.nyc_output
 node_modules
-old
+typings
+js
 coverage
 dist
+.vscode
+!.vscode/**/*.json
+.nyc_output
+.DS_Store
 *.log

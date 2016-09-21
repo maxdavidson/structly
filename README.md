@@ -18,8 +18,9 @@ You can also create "view" objects from your type schemas that automatically upd
 their underlying buffer storage on modification, like magic! This concept is shamelessly inspired
 by [Typed Objects](http://wiki.ecmascript.org/doku.php?id=harmony:typed_objects).
 
-Structly works great both in Node (>=4) and most browsers.
-It supports numbers, booleans, arrays, structs, tuples, bitfields, strings and buffers.
+Structly works great in Node (>=4). For browser compatability, a `Buffer` shim must be included.
+
+Structly supports numbers, booleans, arrays, structs, tuples, bitfields, strings and buffers.
 
 
 ## Usage
@@ -68,152 +69,149 @@ You can override the byte alignment of the struct by passing
 ## API
 
 ```typescript
-/**
- * Create a decode function for converting a buffer to its JavaScript representation
- */
-export function createDecoder<T extends Type>(type: T): Decoder<T>;
+/** Create an encode function for serializing a JavaScript object or value into a buffer */
+export declare function createEncoder<T extends Schema>(schema: T, validate?: boolean): Encoder<T>;
 
-/**
- * Create an encode function for serializing a JavaScript object or value into a buffer
- */
-export function createEncoder<T extends Type>(type: T): Encoder<T>;
+/** Create a decode function for converting a buffer into its JavaScript representation */
+export declare function createDecoder<T extends Schema>(schema: T): Decoder<T>;
 
-/**
- * Create a converter object that contains both an encoder and a decoder
- */
-export function createConverter<T extends Type>(type: T): Converter<T>;
+/** Create a converter object that contains both an encoder and a decoder */
+export declare function createConverter<T extends Schema>(schema: T): Converter<T>;
 
-/**
- * Create a view object that automatically updates the buffer on modification
- */
-export function createView<T extends Type>(type: T, buffer?: ArrayBuffer | ArrayBufferView): View<T>;
+/** Create a view object that automatically updates the buffer on modification */
+export declare function createView<T extends Schema>(schema: T, buffer?: Buffer | ArrayBuffer | ArrayBufferView, byteOffset?: number): View<T>;
 
-/**
- * Convert a buffer into its JavaScript representation
- * @deprecated
- */
-export function decode(type: Type, buffer: ArrayBuffer | ArrayBufferView, data?: any): any;
+/** Create a string schema */
+export declare function string(maxLength: number, encoding?: 'utf8' | 'ascii'): StringSchema;
 
-/**
- * Serialize a JavaScript object or value into a buffer
- * @deprecated
- */
-export function encode(type: Type, data: any): ArrayBuffer;
-export function encode<T extends ArrayBuffer | ArrayBufferView>(type: Type, data: any, buffer: T): T;
+/** Create an array schema */
+export declare function array<T extends Schema, size extends number>(elementSchema: T, length: size, { pack }?: { pack?: boolean | number; }): ArraySchema<T, size>;
 
+/** Create a tuple schema */
+export declare function tuple(...elements: Schema[]): TupleSchema;
 
-// Type factories:
-export function string(maxLength: number, encoding?: string): StringType;
-export function array<T extends Type>(element: T, length: number, options?: { pack?: boolean; }): ArrayType<T>;
-export function struct(members: { [name: string]: Type; }, options?: { reorder?: boolean; pack?: boolean | number; }): StructType;
-export function tuple(...elements: Type[]): TupleType;
-export function bitfield(members: { [name: string]: number; }, element?: NumberType): BitfieldType;
-export function buffer(length: number): BufferType;
+/** Create a struct schema */
+export declare function struct(fields: { [fieldName: string]: Schema; }, { reorder, pack }?: { reorder?: boolean; pack?: number; }): StructSchema;
 
+/** Create a bitfield schema */
+export declare function bitfield(fields: { [name: string]: number; }): BitfieldSchema<NumberTag.UInt32>;
+export declare function bitfield<Tag extends NumberTag>(fields: { [name: string]: number; }, elementSchema: NumberSchema<Tag>): BitfieldSchema<Tag>;
 
-// Type constants:
-export const int8: NumberType;
-export const uint8: NumberType;
+/** Create a buffer schema */
+export declare function buffer(length: number): BufferSchema;
 
-export const int16: NumberType;
-export const int16le: NumberType;
-export const int16be: NumberType;
+export declare const bool: BoolSchema;
+export declare const int8: NumberSchema<NumberTag.Int8>;
+export declare const uint8: NumberSchema<NumberTag.UInt8>;
+export declare const int16: NumberSchema<NumberTag.Int16>;
+export declare const int16le: NumberSchema<NumberTag.Int16>;
+export declare const int16be: NumberSchema<NumberTag.Int16>;
+export declare const uint16: NumberSchema<NumberTag.UInt16>;
+export declare const uint16le: NumberSchema<NumberTag.UInt16>;
+export declare const uint16be: NumberSchema<NumberTag.UInt16>;
+export declare const int32: NumberSchema<NumberTag.Int32>;
+export declare const int32le: NumberSchema<NumberTag.Int32>;
+export declare const int32be: NumberSchema<NumberTag.Int32>;
+export declare const uint32: NumberSchema<NumberTag.UInt32>;
+export declare const uint32le: NumberSchema<NumberTag.UInt32>;
+export declare const uint32be: NumberSchema<NumberTag.UInt32>;
+export declare const float32: NumberSchema<NumberTag.Float32>;
+export declare const float32le: NumberSchema<NumberTag.Float32>;
+export declare const float32be: NumberSchema<NumberTag.Float32>;
+export declare const float64: NumberSchema<NumberTag.Float64>;
+export declare const float64le: NumberSchema<NumberTag.Float64>;
+export declare const float64be: NumberSchema<NumberTag.Float64>;
 
-export const uint16: NumberType;
-export const uint16le: NumberType;
-export const uint16be: NumberType;
+export declare type Decoder<T extends Schema> = (buffer: BufferLike, result?: any, byteOffset?: number) => any;
 
-export const int32: NumberType;
-export const int32le: NumberType;
-export const int32be: NumberType;
-
-export const uint32: NumberType;
-export const uint32le: NumberType;
-export const uint32be: NumberType;
-
-export const float32: NumberType;
-export const float32le: NumberType;
-export const float32be: NumberType;
-
-export const float64: NumberType;
-export const float64le: NumberType;
-export const float64be: NumberType;
-
-
-// Utils:
-export const systemLittleEndian: boolean;
-
-export function alignof(type?: Type): number;
-export function sizeof(type?: Type): number;
-export function strideof(type: Type, byteAlignment?: number): number;
-
-
-// Interfaces:
-export interface Decoder<T extends Type> {
-  (buffer: ArrayBuffer | ArrayBufferView, data?: any): any;
+export interface Encoder<T extends Schema> {
+  (data: any): Buffer;
+  <BufferType extends BufferLike>(data: any, buffer: BufferType, byteOffset?: number): BufferType;
 }
 
-export interface Encoder<T extends Type> {
-  (data: any): ArrayBuffer;
-  <BufferType extends ArrayBuffer | ArrayBufferView>(data: any, buffer: BufferType): BufferType;
+export interface Converter<T extends Schema> {
+  readonly schema: T;
+  readonly decode: Decoder<T>;
+  readonly encode: Encoder<T>;
 }
 
-export interface Converter<T extends Type> {
-  type: T;
-  decode: Decoder<T>;
-  encode: Encoder<T>;
-}
-
-export interface View<T> {
+export interface View<T extends Schema> {
   value: any;
-  buffer: ArrayBuffer;
-  byteOffset: number;
-  byteLength: number;
+  readonly schema: T;
+  readonly buffer: ArrayBuffer;
+  readonly byteLength: number;
+  readonly byteOffset: number;
 }
 
-export interface Type {
-  tag: string;
-  byteLength: number;
-  byteAlignment: number;
+export declare const enum SchemaTag {
+  Number = 0,
+  Bool = 1,
+  String = 2,
+  Array = 3,
+  Tuple = 4,
+  Struct = 5,
+  Bitfield = 6,
+  Buffer = 7
 }
 
-export interface NumberType extends Type {
-  kind: string;
-  littleEndian: boolean;
+export declare const enum NumberTag {
+  Int8 = 0,
+  Int16 = 1,
+  Int32 = 2,
+  UInt8 = 3,
+  UInt16 = 4,
+  UInt32 = 5,
+  Float32 = 6,
+  Float64 = 7
 }
 
-export interface ArrayType<T extends Type> extends Type {
-  length: number;
-  element: T;
+export declare type Schema = NumberSchema<NumberTag> | BoolSchema | StringSchema | ArraySchema<any, number> | TupleSchema | StructSchema | BitfieldSchema<NumberTag> | BufferSchema;
+
+export interface SchemaBase<Tag extends SchemaTag> {
+  readonly tag: Tag;
+  readonly byteLength: number;
+  readonly byteAlignment: number;
 }
 
-export interface StringType extends Type {
-  encoding: string;
+export interface NumberSchema<Tag extends NumberTag> extends SchemaBase<SchemaTag.Number> {
+  readonly numberTag: Tag;
+  readonly littleEndian?: boolean;
 }
 
-export interface StructType extends Type {
-  members: {
-    name: string;
-    byteOffset: number;
-    element: Type;
+export interface BoolSchema extends SchemaBase<SchemaTag.Bool> {}
+
+export interface StringSchema extends SchemaBase<SchemaTag.String> {
+  readonly encoding: 'utf8' | 'ascii';
+}
+
+export interface ArraySchema<ElementSchema extends Schema, size extends number> extends SchemaBase<SchemaTag.Array> {
+  readonly length: size;
+  readonly elementSchema: ElementSchema;
+}
+
+export interface TupleSchema extends SchemaBase<SchemaTag.Tuple> {
+  readonly fields: {
+    readonly byteOffset: number;
+    readonly schema: Schema;
   }[];
 }
 
-export interface TupleType extends Type {
-  members: {
-    byteOffset: number;
-    element: Type;
+export interface StructSchema extends SchemaBase<SchemaTag.Struct> {
+  readonly fields: {
+    readonly name: string;
+    readonly byteOffset: number;
+    readonly schema: Schema;
   }[];
 }
 
-export interface BitfieldType extends Type {
-  element: NumberType;
-  members: {
-    name: string;
-    bits: number;
+export interface BitfieldSchema<Tag extends NumberTag> extends SchemaBase<SchemaTag.Bitfield> {
+  readonly elementSchema: NumberSchema<Tag>;
+  readonly fields: {
+    readonly name: string;
+    readonly bits: number;
   }[];
 }
 
-export interface BufferType extends Type {
+export interface BufferSchema extends SchemaBase<SchemaTag.Buffer> {
 }
 ```
