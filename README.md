@@ -79,7 +79,7 @@ export declare function createDecoder<T extends Schema>(schema: T): Decoder<T>;
 export declare function createConverter<T extends Schema>(schema: T): Converter<T>;
 
 /** Create a view object that automatically updates the buffer on modification */
-export declare function createView<T extends Schema>(schema: T, buffer?: Buffer | ArrayBuffer | ArrayBufferView, byteOffset?: number): View<T>;
+export declare function createView<T extends Schema>(schema: T, buffer?: BufferLike, byteOffset?: number): View<T>;
 
 /** Create a string schema */
 export declare function string(maxLength: number, encoding?: 'utf8' | 'ascii'): StringSchema;
@@ -121,6 +121,8 @@ export declare const float32be: NumberSchema<NumberTag.Float32>;
 export declare const float64: NumberSchema<NumberTag.Float64>;
 export declare const float64le: NumberSchema<NumberTag.Float64>;
 export declare const float64be: NumberSchema<NumberTag.Float64>;
+
+export type BufferLike = ArrayBuffer | ArrayBufferView;
 
 export declare type Decoder<T extends Schema> = (buffer: BufferLike, result?: any, byteOffset?: number) => any;
 
@@ -178,7 +180,8 @@ export interface NumberSchema<Tag extends NumberTag> extends SchemaBase<SchemaTa
   readonly littleEndian?: boolean;
 }
 
-export interface BoolSchema extends SchemaBase<SchemaTag.Bool> {}
+export interface BoolSchema extends SchemaBase<SchemaTag.Bool> {
+}
 
 export interface StringSchema extends SchemaBase<SchemaTag.String> {
   readonly encoding: 'utf8' | 'ascii';
