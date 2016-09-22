@@ -158,16 +158,24 @@ export declare const enum SchemaTag {
 
 export declare const enum NumberTag {
   Int8 = 0,
-  Int16 = 1,
-  Int32 = 2,
-  UInt8 = 3,
-  UInt16 = 4,
+  UInt8 = 1,
+  Int16 = 2,
+  UInt16 = 3,
+  Int32 = 4,
   UInt32 = 5,
   Float32 = 6,
   Float64 = 7
 }
 
-export declare type Schema = NumberSchema<NumberTag> | BoolSchema | StringSchema | ArraySchema<any, number> | TupleSchema | StructSchema | BitfieldSchema<NumberTag> | BufferSchema;
+export declare type Schema =
+  NumberSchema<NumberTag>
+  | BoolSchema
+  | StringSchema
+  | ArraySchema<any, number>
+  | TupleSchema
+  | StructSchema
+  | BitfieldSchema<NumberTag>
+  | BufferSchema;
 
 export interface SchemaBase<Tag extends SchemaTag> {
   readonly tag: Tag;
