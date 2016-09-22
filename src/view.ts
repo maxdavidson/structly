@@ -162,6 +162,7 @@ function createProxy(schema: Schema, buffer: Buffer, byteOffset = 0): any {
       return buffer.slice(byteOffset, byteOffset + byteLength);
     }
 
+    /* istanbul ignore next */
     default:
       throw new TypeError(`Invalid schema tag: ${(schema as Schema).tag}`);
   }
@@ -211,8 +212,7 @@ function createArrayProxy(length: number, { get, set, useProxy = SUPPORTS_PROXY 
             return set(index, value) || true;
           }
         }
-        // Don't allow any other properties to be changed
-        return false;
+        return true;
       }
     });
   }

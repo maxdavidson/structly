@@ -28,7 +28,7 @@ test('short array', t => {
   t.true(getBuffer(view).equals(Buffer.from([4, 2, 9])));
 });
 
-test('long array', t => {
+test('long array of numbers', t => {
   const schema = array(uint8, 100);
   const view = createView(schema);
 
@@ -50,10 +50,45 @@ test('long array', t => {
   t.true(getBuffer(view).equals(Buffer.alloc(schema.length, 42)));
 });
 
-test('array of structs', t => {
+test('short array of structs', t => {
   const schema = array(struct({ x: uint8 }), 3);
   const view = createView(schema);
 
   // Caching
   t.is(view.value[0], view.value[0]);
+});
+
+test('long array of structs', t => {
+  const schema = array(struct({ x: uint8 }), 100);
+  const view = createView(schema);
+
+  if (typeof Symbol === 'function') {
+    t.false(Symbol() in view.value);
+  }
+
+  t.is(view.value.length, schema.length);
+  t.false(-1 in view.value);
+  view.value[schema.length] = { x: 42 };
+  t.false(schema.length in view.value);
+
+  for (let i = 0; i < schema.length; ++i) {
+    t.true(i in view.value);
+    t.deepEqual(view.value[i], { x: 0 });
+    // Caching
+    t.is(view.value[i], view.value[i]);
+  }
+
+  t.true(getBuffer(view).equals(Buffer.alloc(schema.length)));
+
+  for (let i = 0; i < schema.length; ++i) {
+    view.value[i] = { x: 42 };
+  }
+
+  for (let i = 0; i < schema.length; ++i) {
+    t.deepEqual(view.value[i], { x: 42 });
+    // Caching
+    t.is(view.value[i], view.value[i]);
+  }
+
+  t.true(getBuffer(view).equals(Buffer.alloc(schema.length, 42)));
 });
