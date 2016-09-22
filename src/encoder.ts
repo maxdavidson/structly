@@ -145,7 +145,7 @@ export function createEncoderCode(schema: Schema, stackDepth = 0): string {
         if (${dataVar}.buffer !== buffer.buffer ||
             ${dataVar}.byteOffset !== ${byteOffsetVar} ||
             ${dataVar}.byteLength !== ${byteLength}) {
-          ${dataVar}.copy(buffer, ${byteOffsetVar});
+          ${dataVar}.copy(buffer, ${byteOffsetVar}, 0, Math.min(${dataVar}.byteLength, ${byteLength}));
         }
       `;
     }
