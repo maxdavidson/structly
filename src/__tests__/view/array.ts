@@ -63,12 +63,15 @@ test('long array of structs', t => {
   const view = createView(schema);
 
   if (typeof Symbol === 'function') {
-    t.false(Symbol() in view.value);
+    const symbol = Symbol();
+    t.false(symbol in view.value);
+    view.value[symbol] = symbol;
+    delete view.value[symbol];
   }
 
   t.is(view.value.length, schema.length);
   t.false(-1 in view.value);
-  view.value[schema.length] = { x: 42 };
+
   t.false(schema.length in view.value);
 
   for (let i = 0; i < schema.length; ++i) {
