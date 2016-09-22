@@ -34,10 +34,10 @@ export function createVariable(name: string, stackDepth = 0) {
 export function getBufferGetterName(numberTag: NumberTag, littleEndian: boolean) {
   switch (numberTag) {
     case NumberTag.Int8: return 'readInt8';
-    case NumberTag.Int16: return littleEndian ? 'readInt16LE' : 'readInt16BE';
-    case NumberTag.Int32: return littleEndian ? 'readInt32LE' : 'readInt32BE';
     case NumberTag.UInt8: return 'readUInt8';
+    case NumberTag.Int16: return littleEndian ? 'readInt16LE' : 'readInt16BE';
     case NumberTag.UInt16: return littleEndian ? 'readUInt16LE' : 'readUInt16BE';
+    case NumberTag.Int32: return littleEndian ? 'readInt32LE' : 'readInt32BE';
     case NumberTag.UInt32: return littleEndian ? 'readUInt32LE' : 'readUInt32BE';
     case NumberTag.Float32: return littleEndian ? 'readFloatLE' : 'readFloatBE';
     case NumberTag.Float64: return littleEndian ? 'readDoubleLE' : 'readDoubleBE';
@@ -48,10 +48,10 @@ export function getBufferGetterName(numberTag: NumberTag, littleEndian: boolean)
 export function getBufferSetterName(numberTag: NumberTag, littleEndian: boolean) {
   switch (numberTag) {
     case NumberTag.Int8: return 'writeInt8';
-    case NumberTag.Int16: return littleEndian ? 'writeInt16LE' : 'writeInt16BE';
-    case NumberTag.Int32: return littleEndian ? 'writeInt32LE' : 'writeInt32BE';
     case NumberTag.UInt8: return 'writeUInt8';
+    case NumberTag.Int16: return littleEndian ? 'writeInt16LE' : 'writeInt16BE';
     case NumberTag.UInt16: return littleEndian ? 'writeUInt16LE' : 'writeUInt16BE';
+    case NumberTag.Int32: return littleEndian ? 'writeInt32LE' : 'writeInt32BE';
     case NumberTag.UInt32: return littleEndian ? 'writeUInt32LE' : 'writeUInt32BE';
     case NumberTag.Float32: return littleEndian ? 'writeFloatLE' : 'writeFloatBE';
     case NumberTag.Float64: return littleEndian ? 'writeDoubleLE' : 'writeDoubleBE';
