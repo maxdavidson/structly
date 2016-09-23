@@ -21,3 +21,13 @@ test('too long string', t => {
   view.value = 'Hello there';
   t.is(view.value, 'Hel');
 });
+
+test('long string, then short', t => {
+  const view = createView(string(1000));
+
+  t.is(view.value, '');
+  view.value = 'Hello there';
+  t.is(view.value, 'Hello there');
+  view.value = 'Disco';
+  t.is(view.value, 'Disco');
+});

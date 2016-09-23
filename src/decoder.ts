@@ -63,11 +63,13 @@ export function createDecoderCode(schema: Schema, stackDepth = 0): string {
     case SchemaTag.String: {
       const { byteLength, encoding } = schema;
       const indexVar = createVariable('i', stackDepth);
+      const maxVar = createVariable('max', stackDepth);
 
       return `
-        var ${indexVar} = buffer.indexOf(0, ${byteOffsetVar});
-        if (${indexVar} < 0 || ${indexVar} > ${byteOffsetVar} + ${byteLength}) {
-          ${indexVar} = ${byteOffsetVar} + ${byteLength};
+        var ${indexVar} = ${byteOffsetVar};
+        var ${maxVar} = ${byteOffsetVar} + ${byteLength};
+        while (${indexVar} < ${maxVar} && buffer[${indexVar}]) {
+          ${indexVar}++;
         }
         ${resultVar} = buffer.toString(${JSON.stringify(encoding)}, ${byteOffsetVar}, ${indexVar});
       `;

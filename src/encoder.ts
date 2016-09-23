@@ -77,11 +77,12 @@ export function createEncoderCode(schema: Schema, stackDepth = 0): string {
 
     case SchemaTag.String: {
       const { byteLength, encoding } = schema;
-      const tmpBufferVar = createVariable('tmpBuffer', stackDepth + 1);
 
       return `
-        var ${tmpBufferVar} = Buffer.from(${dataVar}, ${JSON.stringify(encoding)});
-        ${tmpBufferVar}.copy(buffer, ${byteOffsetVar}, 0, ${byteLength});
+        buffer.write(${dataVar}, ${byteOffsetVar}, ${byteLength}, ${JSON.stringify(encoding)});
+        if (${dataVar}.length < ${byteLength}) {
+          buffer[${byteOffsetVar} + ${dataVar}.length] = 0;
+        }
       `;
     }
 
