@@ -1,0 +1,21 @@
+{
+  "name": "structly-benchmark",
+  "version": "0.0.0",
+  "description": "Benchmark Structly against other tools",
+  "author": "Max Davidson <davidsonmax@gmail.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=6.6.0"
+  },
+  "dependencies": {
+    "benchmark": "^2.1.1",
+    "microtime": "^2.1.1",
+    "schemapack": "^1.4.2",
+    "structly": "^0.3.3"
+  }
+}
