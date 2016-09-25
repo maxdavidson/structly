@@ -7,15 +7,27 @@ import {
 /** Convert a buffer into its JavaScript representation */
 export type Decoder<T extends Schema> = (buffer: BufferLike, result?: any, byteOffset?: number) => any;
 
+export interface DecoderOptions {
+  /** Validate buffer before decoding */
+  validate?: boolean;
+}
+
 /** Create a decode function for converting a buffer into its JavaScript representation */
-export function createDecoder<T extends Schema>(schema: T): Decoder<T> {
+export function createDecoder<T extends Schema>(schema: T, { validate = true }: DecoderOptions = {}): Decoder<T> {
   if (schema === undefined) {
     throw new TypeError('You must specify a type to convert with');
   }
   const decodeUnchecked = createUncheckedDecoder(schema);
 
   return function decode(buffer, result, byteOffset) {
-    return decodeUnchecked(getBuffer(buffer), result, byteOffset);
+    const realBuffer = getBuffer(buffer);
+    if (validate) {
+      if (realBuffer.byteLength < schema.byteLength) {
+        throw new RangeError('The buffer is too small!');
+      }
+    }
+
+    return decodeUnchecked(realBuffer, result, byteOffset);
   };
 }
 

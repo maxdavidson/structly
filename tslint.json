@@ -8,6 +8,7 @@
     "object-literal-sort-keys": false,
     "only-arrow-functions": false,
     "ordered-imports": false,
+    "max-line-length": [true, 130],
     "trailing-comma": [true, { "multiline": "never", "singleline": "never" }]
   }
 }

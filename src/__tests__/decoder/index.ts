@@ -7,8 +7,14 @@ test('no parameters', t => {
 });
 
 test('no data', t => {
-  const encode = createDecoder(float64);
-  t.throws(() => (encode as any)(), TypeError);
+  const decode = createDecoder(float64);
+  t.throws(() => (decode as any)(), TypeError);
+});
+
+test('too small buffer', t => {
+  const decode = createDecoder(float64);
+  const buffer = Buffer.alloc(4);
+  t.throws(() => decode(buffer), RangeError);
 });
 
 test('invalid schema', t => {

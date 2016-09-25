@@ -11,14 +11,22 @@ export interface Encoder<T extends Schema> {
   <BufferType extends BufferLike>(data: any, buffer: BufferType, byteOffset?: number): BufferType;
 }
 
+export interface EncoderOptions {
+  /** Validate data on encode */
+  validate?: boolean;
+  /** Do not zero-out newly allocated buffers */
+  unsafe?: boolean;
+}
+
 /** Create an encode function for serializing a JavaScript object or value into a buffer */
-export function createEncoder<T extends Schema>(schema: T, validate = true): Encoder<T> {
+export function createEncoder<T extends Schema>(schema: T, { validate = true, unsafe = false }: EncoderOptions = {}): Encoder<T> {
   if (typeof schema !== 'object') {
     throw new TypeError('You must specify a schema to convert with');
   }
   const encodeUnchecked = createUncheckedEncoder<T>(schema);
+  const alloc = unsafe ? Buffer.allocUnsafe : Buffer.alloc;
 
-  return function encode(data, buffer = Buffer.alloc(sizeof(schema)), byteOffset = 0) {
+  return function encode(data, buffer = alloc(sizeof(schema)), byteOffset = 0) {
     if (validate) {
       const message = validateData(schema, data);
       if (message !== undefined) {

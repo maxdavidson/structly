@@ -1,6 +1,6 @@
 import { Schema } from './schemas';
-import { Decoder, createDecoder } from './decoder';
-import { Encoder, createEncoder } from './encoder';
+import { Decoder, createDecoder, DecoderOptions } from './decoder';
+import { Encoder, createEncoder, EncoderOptions } from './encoder';
 
 export interface Converter<T extends Schema> {
   readonly schema: T;
@@ -13,10 +13,10 @@ export interface Converter<T extends Schema> {
 }
 
 /** Create a converter object that contains both an encoder and a decoder */
-export function createConverter<T extends Schema>(schema: T): Converter<T> {
+export function createConverter<T extends Schema>(schema: T, options?: EncoderOptions & DecoderOptions): Converter<T> {
   return {
     schema,
-    encode: createEncoder<T>(schema),
-    decode: createDecoder<T>(schema)
+    encode: createEncoder<T>(schema, options),
+    decode: createDecoder<T>(schema, options)
   };
 }

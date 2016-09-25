@@ -70,16 +70,16 @@ You can override the byte alignment of the struct by passing
 
 ```typescript
 /** Create an encode function for serializing a JavaScript object or value into a buffer */
-export declare function createEncoder<T extends Schema>(schema: T, validate?: boolean): Encoder<T>;
+export declare function createEncoder<T extends Schema>(schema: T, {validate, unsafe}?: EncoderOptions): Encoder<T>;
 
 /** Create a decode function for converting a buffer into its JavaScript representation */
-export declare function createDecoder<T extends Schema>(schema: T): Decoder<T>;
+export declare function createDecoder<T extends Schema>(schema: T, {validate}?: DecoderOptions): Decoder<T>;
 
 /** Create a converter object that contains both an encoder and a decoder */
 export declare function createConverter<T extends Schema>(schema: T): Converter<T>;
 
 /** Create a view object that automatically updates the buffer on modification */
-export declare function createView<T extends Schema>(schema: T, buffer?: BufferLike, byteOffset?: number): View<T>;
+export declare function createConverter<T extends Schema>(schema: T, options?: EncoderOptions & DecoderOptions): Converter<T>;
 
 /** Create a string schema */
 export declare function string(maxLength: number, encoding?: 'utf8' | 'ascii'): StringSchema;
@@ -123,6 +123,18 @@ export declare const float64le: NumberSchema<NumberTag.Float64>;
 export declare const float64be: NumberSchema<NumberTag.Float64>;
 
 export type BufferLike = ArrayBuffer | ArrayBufferView;
+
+export interface EncoderOptions {
+  /** Validate data on encode */
+  validate?: boolean;
+  /** Do not zero-out newly allocated buffers */
+  unsafe?: boolean;
+}
+
+export interface DecoderOptions {
+  /** Validate buffer before decoding */
+  validate?: boolean;
+}
 
 export declare type Decoder<T extends Schema> = (buffer: BufferLike, result?: any, byteOffset?: number) => any;
 
