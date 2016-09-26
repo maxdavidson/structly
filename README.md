@@ -76,10 +76,10 @@ export declare function createEncoder<T extends Schema>(schema: T, {validate, un
 export declare function createDecoder<T extends Schema>(schema: T, {validate}?: DecoderOptions): Decoder<T>;
 
 /** Create a converter object that contains both an encoder and a decoder */
-export declare function createConverter<T extends Schema>(schema: T): Converter<T>;
+export declare function createConverter<T extends Schema>(schema: T, options?: EncoderOptions & DecoderOptions): Converter<T>;
 
 /** Create a view object that automatically updates the buffer on modification */
-export declare function createConverter<T extends Schema>(schema: T, options?: EncoderOptions & DecoderOptions): Converter<T>;
+export declare function createView<T extends Schema>(schema: T, buffer?: BufferLike, byteOffset?: number): View<T>;
 
 /** Create a string schema */
 export declare function string(maxLength: number, encoding?: 'utf8' | 'ascii'): StringSchema;
