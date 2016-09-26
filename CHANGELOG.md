@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.1
+
+* Added the ability too pass options to `createDecoder`, `createEncoder` and `createConverter`
+
+## 0.4.0
+
+* TypeScript conversion! The library has been partially rewritten in TypeScript 2.0, for better tooling support and to prevent managing separate declaration files.
+* Rewritten tests
+* "Types" are now called "schemas"
+* Schema objects are not compatible with 0.3.x
+* Input data validation
+* Dropped separate `decode` and `encode` functions. Create your converter functions using `createDecoder`, `createEncoder` or `createConverter` instead.
+* `DataView` have been replaced by `Buffer`, for better performance in Node. For browser support, a `Buffer` shim must be installed globally. Browserify and Webpack should include this for you by default.
+
 ## 0.3.3
 
 * Fix bug in `buffer` code generation
