@@ -1,12 +1,10 @@
 {
-  "cache": true,
   "all": true,
   "include": [
     "js/**/*.js"
   ],
   "reporter": [
     "html",
-    "text",
-    "lcov"
+    "text"
   ]
 }
