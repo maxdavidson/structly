@@ -1,9 +1,8 @@
-import test from 'ava';
 import { createEncoder } from '../../encoder';
 import { StringSchema, string } from '../../schemas';
 
-test('invalid', t => {
-  t.throws(() => (string as any)(), TypeError);
+test('invalid', () => {
+  expect(() => (string as any)()).toThrowError(TypeError);
 });
 
 function createByteString({ byteLength, encoding }: StringSchema, str: string) {
@@ -12,7 +11,7 @@ function createByteString({ byteLength, encoding }: StringSchema, str: string) {
   return buffer;
 }
 
-test('default args', t => {
+test('default args', () => {
   const schema = string(20);
   const encode = createEncoder(schema);
 
@@ -20,10 +19,10 @@ test('default args', t => {
   const encoded = encode(data);
   const expected = createByteString(schema, data);
 
-  t.true(encoded.equals(expected));
+  expect(encoded.equals(expected)).toBe(true);
 });
 
-test('string, ascii', t => {
+test('string, ascii', () => {
   const schema = string(10, 'ascii');
   const encode = createEncoder(schema);
 
@@ -31,5 +30,5 @@ test('string, ascii', t => {
   const encoded = encode(utfString);
   const expected = createByteString(schema, utfString);
 
-  t.true(encoded.equals(expected));
+  expect(encoded.equals(expected)).toBe(true);
 });

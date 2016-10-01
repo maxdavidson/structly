@@ -1,18 +1,17 @@
-import test from 'ava';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 import { bool } from '../../schemas';
 
-test('bool', t => {
+test('bool', () => {
   const view = createView(bool);
 
-  t.is(typeof view.value, 'boolean');
+  expect(typeof view.value).toBe('boolean');
 
-  t.false(view.value);
-  t.true(getBuffer(view).equals(Buffer.from([0x00])));
+  expect(view.value).toBe(false);
+  expect(getBuffer(view).equals(Buffer.from([0x00]))).toBe(true);
 
   view.value = true;
 
-  t.true(view.value);
-  t.true(getBuffer(view).equals(Buffer.from([0x01])));
+  expect(view.value).toBe(true);
+  expect(getBuffer(view).equals(Buffer.from([0x01]))).toBe(true);
 });

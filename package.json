@@ -19,16 +19,14 @@
   "browser": "dist/structly.js",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
-    "build": "run-p build:commonjs build:umd",
+    "build": "npm run build:commonjs & npm run build:umd",
     "build:commonjs": "tsc --module commonjs --outDir dist/commonjs",
     "build:umd": "tsc --declaration --declarationDir dist/typings && rollup --config",
     "clean": "rimraf dist coverage .nyc_output",
     "lint": "tslint --project tsconfig.json --format stylish",
-    "test": "nyc --cache ava",
-    "test:watch": "run-p \"build:commonjs -- --watch\" \"test -- --watch\"",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "prebuild": "npm run clean",
-    "postbuild": "rimraf dist/**/__tests__",
+    "test": "jest",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "pretest": "run-s clean build:commonjs",
     "posttest": "npm run lint",
     "preversion": "npm test",
@@ -49,14 +47,19 @@
     "pack",
     "unpack"
   ],
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "_\\w*.\\w+$"
+    ]
+  },
   "dependencies": {
     "@types/node": "^6.0.38"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
+    "@types/jest": "^15.1.32",
     "coveralls": "^2.11.14",
-    "npm-run-all": "^3.1.0",
-    "nyc": "^8.3.0",
+    "jest": "^16.0.0",
     "rimraf": "^2.5.4",
     "rollup": "^0.36.0",
     "rollup-plugin-commonjs": "^5.0.4",

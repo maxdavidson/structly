@@ -1,9 +1,8 @@
-import test from 'ava';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 import { struct, array, uint8 } from '../../schemas';
 
-test('struct', t => {
+test('struct', () => {
   const type = struct({
     x: uint8,
     y: uint8,
@@ -12,26 +11,26 @@ test('struct', t => {
 
   const view = createView(type);
 
-  t.is(view.value.x, 0);
-  t.is(view.value.y, 0);
-  t.is(view.value.z, 0);
+  expect(view.value.x).toBe(0);
+  expect(view.value.y).toBe(0);
+  expect(view.value.z).toBe(0);
 
-  t.true(getBuffer(view).equals(Buffer.from([0, 0, 0])));
+  expect(getBuffer(view).equals(Buffer.from([0, 0, 0]))).toBe(true);
 
   view.value.x = 4;
   view.value.y = 2;
   view.value.z = 9;
 
-  t.is(view.value.x, 4);
-  t.is(view.value.y, 2);
-  t.is(view.value.z, 9);
-  t.false('w' in view.value);
-  t.is(view.value.w, undefined);
+  expect(view.value.x).toBe(4);
+  expect(view.value.y).toBe(2);
+  expect(view.value.z).toBe(9);
+  expect('w' in view.value).toBe(false);
+  expect(view.value.w).toBe(undefined);
 
-  t.true(getBuffer(view).equals(getBuffer(Buffer.from([4, 2, 9]))));
+  expect(getBuffer(view).equals(getBuffer(Buffer.from([4, 2, 9])))).toBe(true);
 });
 
-test('complex struct', t => {
+test('complex struct', () => {
   const view = createView(struct({
     a: struct({
       b: struct({
@@ -47,25 +46,25 @@ test('complex struct', t => {
   }));
 
   // Make sure instances are cached by comparing equality of references
-  t.is(view.value, view.value);
-  t.is(view.value.a, view.value.a);
-  t.is(view.value.a.b, view.value.a.b);
-  t.is(view.value.a.b.c, view.value.a.b.c);
-  t.is(view.value.a.b.c.d, view.value.a.b.c.d);
-  t.is(view.value.a.b.c.d.e, view.value.a.b.c.d.e);
-  t.is(view.value.a.b.c.d.e.f, view.value.a.b.c.d.e.f);
+  expect(view.value).toBe(view.value);
+  expect(view.value.a).toBe(view.value.a);
+  expect(view.value.a.b).toBe(view.value.a.b);
+  expect(view.value.a.b.c).toBe(view.value.a.b.c);
+  expect(view.value.a.b.c.d).toBe(view.value.a.b.c.d);
+  expect(view.value.a.b.c.d.e).toBe(view.value.a.b.c.d.e);
+  expect(view.value.a.b.c.d.e.f).toBe(view.value.a.b.c.d.e.f);
 
-  t.is(view.byteLength, 1);
-  t.is(view.value.a.b.c.d.e.f, 0);
+  expect(view.byteLength).toBe(1);
+  expect(view.value.a.b.c.d.e.f).toBe(0);
   view.value.a.b.c.d.e.f = 255;
-  t.is(view.value.a.b.c.d.e.f, 255);
-  t.true(getBuffer(view).equals(getBuffer(Buffer.from([255]))));
+  expect(view.value.a.b.c.d.e.f).toBe(255);
+  expect(getBuffer(view).equals(getBuffer(Buffer.from([255])))).toBe(true);
 });
 
-test('struct of arrays', t => {
+test('struct of arrays', () => {
   const schema = struct({ x: array(uint8, 3) });
   const view = createView(schema);
 
   // Caching
-  t.is(view.value.x, view.value.x);
+  expect(view.value.x).toBe(view.value.x);
 });

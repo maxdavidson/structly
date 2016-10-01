@@ -1,25 +1,24 @@
-import test from 'ava';
 import { sizeof, alignof } from '../../utils';
 import { SchemaTag, string } from '../../schemas';
 
-test('throws on invalid input', t => {
-  t.throws(() => (string as any)(), TypeError);
+test('throws on invalid input', () => {
+  expect(() => (string as any)()).toThrowError(TypeError);
 });
 
-test('default args', t => {
+test('default args', () => {
   const schema = string(20);
 
-  t.is(schema.tag, SchemaTag.String);
-  t.is(sizeof(schema), 20);
-  t.is(alignof(schema), 1);
-  t.is(schema.encoding, 'utf8');
+  expect(schema.tag).toBe(SchemaTag.String);
+  expect(sizeof(schema)).toBe(20);
+  expect(alignof(schema)).toBe(1);
+  expect(schema.encoding).toBe('utf8');
 });
 
-test('ascii', t => {
+test('ascii', () => {
   const schema = string(10, 'ascii');
 
-  t.is(schema.tag, SchemaTag.String);
-  t.is(sizeof(schema), 10);
-  t.is(alignof(schema), 1);
-  t.is(schema.encoding, 'ascii');
+  expect(schema.tag).toBe(SchemaTag.String);
+  expect(sizeof(schema)).toBe(10);
+  expect(alignof(schema)).toBe(1);
+  expect(schema.encoding).toBe('ascii');
 });

@@ -1,13 +1,12 @@
-import test from 'ava';
 import { createView } from '../../view';
 import { buffer } from '../../schemas';
 
-test('buffer', t => {
+test('buffer', () => {
   const view = createView(buffer(100));
 
-  t.true(Buffer.isBuffer(view.value));
+  expect(Buffer.isBuffer(view.value)).toBe(true);
 
-  t.is(view.buffer, view.value.buffer);
-  t.is(view.byteLength, view.value.byteLength);
-  t.is(view.byteOffset, view.value.byteOffset);
+  expect(view.buffer).toBe(view.value.buffer);
+  expect(view.byteLength).toBe(view.value.byteLength);
+  expect(view.byteOffset).toBe(view.value.byteOffset);
 });

@@ -1,4 +1,3 @@
-import test from 'ava';
 import { getNumberTagName } from '../_helpers';
 import { validateData } from '../../validator';
 import * as schemas from '../../schemas';
@@ -10,15 +9,15 @@ const numberSchemas: schemas.NumberSchema<schemas.NumberTag>[] = Object.keys(sch
 for (const numberSchema of numberSchemas) {
   const schemaName = getNumberTagName(numberSchema.numberTag);
 
-  test(`invalid ${schemaName}`, t => {
-    t.not((validateData as any)(numberSchema), undefined);
-    t.not(validateData(numberSchema, 'bajs'), undefined);
-    t.not(validateData(numberSchema, true), undefined);
-    t.not(validateData(numberSchema, {}), undefined);
+  test(`invalid ${schemaName}`, () => {
+    expect((validateData as any)(numberSchema)).toBeDefined();
+    expect(validateData(numberSchema, 'bajs')).toBeDefined();
+    expect(validateData(numberSchema, true)).toBeDefined();
+    expect(validateData(numberSchema, {})).toBeDefined();
   });
 
-  test(`valid ${schemaName}`, t => {
-    t.is(validateData(numberSchema, 45), undefined);
-    t.is(validateData(numberSchema, 19), undefined);
+  test(`valid ${schemaName}`, () => {
+    expect(validateData(numberSchema, 45)).toBeUndefined();
+    expect(validateData(numberSchema, 19)).toBeUndefined();
   });
 }

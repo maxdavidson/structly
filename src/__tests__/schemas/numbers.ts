@@ -1,7 +1,5 @@
-import test from 'ava';
-import { numberSchemaHelper } from '../_helpers';
 import {
-  NumberTag,
+  NumberTag, SchemaTag, NumberSchema,
   int8, uint8,
   int16, int16le, int16be,
   uint16, uint16le, uint16be,
@@ -10,6 +8,21 @@ import {
   float32, float32le, float32be,
   float64, float64le, float64be
 } from '../../schemas';
+
+function numberSchemaHelper<T extends NumberSchema<Tag>, Tag extends NumberTag>(
+  schema: T, numberTag: Tag, size: number, littleEndian?: boolean
+) {
+  return () => {
+    expect(schema).toEqual({
+      tag: SchemaTag.Number,
+      numberTag,
+      byteLength:
+      size,
+      byteAlignment: size,
+      littleEndian
+    });
+  };
+}
 
 test('int8', numberSchemaHelper(int8, NumberTag.Int8, 1));
 test('int8', numberSchemaHelper(uint8, NumberTag.UInt8, 1));

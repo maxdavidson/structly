@@ -1,4 +1,3 @@
-import test from 'ava';
 import { createDecoder } from '../../decoder';
 import { struct, float32le } from '../../schemas';
 
@@ -21,14 +20,14 @@ buffer.writeFloatLE(-1, 0);
 buffer.writeFloatLE(0, 4);
 buffer.writeFloatLE(Infinity, 8);
 
-test('simple', t => {
+test('simple', () => {
   const decoded = decode(buffer);
-  t.deepEqual(decoded, data);
+  expect(decoded).toEqual(data);
 });
 
-test('resuse object', t => {
+test('resuse object', () => {
   const result = {};
   const decoded = decode(buffer, result);
-  t.deepEqual(decoded, data);
-  t.is(decoded, result);
+  expect(decoded).toEqual(data);
+  expect(decoded).toBe(result);
 });

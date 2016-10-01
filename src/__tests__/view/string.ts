@@ -1,33 +1,32 @@
-import test from 'ava';
 import { createView } from '../../view';
 import { string } from '../../schemas';
 
-test('string', t => {
+test('string', () => {
   const view = createView(string(100));
 
-  t.is(typeof view.value, 'string');
-  t.is(view.value, '');
+  expect(typeof view.value).toBe('string');
+  expect(view.value).toBe('');
 
   view.value = 'Hello there';
-  t.is(view.value, 'Hello there');
+  expect(view.value).toBe('Hello there');
 });
 
-test('too long string', t => {
+test('too long string', () => {
   const view = createView(string(3));
 
-  t.is(typeof view.value, 'string');
-  t.is(view.value, '');
+  expect(typeof view.value).toBe('string');
+  expect(view.value).toBe('');
 
   view.value = 'Hello there';
-  t.is(view.value, 'Hel');
+  expect(view.value).toBe('Hel');
 });
 
-test('long string, then short', t => {
+test('long string, then short', () => {
   const view = createView(string(1000));
 
-  t.is(view.value, '');
+  expect(view.value).toBe('');
   view.value = 'Hello there';
-  t.is(view.value, 'Hello there');
+  expect(view.value).toBe('Hello there');
   view.value = 'Disco';
-  t.is(view.value, 'Disco');
+  expect(view.value).toBe('Disco');
 });

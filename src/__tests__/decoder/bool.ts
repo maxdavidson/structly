@@ -1,19 +1,18 @@
-import test from 'ava';
 import { createDecoder } from '../../decoder';
 import { bool } from '../../schemas';
 
 const decode = createDecoder(bool);
 
-test('true', t => {
+test('true', () => {
   const buffer = Buffer.from([0x01]);
   const decoded = decode(buffer);
 
-  t.true(decoded);
+  expect(decoded).toBe(true);
 });
 
-test('false', t => {
+test('false', () => {
   const buffer = Buffer.from([0x00]);
   const decoded = decode(buffer);
 
-  t.false(decoded);
+  expect(decoded).toBe(false);
 });

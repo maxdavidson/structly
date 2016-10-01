@@ -1,4 +1,3 @@
-import test from 'ava';
 import { decodeHelper } from '../_helpers';
 import {
   int8, uint8,

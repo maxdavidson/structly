@@ -1,19 +1,10 @@
-import { ContextualTestContext } from 'ava';
 import { createEncoder } from '../encoder';
 import { createDecoder } from '../decoder';
 import { systemLittleEndian, getBuffer } from '../utils';
 import {
-  SchemaTag, NumberTag, NumberSchema,
+  NumberTag, NumberSchema,
   array, int8, uint8, int16, uint16, int32, uint32, float32, float64
 } from '../schemas';
-
-export function numberSchemaHelper<T extends NumberSchema<Tag>, Tag extends NumberTag>(
-  schema: T, numberTag: Tag, size: number, littleEndian?: boolean
-) {
-  return (t: ContextualTestContext) => {
-    t.deepEqual<any>(schema, { tag: SchemaTag.Number, numberTag, byteLength: size, byteAlignment: size, littleEndian });
-  };
-}
 
 const swap16 = typeof Buffer.prototype.swap16 === 'function'
   ? (buffer: Buffer) => buffer.swap16()
@@ -61,7 +52,7 @@ export function encodeHelper<Tag extends NumberTag>(
   values: number[],
   littleEndian = systemLittleEndian
 ) {
-  return t => {
+  return () => {
     const arraySchema = array(schema, values.length);
     const encode = createEncoder(arraySchema);
     const encoded = encode(values);
@@ -80,7 +71,7 @@ export function encodeHelper<Tag extends NumberTag>(
       }
     }
 
-    t.true(valueBuffer.equals(expectedBuffer));
+    expect(valueBuffer.equals(expectedBuffer)).toBe(true);
   };
 }
 
@@ -90,7 +81,7 @@ export function decodeHelper<Tag extends NumberTag>(
   expectedValues: number[],
   littleEndian = systemLittleEndian
 ) {
-  return t => {
+  return () => {
     const constructor = numberConstructors[schema.numberTag as number];
     const buffer = getBuffer(new constructor(testValues));
 
@@ -109,7 +100,7 @@ export function decodeHelper<Tag extends NumberTag>(
 
     const decoded = decode(buffer) as number[];
 
-    t.deepEqual(decoded, expectedValues);
+    expect(decoded).toEqual(expectedValues);
   };
 }
 

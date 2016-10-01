@@ -1,27 +1,26 @@
-import test from 'ava';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 import { tuple, uint8 } from '../../schemas';
 
-test('tuple', t => {
+test('tuple', () => {
   const type = tuple(uint8, uint8, uint8);
 
   const view = createView(type);
 
-  t.is(view.value.length, 3);
-  t.is(view.value[0], 0);
-  t.is(view.value[1], 0);
-  t.is(view.value[2], 0);
+  expect(view.value.length).toBe(3);
+  expect(view.value[0]).toBe(0);
+  expect(view.value[1]).toBe(0);
+  expect(view.value[2]).toBe(0);
 
-  t.true(getBuffer(view).equals(Buffer.from([0, 0, 0])));
+  expect(getBuffer(view).equals(Buffer.from([0, 0, 0]))).toBe(true);
 
   view.value[0] = 4;
   view.value[1] = 2;
   view.value[2] = 9;
 
-  t.is(view.value[0], 4);
-  t.is(view.value[1], 2);
-  t.is(view.value[2], 9);
+  expect(view.value[0]).toBe(4);
+  expect(view.value[1]).toBe(2);
+  expect(view.value[2]).toBe(9);
 
-  t.true(getBuffer(view).equals(Buffer.from([4, 2, 9])));
+  expect(getBuffer(view).equals(Buffer.from([4, 2, 9]))).toBe(true);
 });

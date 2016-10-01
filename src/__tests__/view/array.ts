@@ -1,97 +1,96 @@
-import test from 'ava';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 import { array, struct, uint8 } from '../../schemas';
 
-test('short array', t => {
+test('short array', () => {
   const schema = array(uint8, 3);
   const view = createView(schema);
 
-  t.true('length' in view.value);
-  t.is(view.value.length, 3);
-  t.is(view.value[0], 0);
-  t.is(view.value[1], 0);
-  t.is(view.value[2], 0);
+  expect('length' in view.value).toBe(true);
+  expect(view.value.length).toBe(3);
+  expect(view.value[0]).toBe(0);
+  expect(view.value[1]).toBe(0);
+  expect(view.value[2]).toBe(0);
 
-  t.true(getBuffer(view).equals(Buffer.from([0, 0, 0])));
+  expect(getBuffer(view).equals(Buffer.from([0, 0, 0]))).toBe(true);
 
   view.value[0] = 4;
   view.value[1] = 2;
   view.value[2] = 9;
 
-  t.is(view.value[0], 4);
-  t.is(view.value[1], 2);
-  t.is(view.value[2], 9);
-  t.false(3 in view.value);
-  t.is(view.value[3], undefined);
+  expect(view.value[0]).toBe(4);
+  expect(view.value[1]).toBe(2);
+  expect(view.value[2]).toBe(9);
+  expect(3 in view.value).toBe(false);
+  expect(view.value[3]).toBe(undefined);
 
-  t.true(getBuffer(view).equals(Buffer.from([4, 2, 9])));
+  expect(getBuffer(view).equals(Buffer.from([4, 2, 9]))).toBe(true);
 });
 
-test('long array of numbers', t => {
+test('long array of numbers', () => {
   const schema = array(uint8, 100);
   const view = createView(schema);
 
-  t.is(view.value.length, schema.length);
+  expect(view.value.length).toBe(schema.length);
   for (let i = 0; i < schema.length; ++i) {
-    t.is(view.value[i], 0);
+    expect(view.value[i]).toBe(0);
   }
 
-  t.true(getBuffer(view).equals(Buffer.alloc(schema.length)));
+  expect(getBuffer(view).equals(Buffer.alloc(schema.length))).toBe(true);
 
   for (let i = 0; i < schema.length; ++i) {
     view.value[i] = 42;
   }
 
   for (let i = 0; i < schema.length; ++i) {
-    t.is(view.value[i], 42);
+    expect(view.value[i]).toBe(42);
   }
 
-  t.true(getBuffer(view).equals(Buffer.alloc(schema.length, 42)));
+  expect(getBuffer(view).equals(Buffer.alloc(schema.length, 42))).toBe(true);
 });
 
-test('short array of structs', t => {
+test('short array of structs', () => {
   const schema = array(struct({ x: uint8 }), 3);
   const view = createView(schema);
 
   // Caching
-  t.is(view.value[0], view.value[0]);
+  expect(view.value[0]).toBe(view.value[0]);
 });
 
-test('long array of structs', t => {
+test('long array of structs', () => {
   const schema = array(struct({ x: uint8 }), 100);
   const view = createView(schema);
 
   if (typeof Symbol === 'function') {
     const symbol = Symbol();
-    t.false(symbol in view.value);
+    expect(symbol in view.value).toBe(false);
     view.value[symbol] = symbol;
     delete view.value[symbol];
   }
 
-  t.is(view.value.length, schema.length);
-  t.false(-1 in view.value);
+  expect(view.value.length).toBe(schema.length);
+  expect(-1 in view.value).toBe(false);
 
-  t.false(schema.length in view.value);
+  expect(schema.length in view.value).toBe(false);
 
   for (let i = 0; i < schema.length; ++i) {
-    t.true(i in view.value);
-    t.deepEqual(view.value[i], { x: 0 });
+    expect(i in view.value).toBe(true);
+    expect(view.value[i]).toEqual({ x: 0 });
     // Caching
-    t.is(view.value[i], view.value[i]);
+    expect(view.value[i]).toBe(view.value[i]);
   }
 
-  t.true(getBuffer(view).equals(Buffer.alloc(schema.length)));
+  expect(getBuffer(view).equals(Buffer.alloc(schema.length))).toBe(true);
 
   for (let i = 0; i < schema.length; ++i) {
     view.value[i] = { x: 42 };
   }
 
   for (let i = 0; i < schema.length; ++i) {
-    t.deepEqual(view.value[i], { x: 42 });
+    expect(view.value[i]).toEqual({ x: 42 });
     // Caching
-    t.is(view.value[i], view.value[i]);
+    expect(view.value[i]).toBe(view.value[i]);
   }
 
-  t.true(getBuffer(view).equals(Buffer.alloc(schema.length, 42)));
+  expect(getBuffer(view).equals(Buffer.alloc(schema.length, 42))).toBe(true);
 });

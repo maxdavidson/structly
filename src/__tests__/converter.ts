@@ -1,16 +1,15 @@
-import test from 'ava';
 import { createConverter } from '../converter';
 import { float32 } from '../schemas';
 
-test('invalid', t => {
-  t.throws(() => (createConverter as any)());
+test('invalid', () => {
+  expect(() => (createConverter as any)()).toThrow();
 });
 
-test('default', t => {
+test('default', () => {
   const schema = float32;
   const converter = createConverter(schema);
 
-  t.is(converter.schema, schema);
-  t.is(typeof converter.decode, 'function');
-  t.is(typeof converter.encode, 'function');
+  expect(converter.schema).toBe(schema);
+  expect(typeof converter.decode).toBe('function');
+  expect(typeof converter.encode).toBe('function');
 });

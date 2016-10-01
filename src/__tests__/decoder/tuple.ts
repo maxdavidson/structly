@@ -1,4 +1,3 @@
-import test from 'ava';
 import { createDecoder } from '../../decoder';
 import { tuple, float32le, uint16le } from '../../schemas';
 
@@ -11,19 +10,19 @@ buffer.writeUInt16LE(2, 4);
 
 const decode = createDecoder(schema);
 
-test('tuple', t => {
+test('tuple', () => {
   const decoded = decode(buffer);
-  t.deepEqual(decoded, values);
+  expect(decoded).toEqual(values);
 });
 
-test('invalid schema', t => {
+test('invalid schema', () => {
   const invalidSchema = { tag: 999 };
-  t.throws(() => createDecoder(invalidSchema as any), TypeError);
+  expect(() => createDecoder(invalidSchema as any)).toThrowError(TypeError);
 });
 
-test('resuse object', t => {
+test('resuse object', () => {
   const result = [];
   const decoded = decode(buffer, result);
-  t.deepEqual(decoded, values);
-  t.is(decoded, result);
+  expect(decoded).toEqual(values);
+  expect(decoded).toBe(result);
 });

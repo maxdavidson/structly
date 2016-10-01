@@ -1,4 +1,3 @@
-import test from 'ava';
 import { validateData } from '../../validator';
 import { bitfield } from '../../schemas';
 
@@ -10,34 +9,34 @@ const schema = bitfield({
   you: 5
 });
 
-test(`invalid`, t => {
-  t.not((validateData as any)(schema), undefined);
-  t.not(validateData(schema, 'bajs'), undefined);
-  t.not(validateData(schema, 12), undefined);
-  t.not(validateData(schema, []), undefined);
-  t.not(validateData(schema, {}), undefined);
-  t.not(validateData(schema, { a: 'sdf' }), undefined);
-  t.not(validateData(schema, {
+test('invalid', () => {
+  expect((validateData as any)(schema)).toBeDefined();
+  expect(validateData(schema, 'bajs')).toBeDefined();
+  expect(validateData(schema, 12)).toBeDefined();
+  expect(validateData(schema, [])).toBeDefined();
+  expect(validateData(schema, {})).toBeDefined();
+  expect(validateData(schema, { a: 'sdf' })).toBeDefined();
+  expect(validateData(schema, {
     hello: 1,
     there: 2,
     how: 3,
     are: 4
-  }), undefined);
-  t.not(validateData(schema, {
+  })).toBeDefined();
+  expect(validateData(schema, {
     hello: 1,
     there: 2,
     how: 3,
     are: 4,
     you: '5'
-  }), undefined);
+  })).toBeDefined();
 });
 
-test(`valid`, t => {
-  t.is(validateData(schema, {
+test('valid', () => {
+  expect(validateData(schema, {
     hello: 1,
     there: 2,
     how: 3,
     are: 4,
     you: 5
-  }), undefined);
+  })).toBeUndefined();
 });

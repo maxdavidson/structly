@@ -1,15 +1,14 @@
-import test from 'ava';
 import { sizeof, strideof, alignof } from '../../utils';
 import { SchemaTag, bitfield, uint32, uint8 } from '../../schemas';
 
-test('invalid input', t => {
-  t.throws(() => (bitfield as any)(), TypeError);
-  t.throws(() => (bitfield as any)('bajs'), TypeError);
-  t.throws(() => bitfield({ a: 20, b: 20 }), RangeError);
-  t.throws(() => bitfield({ a: 20, b: 20 }, uint8), RangeError);
+test('invalid input', () => {
+  expect(() => (bitfield as any)()).toThrowError(TypeError);
+  expect(() => (bitfield as any)('bajs')).toThrowError(TypeError);
+  expect(() => bitfield({ a: 20, b: 20 })).toThrowError(RangeError);
+  expect(() => bitfield({ a: 20, b: 20 }, uint8)).toThrowError(RangeError);
 });
 
-test('default storage', t => {
+test('default storage', () => {
   const schema = bitfield({
     hello: 1,
     there: 7,
@@ -18,22 +17,22 @@ test('default storage', t => {
     you: 5
   });
 
-  t.is(schema.tag, SchemaTag.Bitfield);
-  t.is(schema.elementSchema, uint32);
-  t.is(sizeof(schema), sizeof(schema.elementSchema));
-  t.is(strideof(schema), strideof(schema.elementSchema));
-  t.is(alignof(schema), alignof(schema.elementSchema));
+  expect(schema.tag).toBe(SchemaTag.Bitfield);
+  expect(schema.elementSchema).toBe(uint32);
+  expect(sizeof(schema)).toBe(sizeof(schema.elementSchema));
+  expect(strideof(schema)).toBe(strideof(schema.elementSchema));
+  expect(alignof(schema)).toBe(alignof(schema.elementSchema));
 });
 
-test('custom storage', t => {
+test('custom storage', () => {
   const schema = bitfield({
     hello: 1,
     there: 7
   }, uint8);
 
-  t.is(schema.tag, SchemaTag.Bitfield);
-  t.is(schema.elementSchema, uint8);
-  t.is(sizeof(schema), sizeof(schema.elementSchema));
-  t.is(strideof(schema), strideof(schema.elementSchema));
-  t.is(alignof(schema), alignof(schema.elementSchema));
+  expect(schema.tag).toBe(SchemaTag.Bitfield);
+  expect(schema.elementSchema).toBe(uint8);
+  expect(sizeof(schema)).toBe(sizeof(schema.elementSchema));
+  expect(strideof(schema)).toBe(strideof(schema.elementSchema));
+  expect(alignof(schema)).toBe(alignof(schema.elementSchema));
 });

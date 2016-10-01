@@ -1,22 +1,21 @@
-import test from 'ava';
 import { sizeof, strideof, alignof } from '../../utils';
 import { SchemaTag, array, struct, float32le, float64le, uint8 } from '../../schemas';
 
-test('invalid input', t => {
-  t.throws(() => (array as any)(), TypeError);
-  t.throws(() => (array as any)(float32le), TypeError);
+test('invalid input', () => {
+  expect(() => (array as any)()).toThrowError(TypeError);
+  expect(() => (array as any)(float32le)).toThrowError(TypeError);
 });
 
-test('default behavior', t => {
+test('default behavior', () => {
   const schema = array(float32le, 10);
 
-  t.is(schema.tag, SchemaTag.Array);
-  t.is(schema.length, 10);
-  t.is(schema.elementSchema, float32le);
+  expect(schema.tag).toBe(SchemaTag.Array);
+  expect(schema.length).toBe(10);
+  expect(schema.elementSchema).toBe(float32le);
 
-  t.is(sizeof(schema), 40);
-  t.is(alignof(schema), 4);
-  t.is(strideof(schema), 40);
+  expect(sizeof(schema)).toBe(40);
+  expect(alignof(schema)).toBe(4);
+  expect(strideof(schema)).toBe(40);
 });
 
 const structSchema = struct({
@@ -24,69 +23,69 @@ const structSchema = struct({
   b: uint8
 });
 
-test('correct struct schema', t => {
-  t.is(structSchema.tag, SchemaTag.Struct);
-  t.is(sizeof(structSchema), 9);
-  t.is(alignof(structSchema), 8);
-  t.is(strideof(structSchema), 16);
+test('correct struct schema', () => {
+  expect(structSchema.tag).toBe(SchemaTag.Struct);
+  expect(sizeof(structSchema)).toBe(9);
+  expect(alignof(structSchema)).toBe(8);
+  expect(strideof(structSchema)).toBe(16);
 });
 
-test('array of struct, default alignment', t => {
+test('array of struct, default alignment', () => {
   const schema = array(structSchema, 2);
 
-  t.is(schema.tag, SchemaTag.Array);
-  t.is(schema.length, 2);
-  t.is(schema.elementSchema, structSchema);
+  expect(schema.tag).toBe(SchemaTag.Array);
+  expect(schema.length).toBe(2);
+  expect(schema.elementSchema).toBe(structSchema);
 
-  t.is(sizeof(schema), 16 + 9);
-  t.is(alignof(schema), 8);
-  t.is(strideof(schema), 16 + 16);
+  expect(sizeof(schema)).toBe(16 + 9);
+  expect(alignof(schema)).toBe(8);
+  expect(strideof(schema)).toBe(16 + 16);
 });
 
-test('array of struct, packed', t => {
+test('array of struct, packed', () => {
   const schema = array(structSchema, 2, { pack: true });
 
-  t.is(schema.tag, SchemaTag.Array);
-  t.is(schema.length, 2);
-  t.is(schema.elementSchema, structSchema);
+  expect(schema.tag).toBe(SchemaTag.Array);
+  expect(schema.length).toBe(2);
+  expect(schema.elementSchema).toBe(structSchema);
 
-  t.is(sizeof(schema), 9 + 9);
-  t.is(alignof(schema), 1);
-  t.is(strideof(schema), 9 + 9);
+  expect(sizeof(schema)).toBe(9 + 9);
+  expect(alignof(schema)).toBe(1);
+  expect(strideof(schema)).toBe(9 + 9);
 });
 
-test('array of struct, pack = 1', t => {
+test('array of struct, pack = 1', () => {
   const schema = array(structSchema, 2, { pack: 1 });
 
-  t.is(schema.tag, SchemaTag.Array);
-  t.is(schema.length, 2);
-  t.is(schema.elementSchema, structSchema);
+  expect(schema.tag).toBe(SchemaTag.Array);
+  expect(schema.length).toBe(2);
+  expect(schema.elementSchema).toBe(structSchema);
 
-  t.is(sizeof(schema), 9 + 9);
-  t.is(alignof(schema), 1);
-  t.is(strideof(schema), 9 + 9);
+  expect(sizeof(schema)).toBe(9 + 9);
+  expect(alignof(schema)).toBe(1);
+  expect(strideof(schema)).toBe(9 + 9);
 });
 
-test('array of struct, pack = 2', t => {
+test('array of struct, pack = 2', () => {
   const schema = array(structSchema, 2, { pack: 2 });
 
-  t.is(schema.tag, SchemaTag.Array);
-  t.is(schema.length, 2);
-  t.is(schema.elementSchema, structSchema);
+  expect(schema.tag).toBe(SchemaTag.Array);
+  expect(schema.length).toBe(2);
+  expect(schema.elementSchema).toBe(structSchema);
 
-  t.is(sizeof(schema), 10 + 9);
-  t.is(alignof(schema), 2);
-  t.is(strideof(schema), 10 + 10);
+  expect(sizeof(schema)).toBe(10 + 9);
+  expect(alignof(schema)).toBe(2);
+  expect(strideof(schema)).toBe(10 + 10);
 });
 
-test('array of struct, pack = 4', t => {
+test('array of struct, pack = 4', () => {
   const schema = array(structSchema, 2, { pack: 4 });
 
-  t.is(schema.tag, SchemaTag.Array);
-  t.is(schema.length, 2);
-  t.is(schema.elementSchema, structSchema);
+  expect(schema.tag).toBe(SchemaTag.Array);
+  expect(schema.length).toBe(2);
+  expect(schema.elementSchema).toBe(structSchema);
 
-  t.is(sizeof(schema), 12 + 9);
-  t.is(alignof(schema), 4);
-  t.is(strideof(schema), 12 + 12);
+  expect(sizeof(schema)).toBe(12 + 9);
+  expect(alignof(schema)).toBe(4);
+  expect(strideof(schema)).toBe(12 + 12);
 });
