@@ -13,15 +13,15 @@
     "node": ">=4.6.0",
     "npm": ">=2.15.10"
   },
-  "main": "dist/structly.umd.js",
-  "module": "dist/index.js",
-  "jsnext:main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/structly.js",
+  "module": "es2015/index.js",
+  "jsnext:main": "es2015/index.js",
+  "typings": "es2015/index.d.ts",
   "scripts": {
     "build": "npm run build:tsc && npm run build:rollup",
     "build:tsc": "tsc",
     "build:rollup": "rollup --config",
-    "clean": "rimraf dist coverage .nyc_output",
+    "clean": "rimraf dist es2015 coverage .nyc_output",
     "lint": "tslint --project tsconfig.json --format stylish",
     "test": "nyc --cache ava",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
@@ -29,11 +29,13 @@
     "pretest": "npm run build:tsc -- --module commonjs",
     "posttest": "npm run lint",
     "preversion": "npm test",
-    "prepublish": "npm run build",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish",
+    "postbuild:rollup": "rimraf es2015/**/__tests__",
+    "prepublish": "npm run build"
   },
   "files": [
-    "dist"
+    "dist",
+    "es2015"
   ],
   "keywords": [
     "binary",

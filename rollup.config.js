@@ -8,8 +8,8 @@ import uglify from 'rollup-plugin-uglify';
 export default {
   moduleName: 'Structly',
   moduleId: 'structly',
-  entry: 'dist/index.js',
-  dest: 'dist/structly.umd.js',
+  entry: 'es2015/index.js',
+  dest: 'dist/structly.js',
   format: 'umd',
   sourceMap: true,
   plugins: [

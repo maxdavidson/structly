@@ -1,8 +1,7 @@
 node_modules
-typings
-js
 coverage
 dist
+es2015
 .vscode
 !.vscode/**/*.json
 .nyc_output

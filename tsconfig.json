@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "es2015",
-    "outDir": "dist",
+    "outDir": "es2015",
     "newLine": "LF",
     "lib": ["es2015"],
     "moduleResolution": "node",
