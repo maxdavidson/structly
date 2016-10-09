@@ -11,7 +11,7 @@
   "engineStrict": true,
   "engines": {
     "node": ">=4.6.0",
-    "npm": ">=2.15.10"
+    "npm": ">=2.15.9"
   },
   "main": "dist/structly.js",
   "module": "es2015/index.js",
