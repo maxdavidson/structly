@@ -24,6 +24,7 @@
     "clean": "rimraf dist es2015 coverage .nyc_output",
     "lint": "tslint --project tsconfig.json --format stylish",
     "test": "nyc --cache ava",
+    "test:watch": "concurrently -rk \"tsc --module commonjs --watch\" \"ava --watch\"",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "prebuild:tsc": "npm run clean",
     "pretest": "npm run build:tsc -- --module commonjs",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
+    "concurrently": "^3.1.0",
     "coveralls": "^2.11.14",
     "nyc": "^8.3.0",
     "rimraf": "^2.5.4",
