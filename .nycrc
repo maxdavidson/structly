@@ -1,6 +1,6 @@
 {
   "include": [
-    "es2015/**/*.js"
+    "dist/commonjs/**/*.js"
   ],
   "reporter": [
     "html",
