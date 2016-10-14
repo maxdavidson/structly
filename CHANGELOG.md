@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0
+
+* Export ES2015 modules as separate files, for better tree-shaking
+* Reintroduce browser compatibility with included minified UMD bundle
+
 ## 0.4.1
 
 * Added the ability too pass options to `createDecoder`, `createEncoder` and `createConverter`
