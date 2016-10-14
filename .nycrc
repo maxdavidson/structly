@@ -1,7 +1,6 @@
 {
-  "all": true,
   "include": [
-    "js/**/*.js"
+    "dist/commonjs/**/*.js"
   ],
   "reporter": [
     "html",

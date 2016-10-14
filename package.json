@@ -10,29 +10,33 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": ">=4.5.0",
+    "node": ">=4.6.0",
     "npm": ">=2.15.9"
   },
-  "main": "dist/structly.js",
-  "module": "dist/structly.es.js",
-  "jsnext:main": "dist/structly.es.js",
-  "typings": "typings/index.d.ts",
+  "main": "dist/commonjs/index.js",
+  "module": "dist/es2015/index.js",
+  "jsnext:main": "dist/es2015/index.js",
+  "browser": "dist/structly.js",
+  "typings": "dist/typings/index.d.ts",
   "scripts": {
-    "build": "tsc --module es2015 && rollup -c",
-    "clean": "rimraf dist js typings coverage .nyc_output",
+    "build": "run-p build:commonjs build:umd",
+    "build:commonjs": "tsc --module commonjs --outDir dist/commonjs",
+    "build:umd": "tsc --declaration --declarationDir dist/typings && rollup --config",
+    "clean": "rimraf dist coverage .nyc_output",
     "lint": "tslint --project tsconfig.json --format stylish",
-    "test": "tsc && nyc --cache ava",
-    "test:watch": "tsc && concurrently -kr \"ava -w\" \"tsc -w\"",
+    "test": "nyc --cache ava",
+    "test:watch": "run-p \"build:commonjs -- --watch\" \"test -- --watch\"",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "pretest": "npm run clean",
+    "prebuild": "npm run clean",
+    "postbuild": "rimraf dist/**/__tests__",
+    "pretest": "run-s clean build:commonjs",
     "posttest": "npm run lint",
     "preversion": "npm test",
-    "prepublish": "npm run build",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish",
+    "prepublish": "npm run build"
   },
   "files": [
-    "dist",
-    "typings"
+    "dist"
   ],
   "keywords": [
     "binary",
@@ -51,12 +55,17 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
-    "concurrently": "^3.0.0",
     "coveralls": "^2.11.14",
+    "npm-run-all": "^3.1.0",
     "nyc": "^8.3.0",
     "rimraf": "^2.5.4",
     "rollup": "^0.36.0",
+    "rollup-plugin-commonjs": "^5.0.4",
+    "rollup-plugin-node-builtins": "^2.0.0",
+    "rollup-plugin-node-globals": "^1.0.9",
+    "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-sourcemaps": "^0.4.1",
+    "rollup-plugin-uglify": "^1.0.1",
     "tslint": "^3.15.1",
     "typescript": "^2.0.3"
   }

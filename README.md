@@ -18,10 +18,11 @@ You can also create "view" objects from your type schemas that automatically upd
 their underlying buffer storage on modification, like magic! This concept is shamelessly inspired
 by [Typed Objects](http://wiki.ecmascript.org/doku.php?id=harmony:typed_objects).
 
-Structly works great in Node (>=4). For browser compatability, a `Buffer` shim must be included.
-
 Structly supports numbers, booleans, arrays, structs, tuples, bitfields, strings and buffers.
 
+## Compatiblity
+
+Structly works great in Node (>=4). A minified UMD build with included shims is also available for browser compatibility. Structly also exposes ES2015 modules for tree-shaking with ES2015-compatible module loaders, such as Rollup or Webpack 2.
 
 ## Usage
 
