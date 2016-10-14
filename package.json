@@ -32,7 +32,6 @@
     "pretest": "run-s clean build:commonjs",
     "posttest": "npm run lint",
     "preversion": "npm test",
-    "postversion": "git push && git push --tags && npm publish",
     "prepublish": "npm run build"
   },
   "files": [
