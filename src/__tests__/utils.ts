@@ -1,74 +1,73 @@
-import test from 'ava';
 import { NumberTag } from '../schemas';
 import { align, createMask, getBuffer, getBufferGetterName, getBufferSetterName } from '../utils';
 
-test('align', t => {
-  t.is(align(9, 4), 12);
+test('align', () => {
+  expect(align(9, 4)).toBe(12);
 });
 
-test('createMask', t => {
-  t.is(createMask(0), 0);
-  t.is(createMask(32), 0xffffffff);
+test('createMask', () => {
+  expect(createMask(0)).toBe(0);
+  expect(createMask(32)).toBe(0xffffffff);
 });
 
-test('getBuffer', t => {
-  t.throws(() => (getBuffer as any)());
-  t.throws(() => (getBuffer as any)(null));
-  t.throws(() => (getBuffer as any)('232'));
-  t.throws(() => (getBuffer as any)(true));
-  t.true(Buffer.isBuffer(getBuffer(Buffer.alloc(1024))));
-  t.true(Buffer.isBuffer(getBuffer(new ArrayBuffer(1024))));
-  t.true(Buffer.isBuffer(getBuffer(new Float32Array(24))));
+test('getBuffer', () => {
+  expect(() => (getBuffer as any)()).toThrow();
+  expect(() => (getBuffer as any)(null)).toThrow();
+  expect(() => (getBuffer as any)('232')).toThrow();
+  expect(() => (getBuffer as any)(true)).toThrow();
+  expect(Buffer.isBuffer(getBuffer(Buffer.alloc(1024)))).toBe(true);
+  expect(Buffer.isBuffer(getBuffer(new ArrayBuffer(1024)))).toBe(true);
+  expect(Buffer.isBuffer(getBuffer(new Float32Array(24)))).toBe(true);
 });
 
-test('getBufferGetterName', t => {
-  t.throws(() => getBufferGetterName(-1, true));
-  t.throws(() => getBufferGetterName(-1, false));
+test('getBufferGetterName', () => {
+  expect(() => getBufferGetterName(-1, true)).toThrow();
+  expect(() => getBufferGetterName(-1, false)).toThrow();
 
-  t.is(getBufferGetterName(NumberTag.Int8, true), 'readInt8');
-  t.is(getBufferGetterName(NumberTag.Int8, false), 'readInt8');
-  t.is(getBufferGetterName(NumberTag.UInt8, true), 'readUInt8');
-  t.is(getBufferGetterName(NumberTag.UInt8, false), 'readUInt8');
+  expect(getBufferGetterName(NumberTag.Int8, true)).toBe('readInt8');
+  expect(getBufferGetterName(NumberTag.Int8, false)).toBe('readInt8');
+  expect(getBufferGetterName(NumberTag.UInt8, true)).toBe('readUInt8');
+  expect(getBufferGetterName(NumberTag.UInt8, false)).toBe('readUInt8');
 
-  t.is(getBufferGetterName(NumberTag.Int16, true), 'readInt16LE');
-  t.is(getBufferGetterName(NumberTag.Int16, false), 'readInt16BE');
-  t.is(getBufferGetterName(NumberTag.UInt16, true), 'readUInt16LE');
-  t.is(getBufferGetterName(NumberTag.UInt16, false), 'readUInt16BE');
+  expect(getBufferGetterName(NumberTag.Int16, true)).toBe('readInt16LE');
+  expect(getBufferGetterName(NumberTag.Int16, false)).toBe('readInt16BE');
+  expect(getBufferGetterName(NumberTag.UInt16, true)).toBe('readUInt16LE');
+  expect(getBufferGetterName(NumberTag.UInt16, false)).toBe('readUInt16BE');
 
-  t.is(getBufferGetterName(NumberTag.Int32, true), 'readInt32LE');
-  t.is(getBufferGetterName(NumberTag.Int32, false), 'readInt32BE');
-  t.is(getBufferGetterName(NumberTag.UInt32, true), 'readUInt32LE');
-  t.is(getBufferGetterName(NumberTag.UInt32, false), 'readUInt32BE');
+  expect(getBufferGetterName(NumberTag.Int32, true)).toBe('readInt32LE');
+  expect(getBufferGetterName(NumberTag.Int32, false)).toBe('readInt32BE');
+  expect(getBufferGetterName(NumberTag.UInt32, true)).toBe('readUInt32LE');
+  expect(getBufferGetterName(NumberTag.UInt32, false)).toBe('readUInt32BE');
 
-  t.is(getBufferGetterName(NumberTag.Float32, true), 'readFloatLE');
-  t.is(getBufferGetterName(NumberTag.Float32, false), 'readFloatBE');
+  expect(getBufferGetterName(NumberTag.Float32, true)).toBe('readFloatLE');
+  expect(getBufferGetterName(NumberTag.Float32, false)).toBe('readFloatBE');
 
-  t.is(getBufferGetterName(NumberTag.Float64, true), 'readDoubleLE');
-  t.is(getBufferGetterName(NumberTag.Float64, false), 'readDoubleBE');
+  expect(getBufferGetterName(NumberTag.Float64, true)).toBe('readDoubleLE');
+  expect(getBufferGetterName(NumberTag.Float64, false)).toBe('readDoubleBE');
 });
 
-test('getBufferSetterName', t => {
-  t.throws(() => getBufferSetterName(-1, true));
-  t.throws(() => getBufferSetterName(-1, false));
+test('getBufferSetterName', () => {
+  expect(() => getBufferSetterName(-1, true)).toThrow();
+  expect(() => getBufferSetterName(-1, false)).toThrow();
 
-  t.is(getBufferSetterName(NumberTag.Int8, true), 'writeInt8');
-  t.is(getBufferSetterName(NumberTag.Int8, false), 'writeInt8');
-  t.is(getBufferSetterName(NumberTag.UInt8, true), 'writeUInt8');
-  t.is(getBufferSetterName(NumberTag.UInt8, false), 'writeUInt8');
+  expect(getBufferSetterName(NumberTag.Int8, true)).toBe('writeInt8');
+  expect(getBufferSetterName(NumberTag.Int8, false)).toBe('writeInt8');
+  expect(getBufferSetterName(NumberTag.UInt8, true)).toBe('writeUInt8');
+  expect(getBufferSetterName(NumberTag.UInt8, false)).toBe('writeUInt8');
 
-  t.is(getBufferSetterName(NumberTag.Int16, true), 'writeInt16LE');
-  t.is(getBufferSetterName(NumberTag.Int16, false), 'writeInt16BE');
-  t.is(getBufferSetterName(NumberTag.UInt16, true), 'writeUInt16LE');
-  t.is(getBufferSetterName(NumberTag.UInt16, false), 'writeUInt16BE');
+  expect(getBufferSetterName(NumberTag.Int16, true)).toBe('writeInt16LE');
+  expect(getBufferSetterName(NumberTag.Int16, false)).toBe('writeInt16BE');
+  expect(getBufferSetterName(NumberTag.UInt16, true)).toBe('writeUInt16LE');
+  expect(getBufferSetterName(NumberTag.UInt16, false)).toBe('writeUInt16BE');
 
-  t.is(getBufferSetterName(NumberTag.Int32, true), 'writeInt32LE');
-  t.is(getBufferSetterName(NumberTag.Int32, false), 'writeInt32BE');
-  t.is(getBufferSetterName(NumberTag.UInt32, true), 'writeUInt32LE');
-  t.is(getBufferSetterName(NumberTag.UInt32, false), 'writeUInt32BE');
+  expect(getBufferSetterName(NumberTag.Int32, true)).toBe('writeInt32LE');
+  expect(getBufferSetterName(NumberTag.Int32, false)).toBe('writeInt32BE');
+  expect(getBufferSetterName(NumberTag.UInt32, true)).toBe('writeUInt32LE');
+  expect(getBufferSetterName(NumberTag.UInt32, false)).toBe('writeUInt32BE');
 
-  t.is(getBufferSetterName(NumberTag.Float32, true), 'writeFloatLE');
-  t.is(getBufferSetterName(NumberTag.Float32, false), 'writeFloatBE');
+  expect(getBufferSetterName(NumberTag.Float32, true)).toBe('writeFloatLE');
+  expect(getBufferSetterName(NumberTag.Float32, false)).toBe('writeFloatBE');
 
-  t.is(getBufferSetterName(NumberTag.Float64, true), 'writeDoubleLE');
-  t.is(getBufferSetterName(NumberTag.Float64, false), 'writeDoubleBE');
+  expect(getBufferSetterName(NumberTag.Float64, true)).toBe('writeDoubleLE');
+  expect(getBufferSetterName(NumberTag.Float64, false)).toBe('writeDoubleBE');
 });

@@ -7,5 +7,10 @@ node_js:
 cache:
   directories:
     - node_modules
+before_install:
+  - if [[ $(npm --version) == 2* ]]; then npm install -g npm@latest-3; fi
+script:
+  - npm test -- --coverage --no-cache --runInBand
 after_success:
-  - npm run coveralls
+  - npm install -g coveralls
+  - cat coverage/remapped/lcov.info | coveralls

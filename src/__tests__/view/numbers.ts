@@ -1,20 +1,19 @@
-import test from 'ava';
 import { numberSchemaData, getNumberTagName } from '../_helpers';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 
 for (const { schema, constructor } of numberSchemaData) {
-  test(`view of ${getNumberTagName(schema.numberTag)}`, t => {
+  test(`view of ${getNumberTagName(schema.numberTag)}`, () => {
     const view = createView(schema);
 
-    t.is(typeof view.value, 'number');
+    expect(typeof view.value).toBe('number');
 
-    t.is(view.value, 0);
-    t.true(getBuffer(view).equals(getBuffer(new constructor([0]))));
+    expect(view.value).toBe(0);
+    expect(getBuffer(view).equals(getBuffer(new constructor([0])))).toBe(true);
 
     view.value = 42;
 
-    t.is(view.value, 42);
-    t.true(getBuffer(view).equals(getBuffer(new constructor([42]))));
+    expect(view.value).toBe(42);
+    expect(getBuffer(view).equals(getBuffer(new constructor([42])))).toBe(true);
   });
 }

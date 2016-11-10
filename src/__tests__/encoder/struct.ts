@@ -1,8 +1,7 @@
-import test from 'ava';
 import { createEncoder } from '../../encoder';
 import { struct, float32le } from '../../schemas';
 
-test('simple', t => {
+test('simple', () => {
   const schema = struct({
     x: float32le,
     y: float32le,
@@ -24,5 +23,5 @@ test('simple', t => {
 
   const encoded = encode(data);
 
-  t.true(encoded.equals(expected));
+  expect(encoded.equals(expected)).toBe(true);
 });

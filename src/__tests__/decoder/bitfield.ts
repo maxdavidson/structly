@@ -1,4 +1,3 @@
-import test from 'ava';
 import { createDecoder } from '../../decoder';
 import { getBuffer } from '../../utils';
 import { bitfield } from '../../schemas';
@@ -23,14 +22,14 @@ const buffer = getBuffer(new Uint32Array([673186565]));
 
 const decode = createDecoder(schema);
 
-test('simple', t => {
+test('simple', () => {
   const decoded = decode(buffer);
-  t.deepEqual(decoded, data);
+  expect(decoded).toEqual(data);
 });
 
-test('reuse object', t => {
+test('reuse object', () => {
   const result = {};
   const decoded = decode(buffer, result);
-  t.is(decoded, result);
-  t.deepEqual(decoded, data);
+  expect(decoded).toBe(result);
+  expect(decoded).toEqual(data);
 });

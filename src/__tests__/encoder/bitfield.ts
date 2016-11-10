@@ -1,9 +1,8 @@
-import test from 'ava';
 import { getBuffer } from '../../utils';
 import { createEncoder } from '../../encoder';
 import { bitfield } from '../../schemas';
 
-test('simple', t => {
+test('simple', () => {
   const schema = bitfield({
     hello: 1,
     there: 7,
@@ -24,5 +23,5 @@ test('simple', t => {
   const encoded = encode(data);
   const expected = getBuffer(new Uint32Array([673186565]));
 
-  t.true(encoded.equals(expected));
+  expect(encoded.equals(expected)).toBe(true);
 });

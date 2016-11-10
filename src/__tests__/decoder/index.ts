@@ -1,23 +1,22 @@
-import test from 'ava';
 import { createDecoder } from '../../decoder';
 import { float64 } from '../../schemas';
 
-test('no parameters', t => {
-  t.throws(() => (createDecoder as any)(), TypeError);
+test('no parameters', () => {
+  expect(() => (createDecoder as any)()).toThrowError(TypeError);
 });
 
-test('no data', t => {
+test('no data', () => {
   const decode = createDecoder(float64);
-  t.throws(() => (decode as any)(), TypeError);
+  expect(() => (decode as any)()).toThrowError(TypeError);
 });
 
-test('too small buffer', t => {
+test('too small buffer', () => {
   const decode = createDecoder(float64);
   const buffer = Buffer.alloc(4);
-  t.throws(() => decode(buffer), RangeError);
+  expect(() => decode(buffer)).toThrowError(RangeError);
 });
 
-test('invalid schema', t => {
+test('invalid schema', () => {
   const invalidSchema = { tag: 999 };
-  t.throws(() => createDecoder(invalidSchema as any), TypeError);
+  expect(() => createDecoder(invalidSchema as any)).toThrowError(TypeError);
 });

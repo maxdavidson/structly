@@ -1,9 +1,8 @@
-import test from 'ava';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 import { bitfield } from '../../schemas';
 
-test('bitfield', t => {
+it('bitfield', () => {
   const schema = bitfield({
     hello: 1,
     there: 7,
@@ -14,13 +13,13 @@ test('bitfield', t => {
 
   const view = createView(schema);
 
-  t.is(view.value.hello, 0);
-  t.is(view.value.there, 0);
-  t.is(view.value.how, 0);
-  t.is(view.value.are, 0);
-  t.is(view.value.you, 0);
+  expect(view.value.hello).toBe(0);
+  expect(view.value.there).toBe(0);
+  expect(view.value.how).toBe(0);
+  expect(view.value.are).toBe(0);
+  expect(view.value.you).toBe(0);
 
-  t.true(getBuffer(view).equals(getBuffer(new Uint32Array([0]))));
+  expect(getBuffer(view).equals(getBuffer(new Uint32Array([0])))).toBe(true);
 
   view.value.hello = 1;
   view.value.there = 2;
@@ -28,11 +27,11 @@ test('bitfield', t => {
   view.value.are = 4;
   view.value.you = 5;
 
-  t.is(view.value.hello, 1);
-  t.is(view.value.there, 2);
-  t.is(view.value.how, 3);
-  t.is(view.value.are, 4);
-  t.is(view.value.you, 5);
+  expect(view.value.hello).toBe(1);
+  expect(view.value.there).toBe(2);
+  expect(view.value.how).toBe(3);
+  expect(view.value.are).toBe(4);
+  expect(view.value.you).toBe(5);
 
   const expectedValue =
     (1 & 0b1) | ((2 & 0b1111111) << 1) |
@@ -40,5 +39,5 @@ test('bitfield', t => {
     ((4 & 0b11111111) << (1 + 7 + 11)) |
     ((5 % 0b11111) << (1 + 7 + 11 + 8));
 
-  t.true(getBuffer(view).equals(getBuffer(new Uint32Array([expectedValue]))));
+  expect(getBuffer(view).equals(getBuffer(new Uint32Array([expectedValue])))).toBe(true);
 });

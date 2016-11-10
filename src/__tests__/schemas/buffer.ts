@@ -1,16 +1,15 @@
-import test from 'ava';
 import { SchemaTag, buffer } from '../../schemas';
 import { alignof, sizeof } from '../../utils';
 
-test('invalid input', t => {
-  t.throws(() => (buffer as any)(), TypeError);
-  t.throws(() => (buffer as any)('bajs'), TypeError);
+test('invalid input', () => {
+  expect(() => (buffer as any)()).toThrowError(TypeError);
+  expect(() => (buffer as any)('bajs')).toThrowError(TypeError);
 });
 
-test('default behavior', t => {
+test('default behavior', () => {
   const schema = buffer(100);
 
-  t.is(schema.tag, SchemaTag.Buffer);
-  t.is(sizeof(schema), 100);
-  t.is(alignof(schema), 1);
+  expect(schema.tag).toBe(SchemaTag.Buffer);
+  expect(sizeof(schema)).toBe(100);
+  expect(alignof(schema)).toBe(1);
 });

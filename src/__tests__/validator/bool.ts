@@ -1,15 +1,14 @@
-import test from 'ava';
 import { validateData } from '../../validator';
 import { bool } from '../../schemas';
 
-test(`invalid`, t => {
-  t.not((validateData as any)(bool), undefined);
-  t.not(validateData(bool, 'bajs'), undefined);
-  t.not(validateData(bool, 12), undefined);
-  t.not(validateData(bool, {}), undefined);
+test('invalid', () => {
+  expect((validateData as any)(bool)).toBeDefined();
+  expect(validateData(bool, 'bajs')).toBeDefined();
+  expect(validateData(bool, 12)).toBeDefined();
+  expect(validateData(bool, {})).toBeDefined();
 });
 
-test(`valid`, t => {
-  t.is(validateData(bool, true), undefined);
-  t.is(validateData(bool, false), undefined);
+test('valid', () => {
+  expect(validateData(bool, true)).toBeUndefined();
+  expect(validateData(bool, false)).toBeUndefined();
 });

@@ -22,7 +22,7 @@ Structly supports numbers, booleans, arrays, structs, tuples, bitfields, strings
 
 ## Compatiblity
 
-Structly works great in Node (>=4). A minified UMD build with included shims is also available for browser compatibility. Structly also exposes ES2015 modules for tree-shaking with ES2015-compatible module loaders, such as Rollup or Webpack 2.
+Structly works great in Node (>=4.5.0). A minified UMD build with included shims is also available for browser compatibility. Structly also exposes ES2015 modules for tree-shaking with ES2015-compatible module loaders, such as Rollup or Webpack 2.
 
 ## Usage
 
