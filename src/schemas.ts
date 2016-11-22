@@ -8,7 +8,7 @@ export const enum SchemaTag {
   Tuple,
   Struct,
   Bitfield,
-  Buffer,
+  Buffer
 }
 
 export const enum NumberTag {
