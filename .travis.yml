@@ -3,8 +3,12 @@ node_js:
   - lts/argon
   - lts/boron
   - stable
+cache:
+  yarn: true
+  directories:
+    - node_modules
 script:
-  - npm test -- --coverage --no-cache --runInBand
+  - yarn test -- --coverage --no-cache --runInBand
 after_success:
-  - npm install -g coveralls
+  - yarn global add coveralls
   - cat coverage/lcov.info | coveralls
