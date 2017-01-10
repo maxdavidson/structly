@@ -4,7 +4,7 @@ import * as schemas from '../../schemas';
 
 const numberSchemas: schemas.NumberSchema<schemas.NumberTag>[] = Object.keys(schemas)
   .map(key => schemas[key])
-  .filter(schema => 'numberTag' in schema);
+  .filter(schema => typeof schema === 'object' && schema !== null && 'numberTag' in schema);
 
 for (const numberSchema of numberSchemas) {
   const schemaName = getNumberTagName(numberSchema.numberTag);

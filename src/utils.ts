@@ -31,6 +31,19 @@ export function createVariable(name: string, stackDepth = 0) {
   return `${name}${stackDepth}`;
 }
 
+export function mapValues<T, V>(obj: T, mapper: (value: T[keyof T], key: keyof T) => V): { [K in keyof T]: V; } {
+  const mappedObj = {} as any;
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      mappedObj[key] = mapper(obj[key], key);
+    }
+  }
+  return mappedObj;
+}
+
+export const entries: <T>(obj: T) => [keyof T, T[keyof T]][]
+  = (Object as any).entries || (obj => Object.keys(obj).map(key => [key, obj[key]] as any));
+
 export function getBufferGetterName(numberTag: NumberTag, littleEndian: boolean) {
   switch (numberTag) {
     case NumberTag.Int8: return 'readInt8';

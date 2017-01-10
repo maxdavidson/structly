@@ -9,7 +9,8 @@ import {
 const swap16 = typeof Buffer.prototype.swap16 === 'function'
   ? (buffer: Buffer) => buffer.swap16()
   : (buffer: Buffer) => {
-    for (let offset = 0, len = buffer.length; offset < len; offset += 2) {
+    const { length } = buffer;
+    for (let offset = 0; offset < length; offset += 2) {
       buffer.writeUInt16BE(buffer.readUInt16LE(offset, true), offset, true);
     }
     return buffer;
@@ -18,7 +19,8 @@ const swap16 = typeof Buffer.prototype.swap16 === 'function'
 const swap32 = typeof Buffer.prototype.swap32 === 'function'
   ? (buffer: Buffer) => buffer.swap32()
   : (buffer: Buffer) => {
-    for (let offset = 0, len = buffer.length; offset < len; offset += 4) {
+    const { length } = buffer;
+    for (let offset = 0; offset < length; offset += 4) {
       buffer.writeUInt32BE(buffer.readUInt32LE(offset, true), offset, true);
     }
     return buffer;
@@ -27,7 +29,8 @@ const swap32 = typeof Buffer.prototype.swap32 === 'function'
 const swap64 = typeof Buffer.prototype.swap64 === 'function'
   ? (buffer: Buffer) => buffer.swap64()
   : (buffer: Buffer) => {
-    for (let offset = 0, len = buffer.length; offset < len; offset += 8) {
+    const { length } = buffer;
+    for (let offset = 0; offset < length; offset += 8) {
       const lo = buffer.readUInt32LE(offset, true);
       const hi = buffer.readUInt32LE(offset + 4, true);
       buffer.writeUInt32BE(hi, offset, true);

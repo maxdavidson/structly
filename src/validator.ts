@@ -1,4 +1,4 @@
-import { Schema, SchemaTag } from './schemas';
+import { SCHEMA_VERSION, Schema, SchemaTag } from './schemas';
 
 function validate(test: boolean, message: string) {
   return test ? undefined : message;
@@ -17,21 +17,21 @@ function validateLength(expected: any, actual: any) {
 }
 
 // Map keys and ignore undefined values
-function mapObject<T>(
-  obj: any,
-  mapValue: (value: any, key: string) => any,
-  mapKey?: (value: any, key: string) => any
-): Object | undefined {
+function mapObject<T, U>(
+  obj: T,
+  mapValue: (value: T[keyof T], key: keyof T) => U,
+  mapKey?: (value: T[keyof T], key: keyof T) => keyof T
+): { [K in keyof T]: U } {
   let newObj;
   Object.keys(obj).forEach(key => {
     const value = obj[key];
-    const newValue = mapValue(value, key);
+    const newValue = mapValue(value, key as keyof T);
     if (newValue !== undefined) {
       if (newObj === undefined) {
         newObj = {};
       }
       if (mapKey !== undefined) {
-        key = mapKey(value, key);
+        key = mapKey(value, key as keyof T);
       }
       newObj[key] = newValue;
     }
@@ -42,6 +42,10 @@ function mapObject<T>(
 export function validateData(schema: Schema, data: any) {
   if (schema === undefined) {
     throw new TypeError('You must specify a schema to validate with!');
+  }
+
+  if (schema.version !== SCHEMA_VERSION) {
+    throw new TypeError('Invalid schema version ');
   }
 
   switch (schema.tag) {
@@ -64,15 +68,15 @@ export function validateData(schema: Schema, data: any) {
       return validateType('object', data)
         || validate(Array.isArray(data), `Data is not an array`)
         || validateLength(schema.fields, data)
-        || mapObject(schema.fields, (field, i) => validateData(field.schema, data[i]));
+        || mapObject(schema.fields as any, (field, i) => validateData(field.schema, data[i]));
 
     case SchemaTag.Struct:
       return validateType('object', data)
-        || mapObject(schema.fields, field => validateData(field.schema, data[field.name]), field => field.name);
+        || mapObject(schema.fields, (field, name) => validateData(field.schema, data[name]));
 
     case SchemaTag.Bitfield:
       return validateType('object', data)
-        || mapObject(schema.fields, field => validateType('number', data[field.name]));
+        || mapObject(schema.fields, (_, name) => validateType('number', data[name]));
 
     case SchemaTag.Buffer:
       return validateType('object', data)

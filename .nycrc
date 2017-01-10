@@ -1,9 +1,0 @@
-{
-  "include": [
-    "dist/commonjs/**/*.js"
-  ],
-  "reporter": [
-    "html",
-    "text"
-  ]
-}
