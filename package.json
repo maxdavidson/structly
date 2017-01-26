@@ -62,20 +62,20 @@
     ]
   },
   "dependencies": {
-    "@types/node": "^6.0.38"
+    "@types/node": "^7.0.4"
   },
   "devDependencies": {
     "@types/jest": "^16.0.0",
-    "jest": "^17.0.0",
+    "jest": "^18.1.0",
     "rimraf": "^2.5.4",
-    "rollup": "^0.37.0",
-    "rollup-plugin-commonjs": "^5.0.4",
+    "rollup": "^0.41.4",
+    "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-builtins": "^2.0.0",
     "rollup-plugin-node-globals": "^1.0.9",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-sourcemaps": "^0.4.1",
     "rollup-plugin-uglify": "^1.0.1",
-    "ts-jest": "^17.0.0",
+    "ts-jest": "^18.0.2",
     "tslint": "^4.0.1",
     "typescript": "^2.0.8"
   }
