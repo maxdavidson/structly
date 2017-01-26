@@ -1,5 +1,7 @@
 # structly
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/maxdavidson/structly.svg)](https://greenkeeper.io/)
+
 [![NPM](https://img.shields.io/npm/v/structly.svg)](https://www.npmjs.com/package/structly)
 [![Build Status](https://img.shields.io/travis/maxdavidson/structly/master.svg)](https://travis-ci.org/maxdavidson/structly)
 [![Coverage Status](https://img.shields.io/coveralls/maxdavidson/structly/master.svg)](https://coveralls.io/github/maxdavidson/structly?branch=master)
