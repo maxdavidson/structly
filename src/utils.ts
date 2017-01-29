@@ -31,7 +31,7 @@ export function createVariable(name: string, stackDepth = 0) {
   return `${name}${stackDepth}`;
 }
 
-export function mapValues<T, V>(obj: T, mapper: (value: T[keyof T], key: keyof T) => V): { [K in keyof T]: V; } {
+export function mapValues<T, V>(obj: T, mapper: (value: T[keyof T], key: keyof T) => V): Record<keyof T, V> {
   const mappedObj = {} as any;
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
