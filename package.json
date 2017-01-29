@@ -23,10 +23,11 @@
     "build:es2015": "tsc --module es2015 --outDir dist/es2015 --declaration --declarationDir dist/typings",
     "build:umd": "npm run build:es2015 && rollup --config",
     "clean": "rimraf dist coverage",
-    "lint": "tsc --noEmit && tslint --project tsconfig.json --format stylish",
+    "typecheck": "tsc --noEmit",
+    "lint": "tslint --project tsconfig.json --format stylish",
     "prebuild": "npm run clean",
     "test": "jest",
-    "posttest": "npm run lint",
+    "posttest": "npm run typecheck && npm run lint",
     "preversion": "npm test",
     "prepublishOnly": "npm run build"
   },
