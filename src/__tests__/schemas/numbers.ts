@@ -1,5 +1,6 @@
 import {
   NumberTag, SchemaTag, NumberSchema,
+  SCHEMA_VERSION,
   int8, uint8,
   int16, int16le, int16be,
   uint16, uint16le, uint16be,
@@ -15,6 +16,7 @@ function numberSchemaHelper<T extends NumberSchema<Tag>, Tag extends NumberTag>(
   return () => {
     expect(schema).toEqual({
       tag: SchemaTag.Number,
+      version: SCHEMA_VERSION,
       numberTag,
       byteLength:
       size,

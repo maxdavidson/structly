@@ -1,7 +1,7 @@
 import { Schema, SchemaTag, uint8 } from './schemas';
 import {
   BufferLike, createMask, createVariable, getBuffer,
-  getBufferGetterName, strideof, systemLittleEndian
+  getBufferGetterName, entries, strideof, systemLittleEndian
 } from './utils';
 
 /** Convert a buffer into its JavaScript representation */
@@ -124,13 +124,13 @@ export function createDecoderCode(schema: Schema, stackDepth = 0): string {
 
     case SchemaTag.Struct: {
       const { fields } = schema;
-      const emptyStruct = `{ ${fields.map(field => `${JSON.stringify(field.name)}: undefined`).join(', ')} }`;
+      const emptyStruct = `{ ${Object.keys(fields).map(name => `${JSON.stringify(name)}: undefined`).join(', ')} }`;
 
       return `
         if (${resultVar} === undefined) {
           ${resultVar} = ${emptyStruct};
         }
-        ${fields.map(({ name, schema: fieldSchema, byteOffset }) => `
+        ${entries(fields).map(([name, { schema: fieldSchema, byteOffset }]) => `
           var ${innerResultVar} = ${resultVar}[${JSON.stringify(name)}];
           var ${innerByteOffsetVar} = ${byteOffsetVar} + ${byteOffset};
           ${createDecoderCode(fieldSchema, stackDepth + 1)}
@@ -141,7 +141,7 @@ export function createDecoderCode(schema: Schema, stackDepth = 0): string {
 
     case SchemaTag.Bitfield: {
       const { elementSchema, fields } = schema;
-      const emptyBitfield = `{ ${fields.map(field => `${JSON.stringify(field.name)}: undefined`).join(', ')} }`;
+      const emptyBitfield = `{ ${Object.keys(fields).map(name => `${JSON.stringify(name)}: undefined`).join(', ')} }`;
 
       return `
         if (${resultVar} === undefined) {
@@ -150,7 +150,7 @@ export function createDecoderCode(schema: Schema, stackDepth = 0): string {
         var ${innerByteOffsetVar} = ${byteOffsetVar};
         var ${innerResultVar};
         ${createDecoderCode(elementSchema, stackDepth + 1)}
-        ${fields.map(({ name, bits }) => `
+        ${entries(fields).map(([name, bits]) => `
           ${resultVar}[${JSON.stringify(name)}] = ${innerResultVar} & ${createMask(bits)};
           ${innerResultVar} >>>= ${bits};
         `).join('\n')}
