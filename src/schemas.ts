@@ -244,7 +244,7 @@ export function struct<Descriptor extends StructDescriptor>(descriptor: Descript
   let maxByteAlignment = 0;
 
   const processedFields = fieldNames.reduce((obj, name) => {
-    const schema = descriptor[name];
+    const schema: Schema = descriptor[name];
     const { byteLength, byteAlignment } = schema;
     byteOffset = align(byteOffset, Number(pack || byteAlignment));
     obj[name] = { schema, byteOffset };
