@@ -17,11 +17,7 @@ function validateLength(expected: any, actual: any) {
 }
 
 // Map keys and ignore undefined values
-function mapObject<T, U>(
-  obj: T,
-  mapValue: (value: T[keyof T], key: keyof T) => U,
-  mapKey?: (value: T[keyof T], key: keyof T) => keyof T
-): { [K in keyof T]: U } {
+function mapObject<T, U>(obj: T, mapValue: (value: T[keyof T], key: keyof T) => U): Record<keyof T, U> {
   let newObj;
   Object.keys(obj).forEach(key => {
     const value = obj[key];
@@ -29,9 +25,6 @@ function mapObject<T, U>(
     if (newValue !== undefined) {
       if (newObj === undefined) {
         newObj = {};
-      }
-      if (mapKey !== undefined) {
-        key = mapKey(value, key as keyof T);
       }
       newObj[key] = newValue;
     }
