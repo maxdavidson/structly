@@ -26,7 +26,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "tslint --project tsconfig.json --format stylish",
     "prebuild": "npm run clean",
-    "test": "jest",
+    "test": "jest --coverage --runInBand --no-cache",
     "posttest": "npm run typecheck && npm run lint",
     "preversion": "npm test",
     "prepublishOnly": "npm run build"
