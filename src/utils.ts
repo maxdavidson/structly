@@ -41,6 +41,7 @@ export function mapValues<T, V>(obj: T, mapper: (value: T[keyof T], key: keyof T
   return mappedObj;
 }
 
+/* istanbul ignore next */
 export const entries: <T>(obj: T) => [keyof T, T[keyof T]][]
   = (Object as any).entries || (obj => Object.keys(obj).map(key => [key, obj[key]] as any));
 
