@@ -45,7 +45,7 @@ export function validateData(schema: Schema, data: any) {
   }
 
   if (schema.version !== SCHEMA_VERSION) {
-    throw new TypeError('Invalid schema version ');
+    throw new TypeError(`Incompatible schema version (${schema.version})! Expected version ${SCHEMA_VERSION}`);
   }
 
   switch (schema.tag) {
