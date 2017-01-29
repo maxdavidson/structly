@@ -2,7 +2,7 @@ import { Schema, SchemaTag, uint8 } from './schemas';
 import { validateData } from './validator';
 import {
   BufferLike, createMask, createVariable, getBuffer,
-  getBufferSetterName, sizeof, strideof, systemLittleEndian
+  getBufferSetterName, entries, sizeof, strideof, systemLittleEndian
 } from './utils';
 
 /** Serialize a JavaScript object or value into a buffer */
@@ -125,7 +125,7 @@ export function createEncoderCode(schema: Schema, stackDepth = 0): string {
       const { fields } = schema;
 
       return `
-        ${fields.map(({ name, schema: fieldSchema, byteOffset }) => `
+        ${entries(fields).map(([name, { schema: fieldSchema, byteOffset }]) => `
           var ${innerDataVar} = ${dataVar}[${JSON.stringify(name)}];
           var ${innerByteOffsetVar} = ${byteOffsetVar} + ${byteOffset};
           ${createEncoderCode(fieldSchema, stackDepth + 1)}
@@ -139,7 +139,7 @@ export function createEncoderCode(schema: Schema, stackDepth = 0): string {
       return `
         var ${innerByteOffsetVar} = ${byteOffsetVar};
         var ${innerDataVar} = 0;
-        ${fields.slice().reverse().map(({ name, bits }) => `
+        ${entries(fields).slice().reverse().map(([name, bits ]) => `
           ${innerDataVar} <<= ${bits};
           ${innerDataVar} |= ${dataVar}[${JSON.stringify(name)}] & ${createMask(bits)};
         `).join('\n')}

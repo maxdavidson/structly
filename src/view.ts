@@ -1,7 +1,10 @@
 import { createUncheckedDecoder } from './decoder';
 import { createUncheckedEncoder } from './encoder';
 import { Schema, SchemaTag, struct, uint8 } from './schemas';
-import { BufferLike, createMask, getBuffer, getBufferGetterName, sizeof, strideof, systemLittleEndian } from './utils';
+import {
+  BufferLike, createMask, getBuffer, getBufferGetterName,
+  mapValues, sizeof, strideof, systemLittleEndian
+} from './utils';
 
 export interface View<T extends Schema> {
   value: any;
@@ -100,18 +103,13 @@ function createProxy(schema: Schema, buffer: Buffer, byteOffset = 0): any {
     case SchemaTag.Struct: {
       const { fields } = schema;
 
-      const membersByName = fields.reduce((obj, field) => {
-        obj[field.name] = {
-          schema: field.schema,
-          encode: createUncheckedEncoder(field.schema),
-          totalByteOffset: byteOffset + field.byteOffset
-        };
-        return obj;
-      }, {});
+      const membersByName = mapValues(fields, (field, name) => ({
+        schema: field.schema,
+        encode: createUncheckedEncoder(field.schema),
+        totalByteOffset: byteOffset + field.byteOffset
+      }));
 
-      const fieldNames = fields.map(field => field.name);
-
-      return createObjectProxy(fieldNames, {
+      return createObjectProxy(Object.keys(fields), {
         get(name) {
           const { schema: fieldSchema, totalByteOffset } = membersByName[name];
           return createProxy(fieldSchema, buffer, totalByteOffset);
@@ -130,18 +128,15 @@ function createProxy(schema: Schema, buffer: Buffer, byteOffset = 0): any {
       const encode = createUncheckedEncoder(elementSchema);
 
       let currentBitOffset = 0;
-      const infoByName = fields.reduce((info, { name, bits }) => {
+      const infoByName = mapValues(fields, bits => {
         const bitOffset = currentBitOffset;
+        currentBitOffset += bits;
         const mask = createMask(bits);
         const clearMask = ~(mask << bitOffset);
-        info[name] = { bitOffset, mask, clearMask };
-        currentBitOffset += bits;
-        return info;
-      }, {});
+        return { bitOffset, mask, clearMask };
+      });
 
-      const fieldNames = fields.map(member => member.name);
-
-      return createObjectProxy(fieldNames, {
+      return createObjectProxy(Object.keys(fields), {
         get(name) {
           const { bitOffset, mask } = infoByName[name];
           const elementValue = decode(buffer, undefined, byteOffset);

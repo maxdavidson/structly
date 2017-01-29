@@ -1,5 +1,5 @@
 import { sizeof, strideof, alignof } from '../../utils';
-import { SchemaTag, bitfield, uint32, uint8 } from '../../schemas';
+import { SchemaTag, SCHEMA_VERSION, bitfield, uint32, uint8 } from '../../schemas';
 
 test('invalid input', () => {
   expect(() => (bitfield as any)()).toThrowError(TypeError);
@@ -18,6 +18,7 @@ test('default storage', () => {
   });
 
   expect(schema.tag).toBe(SchemaTag.Bitfield);
+  expect(schema.version).toBe(SCHEMA_VERSION);
   expect(schema.elementSchema).toBe(uint32);
   expect(sizeof(schema)).toBe(sizeof(schema.elementSchema));
   expect(strideof(schema)).toBe(strideof(schema.elementSchema));
@@ -31,6 +32,7 @@ test('custom storage', () => {
   }, uint8);
 
   expect(schema.tag).toBe(SchemaTag.Bitfield);
+  expect(schema.version).toBe(SCHEMA_VERSION);
   expect(schema.elementSchema).toBe(uint8);
   expect(sizeof(schema)).toBe(sizeof(schema.elementSchema));
   expect(strideof(schema)).toBe(strideof(schema.elementSchema));

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+* Update type schemas to utilize features in TypeScript 2.1
+* Introduce versioned schemas
+
 ## 0.5.0
 
 * Export ES2015 modules as separate files, for better tree-shaking

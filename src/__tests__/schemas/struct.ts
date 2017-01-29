@@ -1,5 +1,5 @@
 import { sizeof, strideof, alignof } from '../../utils';
-import { SchemaTag, struct, uint8, int16, int32 } from '../../schemas';
+import { SchemaTag, SCHEMA_VERSION, struct, uint8, int16, int32 } from '../../schemas';
 
 test('throw on invalid data', () => {
   expect(() => (struct as any)()).toThrowError(TypeError);
@@ -14,16 +14,17 @@ test('default', () => {
   });
 
   expect(schema.tag).toBe(SchemaTag.Struct);
+  expect(schema.version).toBe(SCHEMA_VERSION);
   expect(sizeof(schema)).toBe(9);
   expect(strideof(schema)).toBe(12);
   expect(alignof(schema)).toBe(4);
 
-  expect(schema.fields).toEqual([
-    { name: 'a', schema: uint8, byteOffset: 0 },
-    { name: 'b', schema: int16, byteOffset: 2 },
-    { name: 'c', schema: int32, byteOffset: 4 },
-    { name: 'd', schema: uint8, byteOffset: 8 }
-  ]);
+  expect(schema.fields).toEqual({
+    a: { schema: uint8, byteOffset: 0 },
+    b: { schema: int16, byteOffset: 2 },
+    c: { schema: int32, byteOffset: 4 },
+    d: { schema: uint8, byteOffset: 8 }
+  });
 });
 
 test('manually reordered', () => {
@@ -35,15 +36,16 @@ test('manually reordered', () => {
   });
 
   expect(schema.tag).toBe(SchemaTag.Struct);
+  expect(schema.version).toBe(SCHEMA_VERSION);
   expect(sizeof(schema)).toBe(8);
   expect(alignof(schema)).toBe(4);
 
-  expect(schema.fields).toEqual([
-    { name: 'a', schema: uint8, byteOffset: 0 },
-    { name: 'd', schema: uint8, byteOffset: 1 },
-    { name: 'b', schema: int16, byteOffset: 2 },
-    { name: 'c', schema: int32, byteOffset: 4 }
-  ]);
+  expect(schema.fields).toEqual({
+    a: { schema: uint8, byteOffset: 0 },
+    d: { schema: uint8, byteOffset: 1 },
+    b: { schema: int16, byteOffset: 2 },
+    c: { schema: int32, byteOffset: 4 }
+  });
 });
 
 test('auto-reordered', () => {
@@ -73,6 +75,7 @@ test('packed', () => {
   }, { pack: 1 });
 
   expect(schema.tag).toBe(SchemaTag.Struct);
+  expect(schema.version).toBe(SCHEMA_VERSION);
   expect(sizeof(schema)).toBe(8);
   expect(alignof(schema)).toBe(1);
 });
