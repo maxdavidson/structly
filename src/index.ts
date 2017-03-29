@@ -4,4 +4,4 @@ export * from './converter';
 export * from './encoder';
 export * from './decoder';
 export * from './view';
-export * from './validator'
+export * from './validator';
