@@ -1,8 +1,10 @@
 node_modules
 coverage
+.code
 dist
+lib
+es
 .vscode/**
 !.vscode/**/*.json
-.nyc_output
 .DS_Store
 *.log
