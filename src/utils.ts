@@ -73,27 +73,41 @@ export function getBufferSetterName(numberTag: NumberTag, littleEndian: boolean)
   }
 }
 
-function isArrayBufferView(arg: any): arg is ArrayBufferView {
-  return arg.buffer instanceof ArrayBuffer
-    && typeof arg.byteOffset === 'number'
-    && typeof arg.byteLength === 'number';
+function isArrayBufferLike(obj: any): obj is ArrayBuffer {
+  return typeof obj === 'object'
+    && obj !== null
+    && typeof obj.byteLength === 'number';
 }
 
-export type BufferLike = ArrayBuffer | ArrayBufferView;
+function isArrayBufferViewLike(obj: any): obj is ArrayBufferView {
+  return typeof obj === 'object'
+    && obj !== null
+    && isArrayBufferLike(obj.buffer)
+    && typeof obj.byteOffset === 'number'
+    && typeof obj.byteLength === 'number';
+}
+
+export type BufferLike = Buffer |  ArrayBuffer | ArrayBufferView;
 
 export function getBuffer(data: BufferLike): Buffer {
   if (Buffer.isBuffer(data)) {
     return data;
   }
 
-  if (data instanceof ArrayBuffer) {
-    return Buffer.from(data);
-  }
-
-  if (isArrayBufferView(data)) {
+  if (isArrayBufferViewLike(data)) {
     const { buffer, byteOffset, byteLength } = data;
-    return Buffer.from(buffer).slice(byteOffset, byteOffset + byteLength);
+    return getBuffer(buffer).slice(byteOffset, byteOffset + byteLength);
   }
 
-  throw new TypeError('Invalid input data');
+  if (isArrayBufferLike(data)) {
+    try {
+      return Buffer.from(data);
+    } catch (e) {
+      // Hacky fix for weird behavior in Node 4 with Jest 20's 'node' enviroment
+      /* istanbul ignore next */
+      return Buffer.from(new Uint8Array(data) as any);
+    }
+  }
+
+  throw new TypeError(`Invalid input data: ${JSON.stringify(data, null, 2)}`);
 }
