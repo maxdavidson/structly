@@ -8,13 +8,13 @@ import uglify from 'rollup-plugin-uglify';
 export default {
   moduleName: 'Structly',
   moduleId: 'structly',
-  entry: 'dist/es2015/index.js',
+  entry: 'es/index.js',
   dest: 'dist/structly.js',
   format: 'umd',
   sourceMap: true,
   plugins: [
     sourcemaps(),
-    nodeResolve({ jsnext: true }),
+    nodeResolve(),
     nodeGlobals(),
     nodeBuiltins(),
     commonjs(),

@@ -2,20 +2,23 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "outDir": "dist/commonjs",
+    "outDir": ".code",
+    "rootDir": "src",
     "newLine": "LF",
     "lib": ["es2015"],
     "moduleResolution": "node",
-    "pretty": true,
-    "sourceMap": true,
-    "inlineSources": true,
     "strictNullChecks": true,
+    "pretty": true,
+    "declaration": true,
+    "sourceMap": true,
+    "importHelpers": true,
+    "inlineSources": true,
     "preserveConstEnums": true
   },
-  "include": [
-    "src/**/*"
-  ],
   "exclude": [
-    "**/__tests__"
+    "node_modules",
+    "dist",
+    "es",
+    "lib"
   ]
 }
