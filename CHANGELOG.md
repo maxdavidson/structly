@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0
+
+* Compiled files now go in `lib` for commonjs and `es` for es2015 modules
+
 ## 0.6.0
 
 * Update type schemas to utilize features in TypeScript 2.1
