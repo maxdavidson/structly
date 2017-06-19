@@ -50,7 +50,7 @@
     "unpack"
   ],
   "dependencies": {
-    "@types/node": "^7.0.18",
+    "@types/node": "^8.0.0",
     "tslib": "^1.7.0"
   },
   "devDependencies": {
