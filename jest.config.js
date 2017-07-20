@@ -35,9 +35,11 @@ module.exports = {
     '!src/**/*.d.ts'
   ],
   globals: {
-    __TS_CONFIG__: {
-      target: getSupportedTypescriptTarget(),
-      module: 'commonjs'
+    'ts-jest': {
+      tsConfigFile: {
+        target: getSupportedTypescriptTarget(),
+        module: 'commonjs'
+      }
     }
   }
 };
