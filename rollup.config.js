@@ -6,12 +6,16 @@ import commonjs from 'rollup-plugin-commonjs';
 import uglify from 'rollup-plugin-uglify';
 
 export default {
-  moduleName: 'Structly',
-  moduleId: 'structly',
-  entry: 'es/index.js',
-  dest: 'dist/structly.js',
-  format: 'umd',
-  sourceMap: true,
+  name: 'Structly',
+  amd: {
+    id: 'structly',
+  },
+  input: 'es/index.js',
+  output: {
+    file: 'dist/structly.js',
+    format: 'umd',
+  },
+  sourcemap: true,
   plugins: [
     sourcemaps(),
     nodeResolve(),
