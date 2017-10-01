@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.0
+
+* No more `any`! The JavaScript types of the decoded schemas will now be automatically inferred! This was achieved by meta-programming TypeScript's type system, using a combination of lookup types and recursive type definitions.
+* Formatted the code with [Prettier](https://prettier.io/)
+
 ## 0.7.0
 
 * Compiled files now go in `lib` for commonjs and `es` for es2015 modules
