@@ -1,13 +1,13 @@
-import { getNumberTagName } from '../_helpers';
 import { validateData } from '../../validator';
 import * as schemas from '../../schemas';
+import { entries } from '../../utils';
 
-const numberSchemas: schemas.NumberSchema<schemas.NumberTag>[] = Object.keys(schemas)
-  .map(key => schemas[key])
-  .filter(schema => typeof schema === 'object' && schema !== null && 'numberTag' in schema);
+const numberSchemas: schemas.NumberSchema<schemas.NumberTag>[] = entries(schemas)
+  .filter(([_, schema]) => typeof schema === 'object' && schema !== null && 'numberTag' in schema)
+  .map(([_, schema]) => schema as any);
 
 for (const numberSchema of numberSchemas) {
-  const schemaName = getNumberTagName(numberSchema.numberTag);
+  const { numberTag: schemaName } = numberSchema;
 
   test(`invalid ${schemaName}`, () => {
     expect((validateData as any)(numberSchema)).toBeDefined();

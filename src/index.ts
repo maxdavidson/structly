@@ -1,4 +1,4 @@
-export { alignof, sizeof, strideof, systemLittleEndian } from './utils';
+export { alignof, sizeof, strideof, systemLittleEndian, Mutable, BufferLike } from './utils';
 export * from './schemas';
 export * from './converter';
 export * from './encoder';

@@ -2,8 +2,18 @@ import { createEncoder } from '../encoder';
 import { createDecoder } from '../decoder';
 import { systemLittleEndian, getBuffer } from '../utils';
 import {
-  NumberTag, NumberSchema,
-  array, int8, uint8, int16, uint16, int32, uint32, float32, float64
+  NumberTag,
+  NumberSchema,
+  array,
+  int8,
+  uint8,
+  int16,
+  uint16,
+  int32,
+  uint32,
+  float32,
+  float64,
+  StringSchema
 } from '../schemas';
 
 const swap16 = typeof Buffer.prototype.swap16 === 'function'
@@ -40,14 +50,14 @@ const swap64 = typeof Buffer.prototype.swap64 === 'function'
   };
 
 const numberConstructors = {
-  [NumberTag.Int8]: Int8Array,
-  [NumberTag.UInt8]: Uint8Array,
-  [NumberTag.Int16]: Int16Array,
-  [NumberTag.UInt16]: Uint16Array,
-  [NumberTag.Int32]: Int32Array,
-  [NumberTag.UInt32]: Uint32Array,
-  [NumberTag.Float32]: Float32Array,
-  [NumberTag.Float64]: Float64Array
+  Int8: Int8Array,
+  UInt8: Uint8Array,
+  Int16: Int16Array,
+  UInt16: Uint16Array,
+  Int32: Int32Array,
+  UInt32: Uint32Array,
+  Float32: Float32Array,
+  Float64: Float64Array
 };
 
 export function encodeHelper<Tag extends NumberTag>(
@@ -61,7 +71,7 @@ export function encodeHelper<Tag extends NumberTag>(
     const encoded = encode(values);
 
     const valueBuffer = Buffer.from(encoded);
-    const constructor = numberConstructors[schema.numberTag as number];
+    const constructor = numberConstructors[schema.numberTag];
     const expected = new constructor(values);
     const expectedBuffer = getBuffer(expected);
 
@@ -85,7 +95,7 @@ export function decodeHelper<Tag extends NumberTag>(
   littleEndian = systemLittleEndian
 ) {
   return () => {
-    const constructor = numberConstructors[schema.numberTag as number];
+    const constructor = numberConstructors[schema.numberTag];
     const buffer = getBuffer(new constructor(testValues));
 
     const length = buffer.byteLength / schema.byteLength;
@@ -128,16 +138,8 @@ export const numberSchemaData: { schema: NumberSchema<NumberTag>; constructor: A
   { schema: float64, constructor: Float64Array }
 ];
 
-export function getNumberTagName(tag: NumberTag) {
-  switch (tag) {
-    case NumberTag.Int8: return 'int8';
-    case NumberTag.UInt8: return 'uint8';
-    case NumberTag.Int16: return 'int8';
-    case NumberTag.UInt16: return 'uint16';
-    case NumberTag.Int32: return 'int32';
-    case NumberTag.UInt32: return 'uint32';
-    case NumberTag.Float32: return 'float32';
-    case NumberTag.Float64: return 'float64';
-    default: throw new TypeError('Invalid number tag');
-  }
+export function createByteString<T extends StringSchema<any, any>>({ byteLength, encoding }: T, str: string) {
+  const buffer = Buffer.alloc(byteLength);
+  Buffer.from(str, encoding).copy(buffer, 0, 0, byteLength);
+  return buffer;
 }

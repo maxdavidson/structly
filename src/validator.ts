@@ -1,4 +1,5 @@
 import { SCHEMA_VERSION, Schema, SchemaTag } from './schemas';
+import { keys } from './utils';
 
 function validate(test: boolean, message: string) {
   return test ? undefined : message;
@@ -18,21 +19,21 @@ function validateLength(expected: any, actual: any) {
 
 // Map keys and ignore undefined values
 function mapObject<T, U>(obj: T, mapValue: (value: T[keyof T], key: keyof T) => U): Record<keyof T, U> {
-  let newObj;
-  Object.keys(obj).forEach(key => {
+  let newObj: Record<keyof T, U>;
+  keys(obj).forEach(key => {
     const value = obj[key];
     const newValue = mapValue(value, key as keyof T);
     if (newValue !== undefined) {
       if (newObj === undefined) {
-        newObj = {};
+        newObj = {} as Record<keyof T, U>;
       }
       newObj[key] = newValue;
     }
   });
-  return newObj;
+  return newObj!;
 }
 
-export function validateData(schema: Schema, data: any) {
+export function validateData(schema: Schema, data: any): any {
   if (schema === undefined) {
     throw new TypeError('You must specify a schema to validate with!');
   }

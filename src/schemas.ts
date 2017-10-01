@@ -1,93 +1,134 @@
-import { align, alignof, sizeof } from './utils';
+import { align, alignof, sizeof, keys, log2, Mutable } from './utils';
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 export const enum SchemaTag {
-  Number = 0,
-  Bool,
-  String,
-  Array,
-  Tuple,
-  Struct,
-  Bitfield,
-  Buffer
+  Number = 'Number',
+  Bool = 'Bool',
+  String = 'String',
+  Array = 'Array',
+  Struct = 'Struct',
+  Bitfield = 'Bitfield',
+  Tuple = 'Tuple',
+  Buffer = 'Buffer'
 }
 
 export const enum NumberTag {
-  Int8 = 0,
-  UInt8,
-  Int16,
-  UInt16,
-  Int32,
-  UInt32,
-  Float32,
-  Float64
+  Int8 = 'Int8',
+  UInt8 = 'UInt8',
+  Int16 = 'Int16',
+  UInt16 = 'UInt16',
+  Int32 = 'Int32',
+  UInt32 = 'UInt32',
+  Float32 = 'Float32',
+  Float64 = 'Float64'
 }
 
-export type BitfieldDescriptor = { [name: string]: number; };
-export type StructDescriptor = { [name: string]: Schema; };
+export interface SchemaMap {
+  Number: NumberSchema;
+  Bool: BoolSchema;
+  String: StringSchema<number, StringEncoding>;
+  Array: ArraySchema<SchemaBase<any>, number>;
+  Struct: StructSchema<Record<string, SchemaBase<any>>>;
+  Bitfield: BitfieldSchema<BitfieldFields, NumberSchema>;
+  Tuple: TupleSchema<SchemaBase<any>>;
+  Buffer: BufferSchema<number, number>;
+}
 
-export type SchemaBase<Tag extends SchemaTag> = {
+export const numberByteSize = {
+  Int8: 1 as 1,
+  UInt8: 1 as 1,
+  Int16: 2 as 2,
+  UInt16: 2 as 2,
+  Int32: 4 as 4,
+  UInt32: 4 as 4,
+  Float32: 4 as 4,
+  Float64: 8 as 8
+};
+
+export type Schema = SchemaMap[keyof SchemaMap];
+
+export interface SchemaBase<Tag extends SchemaTag> {
   readonly tag: Tag;
   readonly version: typeof SCHEMA_VERSION;
   readonly byteLength: number;
   readonly byteAlignment: number;
-};
+}
 
-export type NumberSchema<Tag extends NumberTag> = SchemaBase<SchemaTag.Number> & {
+export interface NumberSchema<Tag extends NumberTag = NumberTag, LittleEndian extends boolean = boolean> extends SchemaBase<SchemaTag.Number> {
+  readonly byteLength: typeof numberByteSize[Tag];
+  readonly byteAlignment: typeof numberByteSize[Tag];
   readonly numberTag: Tag;
-  readonly littleEndian?: boolean;
-};
+  readonly littleEndian?: LittleEndian;
+}
 
-export type BoolSchema = SchemaBase<SchemaTag.Bool>;
+export interface BoolSchema extends SchemaBase<SchemaTag.Bool> {}
 
-export type StringSchema = SchemaBase<SchemaTag.String> & {
-  readonly encoding: 'utf8' | 'ascii';
-};
+export type StringEncoding = 'utf8' | 'ascii';
 
-export type ArraySchema<ElementSchema extends Schema, size extends number> = SchemaBase<SchemaTag.Array> & {
-  readonly length: size;
+export interface StringSchema<MaxLength extends number, Encoding extends StringEncoding> extends SchemaBase<SchemaTag.String> {
+  readonly byteAlignment: 1;
+  readonly encoding: Encoding;
+}
+
+export interface ArraySchema<ElementSchema extends Schema, Length extends number> extends SchemaBase<SchemaTag.Array> {
+  readonly length: Length;
   readonly elementSchema: ElementSchema;
-};
+}
 
-export type TupleSchema = SchemaBase<SchemaTag.Tuple> & {
-  readonly fields: {
-    readonly byteOffset: number;
-    readonly schema: Schema;
-  }[];
-};
+export type StructFields = Record<string, Schema>;
 
-export type StructSchema<Descriptor extends StructDescriptor> = SchemaBase<SchemaTag.Struct> & {
+export interface StructSchema<Fields extends StructFields> extends SchemaBase<SchemaTag.Struct> {
   readonly fields: {
-    readonly [P in keyof Descriptor]: {
+    readonly [Field in keyof Fields]: {
       readonly byteOffset: number;
-      readonly schema: Descriptor[P];
+      readonly schema: Fields[Field];
     };
   };
-};
+}
 
-export type BitfieldSchema<Descriptor extends BitfieldDescriptor, Tag extends NumberTag> = SchemaBase<SchemaTag.Bitfield> & {
-  readonly elementSchema: NumberSchema<Tag>;
-  readonly fields: Descriptor;
-};
+export type BitfieldFields = Record<string, number>;
 
-export type BufferSchema = SchemaBase<SchemaTag.Buffer>;
+export interface BitfieldSchema<Fields extends BitfieldFields, ElementSchema extends NumberSchema> extends SchemaBase<SchemaTag.Bitfield> {
+  readonly byteLength: ElementSchema['byteLength'];
+  readonly byteAlignment: ElementSchema['byteAlignment'];
+  readonly fields: Fields;
+  readonly elementSchema: ElementSchema;
+}
 
-export type Schema =
-  | NumberSchema<NumberTag>
-  | BoolSchema
-  | StringSchema
-  | ArraySchema<any /*Schema*/, number>
-  | TupleSchema
-  | StructSchema<StructDescriptor>
-  | BitfieldSchema<BitfieldDescriptor, NumberTag>
-  | BufferSchema;
+export interface TupleSchema<FieldSchema extends Schema> extends SchemaBase<SchemaTag.Tuple> {
+  readonly fields: {
+    readonly byteOffset: number;
+    readonly schema: FieldSchema;
+  }[];
+}
 
-function createNumberSchema<Tag extends NumberTag>(
+export interface BufferSchema<Length extends number, Alignment extends number> extends SchemaBase<SchemaTag.Buffer> {
+  readonly byteLength: Length;
+  readonly byteAlignment: Alignment;
+}
+
+// Get a type property or default to any
+export type _Get<T extends any, K extends string> = T[K];
+
+export type _GetArr<T extends any[], K extends number = number> = T[K];
+
+export type RuntimeType<T extends Schema> = {
+  Number: number;
+  Bool: boolean;
+  String: string;
+  Array: Array<RuntimeType<_Get<T, 'elementSchema'>>>;
+  Struct: Mutable<{ [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get< _Get<_Get<T, 'fields'>, Field>, 'schema'>> }>;
+  Bitfield: { [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get<T, 'elementSchema'>> };
+  Tuple: Array<RuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
+  Buffer: Buffer;
+}[T['tag']];
+
+function createNumberSchema<Tag extends NumberTag, LittleEndian extends boolean>(
   numberTag: Tag,
-  size: number,
-  littleEndian?: boolean
-): NumberSchema<Tag> {
+  size: typeof numberByteSize[Tag],
+  littleEndian?: LittleEndian
+): NumberSchema<Tag, LittleEndian> {
   return {
     tag: SchemaTag.Number,
     version: SCHEMA_VERSION,
@@ -167,7 +208,10 @@ export const float64le = createNumberSchema(NumberTag.Float64, 8, true);
 export const float64be = createNumberSchema(NumberTag.Float64, 8, false);
 
 /** Create a string schema */
-export function string(maxLength: number, encoding: 'utf8' | 'ascii' = 'utf8'): StringSchema {
+export function string<
+  MaxLength extends number,
+  Encoding extends StringEncoding = 'utf8'
+>(maxLength: MaxLength, encoding: Encoding = 'utf8' as Encoding): StringSchema<MaxLength, Encoding> {
   if (typeof maxLength !== 'number') {
     throw new TypeError('You must specify a max length for the string!');
   }
@@ -207,7 +251,7 @@ export function array<T extends Schema, size extends number>(
 }
 
 /** Create a tuple schema */
-export function tuple(...elements: Schema[]): TupleSchema {
+export function tuple<ElementSchema extends Schema>(elements: ElementSchema[]): TupleSchema<ElementSchema> {
   let byteOffset = 0;
   let maxByteAlignment = 0;
 
@@ -230,12 +274,12 @@ export function tuple(...elements: Schema[]): TupleSchema {
 }
 
 /** Create a struct schema */
-export function struct<Descriptor extends StructDescriptor>(descriptor: Descriptor, { reorder = false, pack = 0 } = {}): StructSchema<Descriptor> {
+export function struct<Fields extends StructFields>(descriptor: Fields, { reorder = false, pack = 0 } = {}): StructSchema<Fields> {
   if (typeof descriptor !== 'object') {
     throw new TypeError('You must supply a struct descriptor!');
   }
 
-  const fieldNames = Object.keys(descriptor) as (keyof Descriptor)[];
+  const fieldNames = keys(descriptor) as (keyof Fields)[];
   if (reorder) {
     fieldNames.sort((a, b) => alignof(descriptor[a] as any) - alignof(descriptor[b] as any));
   }
@@ -263,15 +307,17 @@ export function struct<Descriptor extends StructDescriptor>(descriptor: Descript
 }
 
 /** Create a bitfield schema */
-export function bitfield<Descriptor extends BitfieldDescriptor>(descriptor: BitfieldDescriptor): BitfieldSchema<Descriptor, NumberTag.UInt32>;
-export function bitfield<Descriptor extends BitfieldDescriptor, Tag extends NumberTag>(descriptor: BitfieldDescriptor, elementSchema: NumberSchema<Tag>): BitfieldSchema<Descriptor, Tag>;
-export function bitfield(descriptor: BitfieldDescriptor, elementSchema = uint32) {
-  if (typeof descriptor !== 'object') {
+
+export function bitfield<
+  Fields extends BitfieldFields,
+  ElementSchema extends NumberSchema = typeof uint32
+>(fields: Fields, elementSchema: ElementSchema = uint32 as ElementSchema): BitfieldSchema<Fields, ElementSchema> {
+  if (typeof fields !== 'object') {
     throw new TypeError('You must supply a bitfield descriptor!');
   }
 
-  const fieldNames = Object.keys(descriptor);
-  const totalBits = fieldNames.reduce((sum, name) => sum + descriptor[name], 0);
+  const fieldNames = keys(fields);
+  const totalBits = fieldNames.reduce((sum, name) => sum + fields[name], 0);
 
   if (totalBits > 8 * elementSchema.byteLength) {
     throw new RangeError('Sum of bitfield widths is too large for storage element');
@@ -282,21 +328,29 @@ export function bitfield(descriptor: BitfieldDescriptor, elementSchema = uint32)
     version: SCHEMA_VERSION,
     byteLength: elementSchema.byteLength,
     byteAlignment: elementSchema.byteAlignment,
-    fields: descriptor,
+    fields,
     elementSchema
   };
 }
 
 /** Create a buffer schema */
-export function buffer(length: number): BufferSchema {
-  if (typeof length !== 'number') {
+export function buffer<Length extends number, Alignment extends number = 1>(byteLength: Length, byteAlignment: Alignment = 1 as Alignment): BufferSchema<Length, Alignment> {
+  if (typeof byteLength !== 'number') {
     throw new TypeError('You must specify a length of the buffer!');
+  }
+
+  if (byteAlignment <= 0) {
+    throw new RangeError('Alignment must be positive integer');
+  }
+
+  if (log2(byteAlignment) % 1 !== 0) {
+    throw new RangeError('Alignment must be a power of 2');
   }
 
   return {
     tag: SchemaTag.Buffer,
     version: SCHEMA_VERSION,
-    byteLength: length,
-    byteAlignment: 1
+    byteLength,
+    byteAlignment
   };
 }

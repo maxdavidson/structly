@@ -25,7 +25,7 @@ test('struct', () => {
   expect(view.value.y).toBe(2);
   expect(view.value.z).toBe(9);
   expect('w' in view.value).toBe(false);
-  expect(view.value.w).toBe(undefined);
+  expect((view.value as any).w).toBe(undefined);
 
   expect(getBuffer(view).equals(getBuffer(Buffer.from([4, 2, 9])))).toBe(true);
 });

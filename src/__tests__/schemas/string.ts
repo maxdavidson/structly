@@ -1,5 +1,6 @@
 import { sizeof, alignof } from '../../utils';
 import { SchemaTag, SCHEMA_VERSION, string } from '../../schemas';
+import { StringEncoding } from '../../index';
 
 test('throws on invalid input', () => {
   expect(() => (string as any)()).toThrowError(TypeError);

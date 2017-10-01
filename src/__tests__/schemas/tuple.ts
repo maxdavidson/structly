@@ -2,7 +2,7 @@ import { sizeof, strideof, alignof } from '../../utils';
 import { SchemaTag, SCHEMA_VERSION, tuple, float32, uint16 } from '../../schemas';
 
 test('tuple', () => {
-  const schema = tuple(float32, uint16);
+  const schema = tuple([float32, uint16]);
 
   expect(schema.tag).toBe(SchemaTag.Tuple);
   expect(schema.version).toBe(SCHEMA_VERSION);

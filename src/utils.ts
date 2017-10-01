@@ -1,33 +1,35 @@
-import { NumberTag } from './schemas';
+import { NumberTag, Schema } from './schemas';
+
+export type Mutable<T extends Record<K, any>, K extends string = keyof T> = { [P in K]: T[P]; };
 
 /** Whether the running system is little endian (true = LE, false = BE) */
 export const systemLittleEndian = new Uint32Array(new Uint8Array([0x11, 0x22, 0x33, 0x44]).buffer)[0] === 0x44332211;
 
 /** Gets the closest multiple of byteAlignment from byteOffset (base-2 alignment only) */
-export function align(byteOffset: number, byteAlignment: number) {
+export function align(byteOffset: number, byteAlignment: number): number {
   return (byteOffset + byteAlignment - 1) & ~(byteAlignment - 1);
 }
 
 /** The byte alignment of the given schema */
-export function alignof({ byteAlignment = 0 }: { byteAlignment?: number; } = {}) {
-  return byteAlignment;
+export function alignof<T extends Schema>(schema: T): T['byteAlignment'] {
+  return schema.byteAlignment;
 }
 
 /** The byte size of the schema, excluding alignment padding */
-export function sizeof({ byteLength = 0 }: { byteLength?: number; } = {}) {
-  return byteLength;
+export function sizeof<T extends Schema>(schema: T): T['byteLength'] {
+  return schema.byteLength;
 }
 
 /** The byte size of the schema, including alignment padding */
-export function strideof(schema: { byteLength?: number; byteAlignment?: number; }, byteAlignment = alignof(schema)) {
+export function strideof<T extends Schema>(schema: T, byteAlignment = alignof(schema)): number {
   return align(sizeof(schema), byteAlignment);
 }
 
-export function createMask(bits: number) {
+export function createMask(bits: number): number {
   return (bits <= 0) ? 0 : (0xffffffff >>> (32 - bits));
 }
 
-export function createVariable(name: string, stackDepth = 0) {
+export function createVariable(name: string, stackDepth = 0): string {
   return `${name}${stackDepth}`;
 }
 
@@ -42,8 +44,13 @@ export function mapValues<T, V>(obj: T, mapper: (value: T[keyof T], key: keyof T
 }
 
 /* istanbul ignore next */
+export const log2 = Math.log2 || ((x: number) => Math.log(x) / Math.log(2));
+
+export const keys: <T>(obj: T) => (keyof T)[] = Object.keys as any;
+
+/* istanbul ignore next */
 export const entries: <T>(obj: T) => [keyof T, T[keyof T]][]
-  = (Object as any).entries || (obj => Object.keys(obj).map(key => [key, obj[key]] as any));
+  = Object.entries || (obj => keys(obj).map(key => [key, obj[key]]));
 
 export function getBufferGetterName(numberTag: NumberTag, littleEndian: boolean) {
   switch (numberTag) {
@@ -73,7 +80,7 @@ export function getBufferSetterName(numberTag: NumberTag, littleEndian: boolean)
   }
 }
 
-function isArrayBufferLike(obj: any): obj is ArrayBuffer {
+function isArrayBufferLike(obj: any): obj is ArrayBufferLike {
   return typeof obj === 'object'
     && obj !== null
     && typeof obj.byteLength === 'number';
@@ -87,7 +94,7 @@ function isArrayBufferViewLike(obj: any): obj is ArrayBufferView {
     && typeof obj.byteLength === 'number';
 }
 
-export type BufferLike = Buffer |  ArrayBuffer | ArrayBufferView;
+export type BufferLike = ArrayBufferView | ArrayBufferLike;
 
 export function getBuffer(data: BufferLike): Buffer {
   if (Buffer.isBuffer(data)) {
@@ -101,7 +108,7 @@ export function getBuffer(data: BufferLike): Buffer {
 
   if (isArrayBufferLike(data)) {
     try {
-      return Buffer.from(data);
+      return Buffer.from(data as any);
     } catch (e) {
       // Hacky fix for weird behavior in Node 4 with Jest 20's 'node' enviroment
       /* istanbul ignore next */

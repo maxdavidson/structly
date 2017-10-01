@@ -3,7 +3,7 @@ import { createView } from '../../view';
 import { tuple, uint8 } from '../../schemas';
 
 test('tuple', () => {
-  const type = tuple(uint8, uint8, uint8);
+  const type = tuple([uint8, uint8, uint8]);
 
   const view = createView(type);
 

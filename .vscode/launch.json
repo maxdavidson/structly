@@ -5,16 +5,16 @@
     "type": "node",
     "request": "launch",
     "protocol": "inspector",
-    "stopOnEntry": false,
+    "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
     "args": [
-      "node_modules/.bin/jest",
+      "--env=jsdom",
       "--no-cache",
       "--runInBand",
-      "--env=node-debug"
+      "--findRelatedTests",
+      "${file}"
     ],
     "skipFiles": [
-      "<node_internals>/**/*.js",
-      "${workspaceRoot}/node_modules/**/*.js"
+      "<node_internals>/**/*.js"
     ]
   }]
 }

@@ -1,16 +1,16 @@
 import { createUncheckedDecoder } from './decoder';
 import { createUncheckedEncoder } from './encoder';
-import { Schema, SchemaTag, struct, uint8 } from './schemas';
+import { Schema, SchemaTag, struct, uint8, RuntimeType, BitfieldSchema, SchemaMap } from './schemas';
 import {
   BufferLike, createMask, getBuffer, getBufferGetterName,
   mapValues, sizeof, strideof, systemLittleEndian
 } from './utils';
 
 export interface View<T extends Schema> {
-  value: any;
+  value: RuntimeType<T>;
   readonly schema: T;
   readonly buffer: ArrayBuffer;
-  readonly byteLength: number;
+  readonly byteLength: T['byteLength'];
   readonly byteOffset: number;
 }
 
@@ -22,11 +22,11 @@ export function createView<T extends Schema>(
 ): View<T> {
   const realBuffer = getBuffer(buffer);
 
-  if (sizeof(realBuffer) < sizeof(schema)) {
+  if (realBuffer.byteLength < sizeof(schema)) {
     throw new RangeError('The provided buffer is too small to store the encoded type');
   }
 
-  const view = createProxy(struct({ value: schema }), realBuffer, byteOffset);
+  const view: any = createProxy(struct({ value: schema }), realBuffer, byteOffset);
   view.schema = schema;
   view.buffer = realBuffer.buffer;
   view.byteOffset = realBuffer.byteOffset;
@@ -37,138 +37,139 @@ export function createView<T extends Schema>(
 
 const SUPPORTS_PROXY = typeof Proxy === 'function';
 
-function createProxy(schema: Schema, buffer: Buffer, byteOffset = 0): any {
-  switch (schema.tag) {
-    case SchemaTag.Number: {
-      const { numberTag, littleEndian = systemLittleEndian } = schema;
-      const getterName = getBufferGetterName(numberTag, littleEndian);
-      return buffer[getterName](byteOffset, true);
-    }
-
-    case SchemaTag.Bool: {
-      return Boolean(createProxy(uint8, buffer, byteOffset));
-    }
-
-    case SchemaTag.String: {
-      const { byteLength, encoding } = schema;
-
-      let index = buffer.indexOf(0, byteOffset);
-
-      if (index < 0 || index >= byteOffset + byteLength) {
-        index = byteOffset + byteLength;
-      }
-
-      return buffer.slice(byteOffset, index).toString(encoding);
-    }
-
-    case SchemaTag.Array: {
-      const { length, elementSchema } = schema;
-
-      const encode = createUncheckedEncoder(elementSchema);
-      const byteStride = strideof(elementSchema);
-
-      return createArrayProxy(length, {
-        useProxy: SUPPORTS_PROXY && length > 20,
-        get(i) {
-          return createProxy(elementSchema, buffer, byteOffset + (byteStride * i));
-        },
-        set(i, data) {
-          encode(data, buffer, byteOffset + (byteStride * i));
-        }
-      });
-    }
-
-    case SchemaTag.Tuple: {
-      const { fields } = schema;
-
-      const handlers = fields.map(field => ({
-        schema: field.schema,
-        encode: createUncheckedEncoder(field.schema),
-        totalByteOffset: byteOffset + field.byteOffset
-      }));
-
-      return createArrayProxy(handlers.length, {
-        useProxy: false,
-        get(i) {
-          const { schema: fieldSchema, totalByteOffset } = handlers[i];
-          return createProxy(fieldSchema, buffer, totalByteOffset);
-        },
-        set(i, data) {
-          const { encode, totalByteOffset } = handlers[i];
-          encode(data, buffer, totalByteOffset);
-        }
-      });
-    }
-
-    case SchemaTag.Struct: {
-      const { fields } = schema;
-
-      const membersByName = mapValues(fields, (field, name) => ({
-        schema: field.schema,
-        encode: createUncheckedEncoder(field.schema),
-        totalByteOffset: byteOffset + field.byteOffset
-      }));
-
-      return createObjectProxy(Object.keys(fields), {
-        get(name) {
-          const { schema: fieldSchema, totalByteOffset } = membersByName[name];
-          return createProxy(fieldSchema, buffer, totalByteOffset);
-        },
-        set(name, data) {
-          const { encode, totalByteOffset } = membersByName[name];
-          encode(data, buffer, totalByteOffset);
-        }
-      });
-    }
-
-    case SchemaTag.Bitfield: {
-      const { fields, elementSchema } = schema;
-
-      const decode = createUncheckedDecoder(elementSchema);
-      const encode = createUncheckedEncoder(elementSchema);
-
-      let currentBitOffset = 0;
-      const infoByName = mapValues(fields, bits => {
-        const bitOffset = currentBitOffset;
-        currentBitOffset += bits;
-        const mask = createMask(bits);
-        const clearMask = ~(mask << bitOffset);
-        return { bitOffset, mask, clearMask };
-      });
-
-      return createObjectProxy(Object.keys(fields), {
-        get(name) {
-          const { bitOffset, mask } = infoByName[name];
-          const elementValue = decode(buffer, undefined, byteOffset);
-          return (elementValue >>> bitOffset) & mask;
-        },
-        set(name, value) {
-          const { bitOffset, clearMask, mask } = infoByName[name];
-          let elementValue = decode(buffer, undefined, byteOffset);
-          elementValue &= clearMask;
-          elementValue |= (value & mask) << bitOffset;
-          encode(elementValue, buffer, byteOffset);
-        }
-      });
-    }
-
-    case SchemaTag.Buffer: {
-      const { byteLength } = schema;
-      return buffer.slice(byteOffset, byteOffset + byteLength);
-    }
-
-    /* istanbul ignore next */
-    default:
-      throw new TypeError(`Invalid schema tag: ${(schema as Schema).tag}`);
-  }
+function createProxy<T extends Schema>(schema: T, buffer: Buffer, byteOffset: number): RuntimeType<T> {
+  return (proxyVisitors as any)[schema.tag](schema, buffer, byteOffset);
 }
 
-function createArrayProxy(length: number, { get, set, useProxy = SUPPORTS_PROXY }: any = {}) {
-  const array = new Array(length);
+const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buffer, byteOffset: number) => RuntimeType<SchemaMap[Tag]>; } = {
+  Number({ numberTag, littleEndian = systemLittleEndian }, buffer, byteOffset) {
+    const getterName = getBufferGetterName(numberTag, littleEndian);
+    return buffer[getterName](byteOffset, true);
+  },
+
+  Bool(schema, buffer, byteOffset) {
+    return Boolean(createProxy(uint8, buffer, byteOffset));
+  },
+
+  String({ byteLength, encoding }, buffer, byteOffset) {
+    let index = buffer.indexOf(0, byteOffset);
+
+    if (index < 0 || index >= byteOffset + byteLength) {
+      index = byteOffset + byteLength;
+    }
+
+    return buffer.slice(byteOffset, index).toString(encoding);
+  },
+
+  Array(schema, buffer, byteOffset) {
+    const { length, elementSchema } = schema;
+
+    const encode = createUncheckedEncoder(elementSchema);
+    const byteStride = strideof(elementSchema);
+
+    return createArrayProxy<RuntimeType<typeof schema>>(length, {
+      useProxy: SUPPORTS_PROXY && length > 20,
+      get(i) {
+        return createProxy(elementSchema, buffer, byteOffset + (byteStride * i));
+      },
+      set(i, data) {
+        encode(data, buffer, byteOffset + (byteStride * i));
+      }
+    });
+  },
+
+  Tuple(schema, buffer, byteOffset) {
+    const { fields } = schema;
+
+    const handlers = fields.map(field => ({
+      schema: field.schema,
+      encode: createUncheckedEncoder(field.schema),
+      totalByteOffset: byteOffset + field.byteOffset
+    }));
+
+    return createArrayProxy<RuntimeType<typeof schema>>(handlers.length, {
+      useProxy: false,
+      get(i) {
+        const { schema: fieldSchema, totalByteOffset } = handlers[i];
+        return createProxy(fieldSchema, buffer, totalByteOffset);
+      },
+      set(i, data) {
+        const { encode, totalByteOffset } = handlers[i];
+        encode(data, buffer, totalByteOffset);
+      }
+    });
+  },
+
+  Struct(schema, buffer, byteOffset) {
+    const { fields } = schema;
+
+    const membersByName = mapValues(fields, (field, name) => ({
+      schema: field.schema,
+      encode: createUncheckedEncoder(field.schema),
+      totalByteOffset: byteOffset + field.byteOffset
+    }));
+
+    return createObjectProxy(fields, {
+      get(name) {
+        const { schema: fieldSchema, totalByteOffset } = membersByName[name];
+        return createProxy(fieldSchema, buffer, totalByteOffset);
+      },
+      set(name, data) {
+        const { encode, totalByteOffset } = membersByName[name];
+        encode(data, buffer, totalByteOffset);
+      }
+    });
+  },
+
+  Bitfield(schema, buffer, byteOffset) {
+    const { fields, elementSchema } = schema;
+
+    const decode = createUncheckedDecoder(elementSchema);
+    const encode = createUncheckedEncoder(elementSchema);
+
+    let currentBitOffset = 0;
+    const infoByName = mapValues(fields, bits => {
+      const bitOffset = currentBitOffset;
+      currentBitOffset += bits;
+      const mask = createMask(bits);
+      const clearMask = ~(mask << bitOffset);
+      return { bitOffset, mask, clearMask };
+    });
+
+    return createObjectProxy(fields, {
+      get(name) {
+        const { bitOffset, mask } = infoByName[name];
+        const elementValue = decode(buffer, undefined, byteOffset);
+        return (elementValue >>> bitOffset) & mask;
+      },
+      set(name, value) {
+        const { bitOffset, clearMask, mask } = infoByName[name];
+        let elementValue = decode(buffer, undefined, byteOffset);
+        elementValue &= clearMask;
+        elementValue |= (value & mask) << bitOffset;
+        encode(elementValue, buffer, byteOffset);
+      }
+    });
+  },
+
+  Buffer(schema, buffer, byteOffset) {
+    const { byteLength } = schema;
+    return buffer.slice(byteOffset, byteOffset + byteLength);
+  }
+};
+
+interface ArrayPropertyInterceptor<T extends ArrayLike<any>> {
+  useProxy?: boolean;
+  get(index: number): T[number];
+  set(index: number, data: T[number]): void;
+}
+
+function createArrayProxy<T extends ArrayLike<any>>(length: T['length'], { get, set, useProxy = SUPPORTS_PROXY }: ArrayPropertyInterceptor<T>) {
+  const newArray = new Array<T[number]>(length);
 
   // Lazily compute properties if proxy is available
   if (useProxy) {
-    return new Proxy(array, {
+    return new Proxy(newArray, {
       has(target, key) {
         if (typeof key !== 'symbol') {
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
@@ -179,7 +180,7 @@ function createArrayProxy(length: number, { get, set, useProxy = SUPPORTS_PROXY 
         return key in target;
       },
 
-      get(target, key) {
+      get(target, key: any) {
         if (typeof key !== 'symbol') {
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
           if (!isNaN(index) && (index >= 0) && (index < length)) {
@@ -214,49 +215,51 @@ function createArrayProxy(length: number, { get, set, useProxy = SUPPORTS_PROXY 
 
   // Eagerly compute properties using Object.defineProperty
   for (let i = 0; i < length; ++i) {
-    let cache;
-    Object.defineProperty(array, i, {
+    let getIndex = () => {
+      const result = get(i);
+      if (typeof result === 'object') {
+        getIndex = () => result;
+      }
+      return result;
+    };
+
+    Object.defineProperty(newArray, i, {
       configurable: false,
       enumerable: true,
-      get() {
-        if (cache) {
-          return cache;
-        }
-        const result = get(i);
-        if (typeof result === 'object') {
-          cache = result;
-        }
-        return result;
-      },
+      get: () => getIndex(),
       set: set.bind(undefined, i)
     });
   }
 
-  return array;
+  return newArray;
 }
 
-function createObjectProxy(keys: string[], { get, set }: any = {}) {
-  const object = {};
+interface ObjectPropertyInterceptor<T extends object> {
+  get<K extends keyof T>(key: K): T[K];
+  set<K extends keyof T>(key: K, data: T[K]): void;
+}
+
+function createObjectProxy<T extends object>(object: T, { get, set }: ObjectPropertyInterceptor<T>) {
+  const keys = Object.keys(object) as (keyof T)[];
+  const newObject = {} as T;
 
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
-    let cache;
-    Object.defineProperty(object, key, {
+    let getKey = () => {
+      const result = get(key);
+      if (typeof result === 'object') {
+        getKey = () => result;
+      }
+      return result;
+    };
+
+    Object.defineProperty(newObject, key, {
       configurable: false,
       enumerable: true,
-      get() {
-        if (cache) {
-          return cache;
-        }
-        const result = get(key);
-        if (typeof result === 'object') {
-          cache = result;
-        }
-        return result;
-      },
+      get: () => getKey(),
       set: set.bind(undefined, key)
     });
   }
 
-  return object;
+  return newObject;
 }
