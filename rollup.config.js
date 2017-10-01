@@ -16,12 +16,5 @@ export default {
     format: 'umd',
   },
   sourcemap: true,
-  plugins: [
-    sourcemaps(),
-    nodeResolve(),
-    nodeGlobals(),
-    nodeBuiltins(),
-    commonjs(),
-    uglify()
-  ]
+  plugins: [sourcemaps(), nodeResolve(), nodeGlobals(), nodeBuiltins(), commonjs(), uglify()],
 };

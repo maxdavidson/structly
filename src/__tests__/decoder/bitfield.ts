@@ -7,7 +7,7 @@ const schema = bitfield({
   there: 7,
   how: 11,
   are: 8,
-  you: 5
+  you: 5,
 });
 
 const data = {
@@ -15,7 +15,7 @@ const data = {
   there: 2,
   how: 3,
   are: 4,
-  you: 5
+  you: 5,
 };
 
 const buffer = getBuffer(new Uint32Array([673186565]));

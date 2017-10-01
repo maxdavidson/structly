@@ -5,16 +5,19 @@ const Structly033 = require('structly');
 const Structly = require('..');
 
 // SchemaPack schema
-const schemapackSchema = SchemaPack.build({
-  health: 'uint32',
-  jumping: 'boolean',
-  position: ['int16'],
-  attributes: {
-    str: 'uint8',
-    agi: 'uint8',
-    int: 'uint8'
-  }
-}, false);
+const schemapackSchema = SchemaPack.build(
+  {
+    health: 'uint32',
+    jumping: 'boolean',
+    position: ['int16'],
+    attributes: {
+      str: 'uint8',
+      agi: 'uint8',
+      int: 'uint8',
+    },
+  },
+  false,
+);
 
 // Structly 0.3.3 converter
 const structly033Converter = (() => {
@@ -27,8 +30,8 @@ const structly033Converter = (() => {
     attributes: struct({
       str: uint8,
       agi: uint8,
-      int: uint8
-    })
+      int: uint8,
+    }),
   });
 
   return createConverter(schema);
@@ -45,8 +48,8 @@ const structlyConverter = (() => {
     attributes: struct({
       str: uint8,
       agi: uint8,
-      int: uint8
-    })
+      int: uint8,
+    }),
   });
 
   return createConverter(schema, { unsafe: true, validate: false });
@@ -109,7 +112,7 @@ new Benchmark.Suite()
   .on('cycle', event => {
     console.log(String(event.target));
   })
-  .on('complete', function () {
+  .on('complete', function() {
     console.log('Fastest is ' + this.filter('fastest').map('name'));
   })
   .run();
@@ -137,7 +140,7 @@ new Benchmark.Suite()
   .on('cycle', event => {
     console.log(String(event.target));
   })
-  .on('complete', function () {
+  .on('complete', function() {
     console.log('Fastest is ' + this.filter('fastest').map('name'));
   })
   .run();

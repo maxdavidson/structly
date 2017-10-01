@@ -1,19 +1,23 @@
 {
-  "extends": "tslint:recommended",
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-prettier",
+    "tslint-plugin-prettier"
+  ],
   "rules": {
     "adjacent-overload-signatures": false,
     "array-type": [false],
     "arrow-parens": false,
     "interface-name": [false],
-    "interface-over-type-literal": false,
-    "max-line-length": [false, 130],
+    "interface-over-type-literal": true,
     "no-bitwise": false,
+    "no-empty-interface": false,
+    "no-var-keyword": true,
     "object-literal-sort-keys": false,
     "only-arrow-functions": [false],
     "ordered-imports": [false],
     "prefer-const": true,
     "prefer-for-of": false,
-    "quotemark": [true, "single"],
-    "trailing-comma": [true, { "multiline": "never", "singleline": "never" }]
+    "prettier": true
   }
 }

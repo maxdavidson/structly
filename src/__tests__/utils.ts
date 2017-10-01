@@ -21,8 +21,8 @@ test('getBuffer', () => {
 });
 
 test('getBufferGetterName', () => {
-  expect(() => getBufferGetterName(-1, true)).toThrow();
-  expect(() => getBufferGetterName(-1, false)).toThrow();
+  expect(() => getBufferGetterName(-1 as any, true)).toThrow();
+  expect(() => getBufferGetterName(-1 as any, false)).toThrow();
 
   expect(getBufferGetterName(NumberTag.Int8, true)).toBe('readInt8');
   expect(getBufferGetterName(NumberTag.Int8, false)).toBe('readInt8');
@@ -47,8 +47,8 @@ test('getBufferGetterName', () => {
 });
 
 test('getBufferSetterName', () => {
-  expect(() => getBufferSetterName(-1, true)).toThrow();
-  expect(() => getBufferSetterName(-1, false)).toThrow();
+  expect(() => getBufferSetterName(-1 as any, true)).toThrow();
+  expect(() => getBufferSetterName(-1 as any, false)).toThrow();
 
   expect(getBufferSetterName(NumberTag.Int8, true)).toBe('writeInt8');
   expect(getBufferSetterName(NumberTag.Int8, false)).toBe('writeInt8');

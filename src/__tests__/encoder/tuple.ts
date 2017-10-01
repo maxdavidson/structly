@@ -2,7 +2,7 @@ import { createEncoder } from '../../encoder';
 import { tuple, float32le, uint16le } from '../../schemas';
 
 test('tuple', () => {
-  const schema = tuple(float32le, uint16le);
+  const schema = tuple([float32le, uint16le]);
   const data = [1.5, 2];
 
   const encode = createEncoder(schema);

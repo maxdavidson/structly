@@ -1,10 +1,10 @@
-import { numberSchemaData, getNumberTagName } from '../_helpers';
+import { numberSchemaData } from '../_helpers';
 import { getBuffer } from '../../utils';
 import { createDecoder } from '../../decoder';
 import { array } from '../../schemas';
 
 for (const { schema, constructor } of numberSchemaData) {
-  test(`array of ${getNumberTagName(schema.numberTag)}`, () => {
+  test(`array of ${schema.numberTag}`, () => {
     const values = [1, 2, 3, 4, 5];
     const buffer = getBuffer(new constructor(values));
 

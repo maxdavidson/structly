@@ -64,8 +64,8 @@ test('long array of structs', () => {
   if (typeof Symbol === 'function') {
     const symbol = Symbol();
     expect(symbol in view.value).toBe(false);
-    view.value[symbol] = symbol;
-    delete view.value[symbol];
+    (view.value as any)[symbol] = symbol;
+    delete (view.value as any)[symbol];
   }
 
   expect(view.value.length).toBe(schema.length);

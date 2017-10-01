@@ -6,7 +6,7 @@ const schema = bitfield({
   there: 7,
   how: 11,
   are: 8,
-  you: 5
+  you: 5,
 });
 
 test('invalid', () => {
@@ -16,27 +16,33 @@ test('invalid', () => {
   expect(validateData(schema, [])).toBeDefined();
   expect(validateData(schema, {})).toBeDefined();
   expect(validateData(schema, { a: 'sdf' })).toBeDefined();
-  expect(validateData(schema, {
-    hello: 1,
-    there: 2,
-    how: 3,
-    are: 4
-  })).toBeDefined();
-  expect(validateData(schema, {
-    hello: 1,
-    there: 2,
-    how: 3,
-    are: 4,
-    you: '5'
-  })).toBeDefined();
+  expect(
+    validateData(schema, {
+      hello: 1,
+      there: 2,
+      how: 3,
+      are: 4,
+    }),
+  ).toBeDefined();
+  expect(
+    validateData(schema, {
+      hello: 1,
+      there: 2,
+      how: 3,
+      are: 4,
+      you: '5',
+    }),
+  ).toBeDefined();
 });
 
 test('valid', () => {
-  expect(validateData(schema, {
-    hello: 1,
-    there: 2,
-    how: 3,
-    are: 4,
-    you: 5
-  })).toBeUndefined();
+  expect(
+    validateData(schema, {
+      hello: 1,
+      there: 2,
+      how: 3,
+      are: 4,
+      you: 5,
+    }),
+  ).toBeUndefined();
 });

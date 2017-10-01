@@ -1,9 +1,9 @@
-import { numberSchemaData, getNumberTagName } from '../_helpers';
+import { numberSchemaData } from '../_helpers';
 import { getBuffer } from '../../utils';
 import { createView } from '../../view';
 
 for (const { schema, constructor } of numberSchemaData) {
-  test(`view of ${getNumberTagName(schema.numberTag)}`, () => {
+  test(`view of ${schema.numberTag}`, () => {
     const view = createView(schema);
 
     expect(typeof view.value).toBe('number');

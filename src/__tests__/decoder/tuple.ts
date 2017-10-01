@@ -1,7 +1,7 @@
 import { createDecoder } from '../../decoder';
 import { tuple, float32le, uint16le } from '../../schemas';
 
-const schema = tuple(float32le, uint16le);
+const schema = tuple([float32le, uint16le]);
 const values = [1.5, 2];
 
 const buffer = Buffer.alloc(schema.byteLength);
@@ -21,7 +21,7 @@ test('invalid schema', () => {
 });
 
 test('resuse object', () => {
-  const result = [];
+  const result: any[] = [];
   const decoded = decode(buffer, result);
   expect(decoded).toEqual(values);
   expect(decoded).toBe(result);

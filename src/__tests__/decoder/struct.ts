@@ -4,7 +4,7 @@ import { struct, float32le } from '../../schemas';
 const schema = struct({
   x: float32le,
   y: float32le,
-  z: float32le
+  z: float32le,
 });
 
 const decode = createDecoder(schema);
@@ -12,7 +12,7 @@ const decode = createDecoder(schema);
 const data = {
   x: -1,
   y: 0,
-  z: Infinity
+  z: Infinity,
 };
 
 const buffer = Buffer.alloc(schema.byteLength);

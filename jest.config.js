@@ -4,7 +4,7 @@ function getSupportedTypescriptTarget() {
   var nodeVersion = process.versions.node;
 
   if (semver.gt(nodeVersion, '7.6.0')) {
-    return 'es2017'
+    return 'es2017';
   } else if (semver.gt(nodeVersion, '7.0.0')) {
     return 'es2016';
   } else if (semver.gt(nodeVersion, '6.0.0')) {
@@ -21,25 +21,17 @@ module.exports = {
   testEnvironment: 'node',
   moduleFileExtensions: ['js', 'json', 'ts'],
   transform: {
-    '.ts': '<rootDir>/node_modules/ts-jest/preprocessor.js'
+    '.ts': '<rootDir>/node_modules/ts-jest/preprocessor.js',
   },
-  testMatch: [
-    '**/__tests__/**/*.ts'
-  ],
-  testPathIgnorePatterns: [
-    '<rootDir>/(node_modules|dist)',
-    '_\\w*.\\w+$'
-  ],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts'
-  ],
+  testMatch: ['**/__tests__/**/*.ts'],
+  testPathIgnorePatterns: ['<rootDir>/(node_modules|dist)', '_\\w*.\\w+$'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
   globals: {
     'ts-jest': {
       tsConfigFile: {
         target: getSupportedTypescriptTarget(),
-        module: 'commonjs'
-      }
-    }
-  }
+        module: 'commonjs',
+      },
+    },
+  },
 };
