@@ -20,7 +20,7 @@ test('default behavior', () => {
 
 const structSchema = struct({
   a: float64le,
-  b: uint8
+  b: uint8,
 });
 
 test('correct struct schema', () => {

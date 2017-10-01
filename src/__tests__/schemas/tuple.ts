@@ -10,8 +10,5 @@ test('tuple', () => {
   expect(alignof(schema)).toBe(4);
   expect(strideof(schema)).toBe(8);
 
-  expect(schema.fields).toEqual([
-    { schema: float32, byteOffset: 0 },
-    { schema: uint16, byteOffset: 4 }
-  ]);
+  expect(schema.fields).toEqual([{ schema: float32, byteOffset: 0 }, { schema: uint16, byteOffset: 4 }]);
 });

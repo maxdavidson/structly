@@ -5,6 +5,6 @@ test('bool', () => {
     tag: SchemaTag.Bool,
     version: SCHEMA_VERSION,
     byteLength: 1,
-    byteAlignment: 1
+    byteAlignment: 1,
   });
 });

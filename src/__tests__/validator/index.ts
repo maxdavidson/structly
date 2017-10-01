@@ -1,5 +1,5 @@
 import { validateData } from '../../validator';
-import { uint8 } from '../../schemas';
+import { uint8 } from '../../schemas';
 
 test('invalid', () => {
   expect(() => (validateData as any)()).toThrow();

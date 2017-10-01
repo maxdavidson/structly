@@ -17,6 +17,6 @@ export function createConverter<T extends Schema>(schema: T, options?: EncoderOp
   return {
     schema,
     encode: createEncoder<T>(schema, options),
-    decode: createDecoder<T>(schema, options)
+    decode: createDecoder<T>(schema, options),
   };
 }

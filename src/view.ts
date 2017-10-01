@@ -2,8 +2,14 @@ import { createUncheckedDecoder } from './decoder';
 import { createUncheckedEncoder } from './encoder';
 import { Schema, SchemaTag, struct, uint8, RuntimeType, BitfieldSchema, SchemaMap } from './schemas';
 import {
-  BufferLike, createMask, getBuffer, getBufferGetterName,
-  mapValues, sizeof, strideof, systemLittleEndian
+  BufferLike,
+  createMask,
+  getBuffer,
+  getBufferGetterName,
+  mapValues,
+  sizeof,
+  strideof,
+  systemLittleEndian,
 } from './utils';
 
 export interface View<T extends Schema> {
@@ -18,7 +24,7 @@ export interface View<T extends Schema> {
 export function createView<T extends Schema>(
   schema: T,
   buffer: BufferLike = Buffer.alloc(sizeof(schema)),
-  byteOffset = 0
+  byteOffset = 0,
 ): View<T> {
   const realBuffer = getBuffer(buffer);
 
@@ -41,7 +47,9 @@ function createProxy<T extends Schema>(schema: T, buffer: Buffer, byteOffset: nu
   return (proxyVisitors as any)[schema.tag](schema, buffer, byteOffset);
 }
 
-const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buffer, byteOffset: number) => RuntimeType<SchemaMap[Tag]>; } = {
+const proxyVisitors: {
+  [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buffer, byteOffset: number) => RuntimeType<SchemaMap[Tag]>
+} = {
   Number({ numberTag, littleEndian = systemLittleEndian }, buffer, byteOffset) {
     const getterName = getBufferGetterName(numberTag, littleEndian);
     return buffer[getterName](byteOffset, true);
@@ -70,11 +78,11 @@ const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buff
     return createArrayProxy<RuntimeType<typeof schema>>(length, {
       useProxy: SUPPORTS_PROXY && length > 20,
       get(i) {
-        return createProxy(elementSchema, buffer, byteOffset + (byteStride * i));
+        return createProxy(elementSchema, buffer, byteOffset + byteStride * i);
       },
       set(i, data) {
-        encode(data, buffer, byteOffset + (byteStride * i));
-      }
+        encode(data, buffer, byteOffset + byteStride * i);
+      },
     });
   },
 
@@ -84,7 +92,7 @@ const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buff
     const handlers = fields.map(field => ({
       schema: field.schema,
       encode: createUncheckedEncoder(field.schema),
-      totalByteOffset: byteOffset + field.byteOffset
+      totalByteOffset: byteOffset + field.byteOffset,
     }));
 
     return createArrayProxy<RuntimeType<typeof schema>>(handlers.length, {
@@ -96,7 +104,7 @@ const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buff
       set(i, data) {
         const { encode, totalByteOffset } = handlers[i];
         encode(data, buffer, totalByteOffset);
-      }
+      },
     });
   },
 
@@ -106,7 +114,7 @@ const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buff
     const membersByName = mapValues(fields, (field, name) => ({
       schema: field.schema,
       encode: createUncheckedEncoder(field.schema),
-      totalByteOffset: byteOffset + field.byteOffset
+      totalByteOffset: byteOffset + field.byteOffset,
     }));
 
     return createObjectProxy(fields, {
@@ -117,7 +125,7 @@ const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buff
       set(name, data) {
         const { encode, totalByteOffset } = membersByName[name];
         encode(data, buffer, totalByteOffset);
-      }
+      },
     });
   },
 
@@ -148,14 +156,14 @@ const proxyVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], buffer: Buff
         elementValue &= clearMask;
         elementValue |= (value & mask) << bitOffset;
         encode(elementValue, buffer, byteOffset);
-      }
+      },
     });
   },
 
   Buffer(schema, buffer, byteOffset) {
     const { byteLength } = schema;
     return buffer.slice(byteOffset, byteOffset + byteLength);
-  }
+  },
 };
 
 interface ArrayPropertyInterceptor<T extends ArrayLike<any>> {
@@ -164,7 +172,10 @@ interface ArrayPropertyInterceptor<T extends ArrayLike<any>> {
   set(index: number, data: T[number]): void;
 }
 
-function createArrayProxy<T extends ArrayLike<any>>(length: T['length'], { get, set, useProxy = SUPPORTS_PROXY }: ArrayPropertyInterceptor<T>) {
+function createArrayProxy<T extends ArrayLike<any>>(
+  length: T['length'],
+  { get, set, useProxy = SUPPORTS_PROXY }: ArrayPropertyInterceptor<T>,
+) {
   const newArray = new Array<T[number]>(length);
 
   // Lazily compute properties if proxy is available
@@ -174,7 +185,7 @@ function createArrayProxy<T extends ArrayLike<any>>(length: T['length'], { get, 
         if (typeof key !== 'symbol') {
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
           if (!isNaN(index)) {
-            return (index >= 0) && (index < length);
+            return index >= 0 && index < length;
           }
         }
         return key in target;
@@ -183,7 +194,7 @@ function createArrayProxy<T extends ArrayLike<any>>(length: T['length'], { get, 
       get(target, key: any) {
         if (typeof key !== 'symbol') {
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
-          if (!isNaN(index) && (index >= 0) && (index < length)) {
+          if (!isNaN(index) && index >= 0 && index < length) {
             let cache;
             if (key in target) {
               cache = target[key];
@@ -204,12 +215,12 @@ function createArrayProxy<T extends ArrayLike<any>>(length: T['length'], { get, 
         if (typeof key !== 'symbol') {
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
           // Check bounds
-          if (!isNaN(index) && (index >= 0) && (index < length)) {
+          if (!isNaN(index) && index >= 0 && index < length) {
             return set(index, value) || true;
           }
         }
         return true;
-      }
+      },
     });
   }
 
@@ -227,7 +238,7 @@ function createArrayProxy<T extends ArrayLike<any>>(length: T['length'], { get, 
       configurable: false,
       enumerable: true,
       get: () => getIndex(),
-      set: set.bind(undefined, i)
+      set: set.bind(undefined, i),
     });
   }
 
@@ -257,7 +268,7 @@ function createObjectProxy<T extends object>(object: T, { get, set }: ObjectProp
       configurable: false,
       enumerable: true,
       get: () => getKey(),
-      set: set.bind(undefined, key)
+      set: set.bind(undefined, key),
     });
   }
 

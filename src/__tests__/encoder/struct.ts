@@ -5,7 +5,7 @@ test('simple', () => {
   const schema = struct({
     x: float32le,
     y: float32le,
-    z: float32le
+    z: float32le,
   });
 
   const encode = createEncoder(schema);
@@ -13,7 +13,7 @@ test('simple', () => {
   const data = {
     x: -1,
     y: 0,
-    z: Infinity
+    z: Infinity,
   };
 
   const expected = Buffer.alloc(schema.byteLength);

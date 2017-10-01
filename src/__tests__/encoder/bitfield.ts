@@ -8,7 +8,7 @@ test('simple', () => {
     there: 7,
     how: 11,
     are: 8,
-    you: 5
+    you: 5,
   });
 
   const data = {
@@ -16,7 +16,7 @@ test('simple', () => {
     there: 2,
     how: 3,
     are: 4,
-    you: 5
+    you: 5,
   };
 
   const encode = createEncoder(schema);

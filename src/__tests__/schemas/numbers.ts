@@ -1,27 +1,44 @@
 import {
-  NumberTag, SchemaTag, NumberSchema,
+  NumberTag,
+  SchemaTag,
+  NumberSchema,
   SCHEMA_VERSION,
-  int8, uint8,
-  int16, int16le, int16be,
-  uint16, uint16le, uint16be,
-  int32, int32le, int32be,
-  uint32, uint32le, uint32be,
-  float32, float32le, float32be,
-  float64, float64le, float64be
+  int8,
+  uint8,
+  int16,
+  int16le,
+  int16be,
+  uint16,
+  uint16le,
+  uint16be,
+  int32,
+  int32le,
+  int32be,
+  uint32,
+  uint32le,
+  uint32be,
+  float32,
+  float32le,
+  float32be,
+  float64,
+  float64le,
+  float64be,
 } from '../../schemas';
 
 function numberSchemaHelper<T extends NumberSchema<Tag>, Tag extends NumberTag>(
-  schema: T, numberTag: Tag, size: number, littleEndian?: boolean
+  schema: T,
+  numberTag: Tag,
+  size: number,
+  littleEndian?: boolean,
 ) {
   return () => {
     expect(schema).toEqual({
       tag: SchemaTag.Number,
       version: SCHEMA_VERSION,
       numberTag,
-      byteLength:
-      size,
+      byteLength: size,
       byteAlignment: size,
-      littleEndian
+      littleEndian,
     });
   };
 }

@@ -6,7 +6,7 @@ test('struct', () => {
   const type = struct({
     x: uint8,
     y: uint8,
-    z: uint8
+    z: uint8,
   });
 
   const view = createView(type);
@@ -31,19 +31,21 @@ test('struct', () => {
 });
 
 test('complex struct', () => {
-  const view = createView(struct({
-    a: struct({
-      b: struct({
-        c: struct({
-          d: struct({
-            e: struct({
-              f: uint8
-            })
-          })
-        })
-      })
-    })
-  }));
+  const view = createView(
+    struct({
+      a: struct({
+        b: struct({
+          c: struct({
+            d: struct({
+              e: struct({
+                f: uint8,
+              }),
+            }),
+          }),
+        }),
+      }),
+    }),
+  );
 
   // Make sure instances are cached by comparing equality of references
   expect(view.value).toBe(view.value);

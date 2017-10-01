@@ -8,11 +8,15 @@ import {
   entries,
   strideof,
   systemLittleEndian,
-  keys
+  keys,
 } from './utils';
 
 /** Convert a buffer into its JavaScript representation */
-export type Decoder<T extends Schema> = (buffer: BufferLike, result?: Partial<RuntimeType<T>>, byteOffset?: number) => RuntimeType<T>;
+export type Decoder<T extends Schema> = (
+  buffer: BufferLike,
+  result?: Partial<RuntimeType<T>>,
+  byteOffset?: number,
+) => RuntimeType<T>;
 
 export interface DecoderOptions {
   /** Validate buffer before decoding */
@@ -38,12 +42,17 @@ export function createDecoder<T extends Schema>(schema: T, { validate = true }: 
   };
 }
 
-export type UncheckedDecoder<T extends Schema> = (buffer: Buffer, result?: Partial<RuntimeType<T>>, byteOffset?: number) => RuntimeType<T>;
+export type UncheckedDecoder<T extends Schema> = (
+  buffer: Buffer,
+  result?: Partial<RuntimeType<T>>,
+  byteOffset?: number,
+) => RuntimeType<T>;
 
 export function createUncheckedDecoder<T extends Schema>(schema: T): UncheckedDecoder<T> {
   const byteOffsetVar = createVariable('byteOffset');
   const resultVar = createVariable('result');
 
+  // prettier-ignore
   return new Function(`
     return function decodeUnchecked(buffer, ${resultVar}, ${byteOffsetVar}) {
       "use strict";
@@ -54,7 +63,7 @@ export function createUncheckedDecoder<T extends Schema>(schema: T): UncheckedDe
       return ${resultVar};
     }
   `)();
-  }
+}
 
 function createDecoderCode(schema: Schema, stackDepth: number): string {
   const visitor = (decoderVisitors as any)[schema.tag];
@@ -64,12 +73,13 @@ function createDecoderCode(schema: Schema, stackDepth: number): string {
   return visitor(schema, stackDepth);
 }
 
-const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth: number) => string; } = {
+const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth: number) => string } = {
   Number({ numberTag, littleEndian = systemLittleEndian }, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
     const bufferGetterName = getBufferGetterName(numberTag, littleEndian);
 
+    // prettier-ignore
     return `
       ${resultVar} = buffer.${bufferGetterName}(${byteOffsetVar}, true);
     `;
@@ -78,6 +88,7 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
   Bool({}, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
 
+    // prettier-ignore
     return `
       ${createDecoderCode(uint8, stackDepth)}
       ${resultVar} = Boolean(${resultVar});
@@ -90,6 +101,7 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const indexVar = createVariable('i', stackDepth);
     const maxVar = createVariable('max', stackDepth);
 
+    // prettier-ignore
     return `
       var ${indexVar} = ${byteOffsetVar};
       var ${maxVar} = ${byteOffsetVar} + ${byteLength};
@@ -109,6 +121,7 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const maxVar = createVariable('max', stackDepth);
     const stride = strideof(elementSchema, byteAlignment);
 
+    // prettier-ignore
     return `
       if (${resultVar} === undefined) {
         ${resultVar} = new Array(${length});
@@ -129,6 +142,7 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const innerResultVar = createVariable('result', stackDepth + 1);
     const innerByteOffsetVar = createVariable('byteOffset', stackDepth + 1);
 
+    // prettier-ignore
     return `
       if (${resultVar} === undefined) {
         ${resultVar} = new Array(${fields.length});
@@ -147,8 +161,11 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
     const innerResultVar = createVariable('result', stackDepth + 1);
     const innerByteOffsetVar = createVariable('byteOffset', stackDepth + 1);
-    const emptyStruct = `{ ${keys(fields).map(name => `${JSON.stringify(name)}: undefined`).join(', ')} }`;
+    const emptyStruct = `{ ${keys(fields)
+      .map(name => `${JSON.stringify(name)}: undefined`)
+      .join(', ')} }`;
 
+    // prettier-ignore
     return `
       if (${resultVar} === undefined) {
         ${resultVar} = ${emptyStruct};
@@ -162,6 +179,7 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     `;
   },
 
+  // prettier-ignore
   Bitfield({ elementSchema, fields }, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
@@ -169,6 +187,7 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const innerByteOffsetVar = createVariable('byteOffset', stackDepth + 1);
     const emptyBitfield = `{ ${keys(fields).map(name => `${JSON.stringify(name)}: undefined`).join(', ')} }`;
 
+    // prettier-ignore
     return `
       if (${resultVar} === undefined) {
         ${resultVar} = ${emptyBitfield};
@@ -183,10 +202,11 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     `;
   },
 
-  Buffer({ byteLength } , stackDepth) {
+  Buffer({ byteLength }, stackDepth) {
     const resultVar = createVariable('result', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
 
+    // prettier-ignore
     return `
       if (${resultVar} === undefined ||
           ${resultVar}.buffer !== buffer.buffer ||
@@ -195,5 +215,5 @@ const decoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
         ${resultVar} = buffer.slice(${byteOffsetVar}, ${byteOffsetVar} + ${byteLength});
       }
     `;
-  }
+  },
 };

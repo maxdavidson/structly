@@ -8,7 +8,7 @@ it('bitfield', () => {
     there: 7,
     how: 11,
     are: 8,
-    you: 5
+    you: 5,
   });
 
   const view = createView(schema);
@@ -34,7 +34,8 @@ it('bitfield', () => {
   expect(view.value.you).toBe(5);
 
   const expectedValue =
-    (1 & 0b1) | ((2 & 0b1111111) << 1) |
+    (1 & 0b1) |
+    ((2 & 0b1111111) << 1) |
     ((3 & 0b11111111111) << (1 + 7)) |
     ((4 & 0b11111111) << (1 + 7 + 11)) |
     ((5 % 0b11111) << (1 + 7 + 11 + 8));

@@ -14,7 +14,7 @@ test('default storage', () => {
     there: 7,
     how: 11,
     are: 8,
-    you: 5
+    you: 5,
   });
 
   expect(schema.tag).toBe(SchemaTag.Bitfield);
@@ -26,10 +26,13 @@ test('default storage', () => {
 });
 
 test('custom storage', () => {
-  const schema = bitfield({
-    hello: 1,
-    there: 7
-  }, uint8);
+  const schema = bitfield(
+    {
+      hello: 1,
+      there: 7,
+    },
+    uint8,
+  );
 
   expect(schema.tag).toBe(SchemaTag.Bitfield);
   expect(schema.version).toBe(SCHEMA_VERSION);

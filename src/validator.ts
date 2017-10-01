@@ -53,29 +53,36 @@ export function validateData(schema: Schema, data: any): any {
       return validateType('string', data);
 
     case SchemaTag.Array:
-      return validateType('object', data)
-        || validate(Array.isArray(data), `Data is not an array`)
-        || validateLength(schema, data)
-        || mapObject(data, value => validateData(schema.elementSchema, value));
+      return (
+        validateType('object', data) ||
+        validate(Array.isArray(data), `Data is not an array`) ||
+        validateLength(schema, data) ||
+        mapObject(data, value => validateData(schema.elementSchema, value))
+      );
 
     case SchemaTag.Tuple:
-      return validateType('object', data)
-        || validate(Array.isArray(data), `Data is not an array`)
-        || validateLength(schema.fields, data)
-        || mapObject(schema.fields as any, (field, i) => validateData(field.schema, data[i]));
+      return (
+        validateType('object', data) ||
+        validate(Array.isArray(data), `Data is not an array`) ||
+        validateLength(schema.fields, data) ||
+        mapObject(schema.fields as any, (field, i) => validateData(field.schema, data[i]))
+      );
 
     case SchemaTag.Struct:
-      return validateType('object', data)
-        || mapObject(schema.fields, (field, name) => validateData(field.schema, data[name]));
+      return (
+        validateType('object', data) ||
+        mapObject(schema.fields, (field, name) => validateData(field.schema, data[name]))
+      );
 
     case SchemaTag.Bitfield:
-      return validateType('object', data)
-        || mapObject(schema.fields, (_, name) => validateType('number', data[name]));
+      return validateType('object', data) || mapObject(schema.fields, (_, name) => validateType('number', data[name]));
 
     case SchemaTag.Buffer:
-      return validateType('object', data)
-        || validate(Buffer.isBuffer(data), `Data is not a Buffer`)
-        || validateEquality(schema.byteLength, data.byteLength, 'byteLength');
+      return (
+        validateType('object', data) ||
+        validate(Buffer.isBuffer(data), `Data is not a Buffer`) ||
+        validateEquality(schema.byteLength, data.byteLength, 'byteLength')
+      );
 
     default:
       throw new TypeError(`Invalid schema tag: ${(schema as Schema).tag}`);

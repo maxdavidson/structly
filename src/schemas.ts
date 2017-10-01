@@ -10,7 +10,7 @@ export const enum SchemaTag {
   Struct = 'Struct',
   Bitfield = 'Bitfield',
   Tuple = 'Tuple',
-  Buffer = 'Buffer'
+  Buffer = 'Buffer',
 }
 
 export const enum NumberTag {
@@ -21,7 +21,7 @@ export const enum NumberTag {
   Int32 = 'Int32',
   UInt32 = 'UInt32',
   Float32 = 'Float32',
-  Float64 = 'Float64'
+  Float64 = 'Float64',
 }
 
 export interface SchemaMap {
@@ -43,7 +43,7 @@ export const numberByteSize = {
   Int32: 4 as 4,
   UInt32: 4 as 4,
   Float32: 4 as 4,
-  Float64: 8 as 8
+  Float64: 8 as 8,
 };
 
 export type Schema = SchemaMap[keyof SchemaMap];
@@ -55,7 +55,8 @@ export interface SchemaBase<Tag extends SchemaTag> {
   readonly byteAlignment: number;
 }
 
-export interface NumberSchema<Tag extends NumberTag = NumberTag, LittleEndian extends boolean = boolean> extends SchemaBase<SchemaTag.Number> {
+export interface NumberSchema<Tag extends NumberTag = NumberTag, LittleEndian extends boolean = boolean>
+  extends SchemaBase<SchemaTag.Number> {
   readonly byteLength: typeof numberByteSize[Tag];
   readonly byteAlignment: typeof numberByteSize[Tag];
   readonly numberTag: Tag;
@@ -64,9 +65,10 @@ export interface NumberSchema<Tag extends NumberTag = NumberTag, LittleEndian ex
 
 export interface BoolSchema extends SchemaBase<SchemaTag.Bool> {}
 
-export type StringEncoding = 'utf8' | 'ascii';
+export type StringEncoding = 'utf8' | 'ascii';
 
-export interface StringSchema<MaxLength extends number, Encoding extends StringEncoding> extends SchemaBase<SchemaTag.String> {
+export interface StringSchema<MaxLength extends number, Encoding extends StringEncoding>
+  extends SchemaBase<SchemaTag.String> {
   readonly byteAlignment: 1;
   readonly encoding: Encoding;
 }
@@ -83,13 +85,14 @@ export interface StructSchema<Fields extends StructFields> extends SchemaBase<Sc
     readonly [Field in keyof Fields]: {
       readonly byteOffset: number;
       readonly schema: Fields[Field];
-    };
+    }
   };
 }
 
 export type BitfieldFields = Record<string, number>;
 
-export interface BitfieldSchema<Fields extends BitfieldFields, ElementSchema extends NumberSchema> extends SchemaBase<SchemaTag.Bitfield> {
+export interface BitfieldSchema<Fields extends BitfieldFields, ElementSchema extends NumberSchema>
+  extends SchemaBase<SchemaTag.Bitfield> {
   readonly byteLength: ElementSchema['byteLength'];
   readonly byteAlignment: ElementSchema['byteAlignment'];
   readonly fields: Fields;
@@ -118,7 +121,7 @@ export type RuntimeType<T extends Schema> = {
   Bool: boolean;
   String: string;
   Array: Array<RuntimeType<_Get<T, 'elementSchema'>>>;
-  Struct: Mutable<{ [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get< _Get<_Get<T, 'fields'>, Field>, 'schema'>> }>;
+  Struct: Mutable<{ [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get<_Get<_Get<T, 'fields'>, Field>, 'schema'>> }>;
   Bitfield: { [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get<T, 'elementSchema'>> };
   Tuple: Array<RuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
   Buffer: Buffer;
@@ -127,7 +130,7 @@ export type RuntimeType<T extends Schema> = {
 function createNumberSchema<Tag extends NumberTag, LittleEndian extends boolean>(
   numberTag: Tag,
   size: typeof numberByteSize[Tag],
-  littleEndian?: LittleEndian
+  littleEndian?: LittleEndian,
 ): NumberSchema<Tag, LittleEndian> {
   return {
     tag: SchemaTag.Number,
@@ -135,7 +138,7 @@ function createNumberSchema<Tag extends NumberTag, LittleEndian extends boolean>
     numberTag,
     byteLength: size,
     byteAlignment: size,
-    littleEndian
+    littleEndian,
   };
 }
 
@@ -144,7 +147,7 @@ export const bool: BoolSchema = {
   tag: SchemaTag.Bool,
   version: SCHEMA_VERSION,
   byteLength: 1,
-  byteAlignment: 1
+  byteAlignment: 1,
 };
 
 /** Int8 schema */
@@ -208,10 +211,10 @@ export const float64le = createNumberSchema(NumberTag.Float64, 8, true);
 export const float64be = createNumberSchema(NumberTag.Float64, 8, false);
 
 /** Create a string schema */
-export function string<
-  MaxLength extends number,
-  Encoding extends StringEncoding = 'utf8'
->(maxLength: MaxLength, encoding: Encoding = 'utf8' as Encoding): StringSchema<MaxLength, Encoding> {
+export function string<MaxLength extends number, Encoding extends StringEncoding = 'utf8'>(
+  maxLength: MaxLength,
+  encoding: Encoding = 'utf8' as Encoding,
+): StringSchema<MaxLength, Encoding> {
   if (typeof maxLength !== 'number') {
     throw new TypeError('You must specify a max length for the string!');
   }
@@ -221,7 +224,7 @@ export function string<
     version: SCHEMA_VERSION,
     byteLength: maxLength,
     byteAlignment: 1,
-    encoding
+    encoding,
   };
 }
 
@@ -229,7 +232,7 @@ export function string<
 export function array<T extends Schema, size extends number>(
   elementSchema: T,
   length: size,
-  { pack }: { pack?: boolean | number; } = {}
+  { pack }: { pack?: boolean | number } = {},
 ): ArraySchema<T, size> {
   if (typeof elementSchema !== 'object') {
     throw new TypeError('You must specify the array element type!');
@@ -243,10 +246,10 @@ export function array<T extends Schema, size extends number>(
   return {
     tag: SchemaTag.Array,
     version: SCHEMA_VERSION,
-    byteLength: (length as number - 1) * align(sizeof(elementSchema), byteAlignment) + sizeof(elementSchema),
+    byteLength: ((length as number) - 1) * align(sizeof(elementSchema), byteAlignment) + sizeof(elementSchema),
     byteAlignment,
     length,
-    elementSchema
+    elementSchema,
   };
 }
 
@@ -269,12 +272,15 @@ export function tuple<ElementSchema extends Schema>(elements: ElementSchema[]): 
     version: SCHEMA_VERSION,
     byteLength: byteOffset,
     byteAlignment: maxByteAlignment,
-    fields
+    fields,
   };
 }
 
 /** Create a struct schema */
-export function struct<Fields extends StructFields>(descriptor: Fields, { reorder = false, pack = 0 } = {}): StructSchema<Fields> {
+export function struct<Fields extends StructFields>(
+  descriptor: Fields,
+  { reorder = false, pack = 0 } = {},
+): StructSchema<Fields> {
   if (typeof descriptor !== 'object') {
     throw new TypeError('You must supply a struct descriptor!');
   }
@@ -287,31 +293,34 @@ export function struct<Fields extends StructFields>(descriptor: Fields, { reorde
   let byteOffset = 0;
   let maxByteAlignment = 0;
 
-  const processedFields = fieldNames.reduce((obj, name) => {
-    const schema: Schema = descriptor[name];
-    const { byteLength, byteAlignment } = schema;
-    byteOffset = align(byteOffset, Number(pack || byteAlignment));
-    obj[name] = { schema, byteOffset };
-    byteOffset += byteLength;
-    maxByteAlignment = Math.max(maxByteAlignment, byteAlignment);
-    return obj;
-  }, {} as any);
+  const processedFields = fieldNames.reduce(
+    (obj, name) => {
+      const schema: Schema = descriptor[name];
+      const { byteLength, byteAlignment } = schema;
+      byteOffset = align(byteOffset, Number(pack || byteAlignment));
+      obj[name] = { schema, byteOffset };
+      byteOffset += byteLength;
+      maxByteAlignment = Math.max(maxByteAlignment, byteAlignment);
+      return obj;
+    },
+    {} as any,
+  );
 
   return {
     tag: SchemaTag.Struct,
     version: SCHEMA_VERSION,
     byteLength: byteOffset,
     byteAlignment: Number(pack || maxByteAlignment),
-    fields: processedFields
+    fields: processedFields,
   };
 }
 
 /** Create a bitfield schema */
 
-export function bitfield<
-  Fields extends BitfieldFields,
-  ElementSchema extends NumberSchema = typeof uint32
->(fields: Fields, elementSchema: ElementSchema = uint32 as ElementSchema): BitfieldSchema<Fields, ElementSchema> {
+export function bitfield<Fields extends BitfieldFields, ElementSchema extends NumberSchema = typeof uint32>(
+  fields: Fields,
+  elementSchema: ElementSchema = uint32 as ElementSchema,
+): BitfieldSchema<Fields, ElementSchema> {
   if (typeof fields !== 'object') {
     throw new TypeError('You must supply a bitfield descriptor!');
   }
@@ -329,12 +338,15 @@ export function bitfield<
     byteLength: elementSchema.byteLength,
     byteAlignment: elementSchema.byteAlignment,
     fields,
-    elementSchema
+    elementSchema,
   };
 }
 
 /** Create a buffer schema */
-export function buffer<Length extends number, Alignment extends number = 1>(byteLength: Length, byteAlignment: Alignment = 1 as Alignment): BufferSchema<Length, Alignment> {
+export function buffer<Length extends number, Alignment extends number = 1>(
+  byteLength: Length,
+  byteAlignment: Alignment = 1 as Alignment,
+): BufferSchema<Length, Alignment> {
   if (typeof byteLength !== 'number') {
     throw new TypeError('You must specify a length of the buffer!');
   }
@@ -351,6 +363,6 @@ export function buffer<Length extends number, Alignment extends number = 1>(byte
     tag: SchemaTag.Buffer,
     version: SCHEMA_VERSION,
     byteLength,
-    byteAlignment
+    byteAlignment,
   };
 }

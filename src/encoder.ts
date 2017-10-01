@@ -1,13 +1,23 @@
 import { Schema, SchemaTag, uint8, RuntimeType, SchemaMap } from './schemas';
 import { validateData } from './validator';
 import {
-  BufferLike, createMask, createVariable, getBuffer,
-  getBufferSetterName, entries, sizeof, strideof, systemLittleEndian
+  BufferLike,
+  createMask,
+  createVariable,
+  getBuffer,
+  getBufferSetterName,
+  entries,
+  sizeof,
+  strideof,
+  systemLittleEndian,
 } from './utils';
 
 /** Serialize a JavaScript object or value into a buffer */
-export type Encoder<T extends Schema> =
-  <BufferType extends BufferLike = Buffer>(data: RuntimeType<T>, buffer?: BufferType, byteOffset?: number) => BufferType;
+export type Encoder<T extends Schema> = <BufferType extends BufferLike = Buffer>(
+  data: RuntimeType<T>,
+  buffer?: BufferType,
+  byteOffset?: number,
+) => BufferType;
 
 export interface EncoderOptions {
   /** Validate data on encode */
@@ -17,7 +27,10 @@ export interface EncoderOptions {
 }
 
 /** Create an encode function for serializing a JavaScript object or value into a buffer */
-export function createEncoder<T extends Schema>(schema: T, { validate = true, unsafe = false }: EncoderOptions = {}): Encoder<T> {
+export function createEncoder<T extends Schema>(
+  schema: T,
+  { validate = true, unsafe = false }: EncoderOptions = {},
+): Encoder<T> {
   if (typeof schema !== 'object') {
     throw new TypeError('You must specify a schema to convert with');
   }
@@ -50,6 +63,7 @@ export function createUncheckedEncoder<T extends Schema>(schema: T): UncheckedEn
   const byteOffsetVar = createVariable('byteOffset');
   const dataVar = createVariable('data');
 
+  // prettier-ignore
   return new Function(`
     return function encodeUnchecked(${dataVar}, buffer, ${byteOffsetVar}) {
       "use strict";
@@ -67,30 +81,33 @@ function createEncoderCode(schema: Schema, stackDepth: number): string {
   return visitor(schema, stackDepth);
 }
 
-const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth: number) => string; } = {
+const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth: number) => string } = {
   Number({ numberTag, littleEndian = systemLittleEndian }, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
     const bufferSetterName = getBufferSetterName(numberTag, littleEndian);
 
+    // prettier-ignore
     return `
       buffer.${bufferSetterName}(${dataVar}, ${byteOffsetVar}, true);
     `;
-},
+  },
 
   Bool({}, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
 
+    // prettier-ignore
     return `
       ${dataVar} = Number(${dataVar});
       ${createEncoderCode(uint8, stackDepth)}
     `;
-},
+  },
 
   String({ byteLength, encoding }, stackDepth) {
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
 
+    // prettier-ignore
     return `
       buffer.write(${dataVar}, ${byteOffsetVar}, ${byteLength}, ${JSON.stringify(encoding)});
       if (${dataVar}.length < ${byteLength}) {
@@ -107,6 +124,7 @@ const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const indexVar = createVariable('i', stackDepth);
     const stride = strideof(elementSchema, byteAlignment);
 
+    // prettier-ignore
     return `
       var ${innerByteOffsetVar} = ${byteOffsetVar};
       for (var ${indexVar} = 0; ${indexVar} < ${length}; ++${indexVar}) {
@@ -123,6 +141,7 @@ const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const innerDataVar = createVariable('data', stackDepth + 1);
     const innerByteOffsetVar = createVariable('byteOffset', stackDepth + 1);
 
+    // prettier-ignore
     return `
       ${fields.map(({ schema: fieldSchema, byteOffset }, i) => `
         var ${innerDataVar} = ${dataVar}[${i}];
@@ -138,6 +157,7 @@ const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const innerDataVar = createVariable('data', stackDepth + 1);
     const innerByteOffsetVar = createVariable('byteOffset', stackDepth + 1);
 
+    // prettier-ignore
     return `
       ${entries(fields).map(([name, { schema: fieldSchema, byteOffset }]) => `
         var ${innerDataVar} = ${dataVar}[${JSON.stringify(name)}];
@@ -153,6 +173,7 @@ const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const innerDataVar = createVariable('data', stackDepth + 1);
     const innerByteOffsetVar = createVariable('byteOffset', stackDepth + 1);
 
+    // prettier-ignore
     return `
       var ${innerByteOffsetVar} = ${byteOffsetVar};
       var ${innerDataVar} = 0;
@@ -168,6 +189,7 @@ const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
     const dataVar = createVariable('data', stackDepth);
     const byteOffsetVar = createVariable('byteOffset', stackDepth);
 
+    // prettier-ignore
     return `
       if (${dataVar}.buffer !== buffer.buffer ||
           ${dataVar}.byteOffset !== ${byteOffsetVar} ||
@@ -175,5 +197,5 @@ const encoderVisitors: { [Tag in SchemaTag]: (schema: SchemaMap[Tag], stackDepth
         ${dataVar}.copy(buffer, ${byteOffsetVar}, 0, Math.min(${dataVar}.byteLength, ${byteLength}));
       }
     `;
-  }
+  },
 };
