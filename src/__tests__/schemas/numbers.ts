@@ -25,7 +25,7 @@ import {
   float64be,
 } from '../../schemas';
 
-function numberSchemaHelper<T extends NumberSchema<Tag>, Tag extends NumberTag>(
+function numberSchemaHelper<T extends NumberSchema<Tag, boolean>, Tag extends NumberTag>(
   schema: T,
   numberTag: Tag,
   size: number,

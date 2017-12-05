@@ -2,7 +2,7 @@ import { validateData } from '../../validator';
 import * as schemas from '../../schemas';
 import { entries } from '../../utils';
 
-const numberSchemas: schemas.NumberSchema<schemas.NumberTag>[] = entries(schemas)
+const numberSchemas: schemas.NumberSchema<schemas.NumberTag, boolean>[] = entries(schemas)
   .filter(([_, schema]) => typeof schema === 'object' && schema !== null && 'numberTag' in schema)
   .map(([_, schema]) => schema as any);
 

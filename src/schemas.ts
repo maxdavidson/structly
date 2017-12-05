@@ -1,4 +1,4 @@
-import { align, alignof, sizeof, keys, log2, Mutable } from './utils';
+import { align, alignof, sizeof, keys, log2, Mutable, PartialMutable } from './utils';
 
 export const SCHEMA_VERSION = 7;
 
@@ -25,14 +25,14 @@ export const enum NumberTag {
 }
 
 export interface SchemaMap {
-  Number: NumberSchema;
+  Number: NumberSchema<any, any>;
   Bool: BoolSchema;
-  String: StringSchema<number, StringEncoding>;
-  Array: ArraySchema<SchemaBase<any>, number>;
-  Struct: StructSchema<Record<string, SchemaBase<any>>>;
-  Bitfield: BitfieldSchema<BitfieldFields, NumberSchema>;
-  Tuple: TupleSchema<SchemaBase<any>>;
-  Buffer: BufferSchema<number, number>;
+  String: StringSchema<any, any>;
+  Array: ArraySchema<any, any>;
+  Struct: StructSchema<any>;
+  Bitfield: BitfieldSchema<any, any>;
+  Tuple: TupleSchema<any>;
+  Buffer: BufferSchema<any, any>;
 }
 
 export const numberByteSize = {
@@ -55,7 +55,7 @@ export interface SchemaBase<Tag extends SchemaTag> {
   readonly byteAlignment: number;
 }
 
-export interface NumberSchema<Tag extends NumberTag = NumberTag, LittleEndian extends boolean = boolean>
+export interface NumberSchema<Tag extends NumberTag, LittleEndian extends boolean>
   extends SchemaBase<SchemaTag.Number> {
   readonly byteLength: typeof numberByteSize[Tag];
   readonly byteAlignment: typeof numberByteSize[Tag];
@@ -91,7 +91,7 @@ export interface StructSchema<Fields extends StructFields> extends SchemaBase<Sc
 
 export type BitfieldFields = Record<string, number>;
 
-export interface BitfieldSchema<Fields extends BitfieldFields, ElementSchema extends NumberSchema>
+export interface BitfieldSchema<Fields extends BitfieldFields, ElementSchema extends NumberSchema<any, any>>
   extends SchemaBase<SchemaTag.Bitfield> {
   readonly byteLength: ElementSchema['byteLength'];
   readonly byteAlignment: ElementSchema['byteAlignment'];
@@ -111,8 +111,8 @@ export interface BufferSchema<Length extends number, Alignment extends number> e
   readonly byteAlignment: Alignment;
 }
 
-// Get a type property or default to any
-export type _Get<T extends any, K extends string> = T[K];
+// Get a type property or default to never
+export type _Get<T extends any, K extends string> = (T & { [n: string]: never })[K];
 
 export type _GetArr<T extends any[], K extends number = number> = T[K];
 
@@ -125,6 +125,32 @@ export type RuntimeType<T extends Schema> = {
   Bitfield: { [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get<T, 'elementSchema'>> };
   Tuple: Array<RuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
   Buffer: Buffer;
+}[T['tag']];
+
+export type ReadonlyRuntimeType<T extends Schema> = {
+  Number: number;
+  Bool: boolean;
+  String: string;
+  Array: ReadonlyArray<ReadonlyRuntimeType<_Get<T, 'elementSchema'>>>;
+  Struct: {
+    readonly [Field in keyof _Get<T, 'fields'>]: ReadonlyRuntimeType<_Get<_Get<_Get<T, 'fields'>, Field>, 'schema'>>
+  };
+  Bitfield: { readonly [Field in keyof _Get<T, 'fields'>]: ReadonlyRuntimeType<_Get<T, 'elementSchema'>> };
+  Tuple: ReadonlyArray<ReadonlyRuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
+  Buffer: Buffer;
+}[T['tag']];
+
+export type PartialRuntimeType<T extends Schema> = {
+  Number: number;
+  Bool: boolean;
+  String: string;
+  Array: Array<PartialRuntimeType<_Get<T, 'elementSchema'>>>;
+  Struct: PartialMutable<
+    { [Field in keyof _Get<T, 'fields'>]: PartialRuntimeType<_Get<_Get<_Get<T, 'fields'>, Field>, 'schema'>> }
+  >;
+  Bitfield: Mutable<{ [Field in keyof _Get<T, 'fields'>]?: PartialRuntimeType<_Get<T, 'elementSchema'>> }>;
+  Tuple: Array<PartialRuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
+  Buffer: Buffer | undefined;
 }[T['tag']];
 
 function createNumberSchema<Tag extends NumberTag, LittleEndian extends boolean>(
@@ -317,10 +343,10 @@ export function struct<Fields extends StructFields>(
 
 /** Create a bitfield schema */
 
-export function bitfield<Fields extends BitfieldFields, ElementSchema extends NumberSchema = typeof uint32>(
-  fields: Fields,
-  elementSchema: ElementSchema = uint32 as ElementSchema,
-): BitfieldSchema<Fields, ElementSchema> {
+export function bitfield<
+  Fields extends BitfieldFields,
+  ElementSchema extends NumberSchema<NumberTag, boolean> = typeof uint32
+>(fields: Fields, elementSchema: ElementSchema = uint32 as ElementSchema): BitfieldSchema<Fields, ElementSchema> {
   if (typeof fields !== 'object') {
     throw new TypeError('You must supply a bitfield descriptor!');
   }
