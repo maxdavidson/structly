@@ -57,7 +57,7 @@
   "devDependencies": {
     "@types/jest": "^21.1.1",
     "dts-bundle": "^0.7.3",
-    "jest": "^21.2.1",
+    "jest": "^22.0.0",
     "prettier": "^1.7.3",
     "rimraf": "^2.6.2",
     "rollup": "^0.50.0",
