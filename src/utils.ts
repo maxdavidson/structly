@@ -1,6 +1,7 @@
 import { NumberTag, Schema } from './schemas';
 
-export type Mutable<T extends Record<K, any>, K extends string = keyof T> = { [P in K]: T[P] };
+export type Mutable<T extends any, K extends string = keyof T> = { [P in K]: T[P] };
+export type PartialMutable<T extends any, K extends string = keyof T> = { [P in K]?: T[P] };
 
 /** Whether the running system is little endian (true = LE, false = BE) */
 export const systemLittleEndian = new Uint32Array(new Uint8Array([0x11, 0x22, 0x33, 0x44]).buffer)[0] === 0x44332211;

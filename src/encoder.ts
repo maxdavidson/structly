@@ -1,4 +1,4 @@
-import { Schema, SchemaTag, uint8, RuntimeType, SchemaMap } from './schemas';
+import { Schema, SchemaTag, uint8, ReadonlyRuntimeType, SchemaMap } from './schemas';
 import { validateData } from './validator';
 import {
   BufferLike,
@@ -14,7 +14,7 @@ import {
 
 /** Serialize a JavaScript object or value into a buffer */
 export type Encoder<T extends Schema> = <BufferType extends BufferLike = Buffer>(
-  data: RuntimeType<T>,
+  data: ReadonlyRuntimeType<T>,
   buffer?: BufferType,
   byteOffset?: number,
 ) => BufferType;
@@ -57,7 +57,11 @@ export function createEncoder<T extends Schema>(
   };
 }
 
-export type UncheckedEncoder<T extends Schema> = (data: RuntimeType<T>, buffer: Buffer, byteOffset?: number) => Buffer;
+export type UncheckedEncoder<T extends Schema> = (
+  data: ReadonlyRuntimeType<T>,
+  buffer: Buffer,
+  byteOffset?: number,
+) => Buffer;
 
 export function createUncheckedEncoder<T extends Schema>(schema: T): UncheckedEncoder<T> {
   const byteOffsetVar = createVariable('byteOffset');

@@ -1,4 +1,4 @@
-import { Schema, SchemaTag, uint8, RuntimeType, SchemaMap } from './schemas';
+import { Schema, SchemaTag, uint8, RuntimeType, SchemaMap, PartialRuntimeType } from './schemas';
 import {
   BufferLike,
   createMask,
@@ -14,7 +14,7 @@ import {
 /** Convert a buffer into its JavaScript representation */
 export type Decoder<T extends Schema> = (
   buffer: BufferLike,
-  result?: Partial<RuntimeType<T>>,
+  result?: PartialRuntimeType<T>,
   byteOffset?: number,
 ) => RuntimeType<T>;
 
@@ -44,7 +44,7 @@ export function createDecoder<T extends Schema>(schema: T, { validate = true }: 
 
 export type UncheckedDecoder<T extends Schema> = (
   buffer: Buffer,
-  result?: Partial<RuntimeType<T>>,
+  result?: PartialRuntimeType<T>,
   byteOffset?: number,
 ) => RuntimeType<T>;
 

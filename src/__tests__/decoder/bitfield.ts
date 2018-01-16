@@ -26,10 +26,3 @@ test('simple', () => {
   const decoded = decode(buffer);
   expect(decoded).toEqual(data);
 });
-
-test('reuse object', () => {
-  const result = {};
-  const decoded = decode(buffer, result);
-  expect(decoded).toBe(result);
-  expect(decoded).toEqual(data);
-});

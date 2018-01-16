@@ -2,9 +2,13 @@ language: node_js
 node_js:
   - lts/argon
   - lts/boron
+  - lts/carbon
   - stable
+cache:
+  directories:
+    - node_modules
 script:
-  - npm test -- --coverage --no-cache --runInBand
+  - npm test -- --coverage --maxWorkers=4
 after_success:
   - npm install -g coveralls
   - cat coverage/lcov.info | coveralls

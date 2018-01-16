@@ -64,7 +64,7 @@ const numberConstructors = {
 };
 
 export function encodeHelper<Tag extends NumberTag>(
-  schema: NumberSchema<Tag>,
+  schema: NumberSchema<Tag, boolean>,
   values: number[],
   littleEndian = systemLittleEndian,
 ) {
@@ -98,8 +98,8 @@ export function encodeHelper<Tag extends NumberTag>(
   };
 }
 
-export function decodeHelper<Tag extends NumberTag>(
-  schema: NumberSchema<Tag>,
+export function decodeHelper(
+  schema: NumberSchema<NumberTag, boolean>,
   testValues: number[],
   expectedValues: number[],
   littleEndian = systemLittleEndian,
@@ -145,7 +145,7 @@ export type ArrayBufferViewConstructor =
   | Float64ArrayConstructor;
 
 export const numberSchemaData: {
-  schema: NumberSchema<NumberTag>;
+  schema: NumberSchema<NumberTag, boolean>;
   constructor: ArrayBufferViewConstructor;
 }[] = [
   { schema: int8, constructor: Int8Array },
