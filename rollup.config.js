@@ -12,9 +12,9 @@ export default {
     file: 'dist/structly.js',
     format: 'umd',
     sourcemap: true,
-  },
-  amd: {
-    id: 'structly',
+    amd: {
+      id: 'structly',
+    },
   },
   plugins: [sourcemaps(), nodeResolve(), nodeGlobals(), nodeBuiltins(), commonjs(), uglify()],
 };
