@@ -38,7 +38,7 @@ it('bitfield', () => {
     ((2 & 0b1111111) << 1) |
     ((3 & 0b11111111111) << (1 + 7)) |
     ((4 & 0b11111111) << (1 + 7 + 11)) |
-    ((5 % 0b11111) << (1 + 7 + 11 + 8));
+    ((5 & 0b11111) << (1 + 7 + 11 + 8));
 
   expect(getBuffer(view).equals(getBuffer(new Uint32Array([expectedValue])))).toBe(true);
 });
