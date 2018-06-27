@@ -48,17 +48,15 @@ export const numberByteSize = {
 
 export type Schema = SchemaMap[keyof SchemaMap];
 
-export interface SchemaBase<Tag extends SchemaTag> {
+export interface SchemaBase<Tag extends SchemaTag, ByteLength = number, Alignment = number> {
   readonly tag: Tag;
   readonly version: typeof SCHEMA_VERSION;
-  readonly byteLength: number;
-  readonly byteAlignment: number;
+  readonly byteLength: ByteLength;
+  readonly byteAlignment: Alignment;
 }
 
 export interface NumberSchema<Tag extends NumberTag, LittleEndian extends boolean>
-  extends SchemaBase<SchemaTag.Number> {
-  readonly byteLength: typeof numberByteSize[Tag];
-  readonly byteAlignment: typeof numberByteSize[Tag];
+  extends SchemaBase<SchemaTag.Number, typeof numberByteSize[Tag], typeof numberByteSize[Tag]> {
   readonly numberTag: Tag;
   readonly littleEndian?: LittleEndian;
 }
@@ -68,14 +66,13 @@ export interface BoolSchema extends SchemaBase<SchemaTag.Bool> {}
 export type StringEncoding = 'utf8' | 'ascii';
 
 export interface StringSchema<MaxLength extends number, Encoding extends StringEncoding>
-  extends SchemaBase<SchemaTag.String> {
-  readonly byteAlignment: 1;
+  extends SchemaBase<SchemaTag.String, number, 1> {
   readonly encoding: Encoding;
 }
 
 export interface ArraySchema<ElementSchema extends Schema, Length extends number> extends SchemaBase<SchemaTag.Array> {
-  readonly length: Length;
   readonly elementSchema: ElementSchema;
+  readonly length: Length;
 }
 
 export type StructFields = Record<string, Schema>;
@@ -92,9 +89,7 @@ export interface StructSchema<Fields extends StructFields> extends SchemaBase<Sc
 export type BitfieldFields = Record<string, number>;
 
 export interface BitfieldSchema<Fields extends BitfieldFields, ElementSchema extends NumberSchema<any, any>>
-  extends SchemaBase<SchemaTag.Bitfield> {
-  readonly byteLength: ElementSchema['byteLength'];
-  readonly byteAlignment: ElementSchema['byteAlignment'];
+  extends SchemaBase<SchemaTag.Bitfield, ElementSchema['byteLength'], ElementSchema['byteAlignment']> {
   readonly fields: Fields;
   readonly elementSchema: ElementSchema;
 }
@@ -112,18 +107,20 @@ export interface BufferSchema<Length extends number, Alignment extends number> e
 }
 
 // Get a type property or default to never
-export type _Get<T extends any, K extends string> = (T & { [n: string]: never })[K];
+export type TryGet<T, K extends keyof any> = T extends Record<K, any> ? T[Extract<keyof T, K>] : never;
 
-export type _GetArr<T extends any[], K extends number = number> = T[K];
+export type TryGetArr<T extends any[], K extends number = number> = T[K];
 
 export type RuntimeType<T extends Schema> = {
   Number: number;
   Bool: boolean;
   String: string;
-  Array: Array<RuntimeType<_Get<T, 'elementSchema'>>>;
-  Struct: Mutable<{ [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get<_Get<_Get<T, 'fields'>, Field>, 'schema'>> }>;
-  Bitfield: { [Field in keyof _Get<T, 'fields'>]: RuntimeType<_Get<T, 'elementSchema'>> };
-  Tuple: Array<RuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
+  Array: Array<RuntimeType<TryGet<T, 'elementSchema'>>>;
+  Struct: Mutable<
+    { [Field in keyof TryGet<T, 'fields'>]: RuntimeType<TryGet<TryGet<TryGet<T, 'fields'>, Field>, 'schema'>> }
+  >;
+  Bitfield: { [Field in keyof TryGet<T, 'fields'>]: RuntimeType<TryGet<T, 'elementSchema'>> };
+  Tuple: Array<RuntimeType<TryGet<TryGetArr<TryGet<T, 'fields'>>, 'schema'>>>;
   Buffer: Buffer;
 }[T['tag']];
 
@@ -131,12 +128,14 @@ export type ReadonlyRuntimeType<T extends Schema> = {
   Number: number;
   Bool: boolean;
   String: string;
-  Array: ReadonlyArray<ReadonlyRuntimeType<_Get<T, 'elementSchema'>>>;
+  Array: ReadonlyArray<ReadonlyRuntimeType<TryGet<T, 'elementSchema'>>>;
   Struct: {
-    readonly [Field in keyof _Get<T, 'fields'>]: ReadonlyRuntimeType<_Get<_Get<_Get<T, 'fields'>, Field>, 'schema'>>
+    readonly [Field in keyof TryGet<T, 'fields'>]: ReadonlyRuntimeType<
+      TryGet<TryGet<TryGet<T, 'fields'>, Field>, 'schema'>
+    >
   };
-  Bitfield: { readonly [Field in keyof _Get<T, 'fields'>]: ReadonlyRuntimeType<_Get<T, 'elementSchema'>> };
-  Tuple: ReadonlyArray<ReadonlyRuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
+  Bitfield: { readonly [Field in keyof TryGet<T, 'fields'>]: ReadonlyRuntimeType<TryGet<T, 'elementSchema'>> };
+  Tuple: ReadonlyArray<ReadonlyRuntimeType<TryGet<TryGetArr<TryGet<T, 'fields'>>, 'schema'>>>;
   Buffer: Buffer;
 }[T['tag']];
 
@@ -144,12 +143,12 @@ export type PartialRuntimeType<T extends Schema> = {
   Number: number;
   Bool: boolean;
   String: string;
-  Array: Array<PartialRuntimeType<_Get<T, 'elementSchema'>>>;
+  Array: Array<PartialRuntimeType<TryGet<T, 'elementSchema'>>>;
   Struct: PartialMutable<
-    { [Field in keyof _Get<T, 'fields'>]: PartialRuntimeType<_Get<_Get<_Get<T, 'fields'>, Field>, 'schema'>> }
+    { [Field in keyof TryGet<T, 'fields'>]: PartialRuntimeType<TryGet<TryGet<TryGet<T, 'fields'>, Field>, 'schema'>> }
   >;
-  Bitfield: Mutable<{ [Field in keyof _Get<T, 'fields'>]?: PartialRuntimeType<_Get<T, 'elementSchema'>> }>;
-  Tuple: Array<PartialRuntimeType<_Get<_GetArr<_Get<T, 'fields'>>, 'schema'>>>;
+  Bitfield: Mutable<{ [Field in keyof TryGet<T, 'fields'>]?: PartialRuntimeType<TryGet<T, 'elementSchema'>> }>;
+  Tuple: Array<PartialRuntimeType<TryGet<TryGetArr<TryGet<T, 'fields'>>, 'schema'>>>;
   Buffer: Buffer | undefined;
 }[T['tag']];
 
@@ -255,11 +254,11 @@ export function string<MaxLength extends number, Encoding extends StringEncoding
 }
 
 /** Create an array schema */
-export function array<T extends Schema, size extends number>(
+export function array<T extends Schema, Length extends number>(
   elementSchema: T,
-  length: size,
+  length: Length,
   { pack }: { pack?: boolean | number } = {},
-): ArraySchema<T, size> {
+): ArraySchema<T, Length> {
   if (typeof elementSchema !== 'object') {
     throw new TypeError('You must specify the array element type!');
   }
