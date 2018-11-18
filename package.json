@@ -9,8 +9,8 @@
     "url": "https://github.com/maxdavidson/structly.git"
   },
   "engines": {
-    "node": ">=4.5.0",
-    "npm": ">=2.15.9"
+    "node": ">=6.x",
+    "npm": ">=5.x"
   },
   "sideEffects": false,
   "main": "lib/index.js",

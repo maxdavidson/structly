@@ -28,7 +28,10 @@ Structly works great in Node (>=4.5.0). A minified UMD build with included shims
 ## Usage
 
 ```javascript
+// import modules by bundler
 import { createConverter, struct, array, float32 } from 'structly';
+// or use common js style require
+// const { createConverter, struct, array, float32 } = require('structly');
 
 // A point type with three float32 (single-precision) members.
 const point = struct({
@@ -54,6 +57,9 @@ const bytes = converter.encode(data);
 
 // Decode the bytes in the array buffer into a JavaScript object
 const decoded = converter.decode(bytes);
+
+console.log(data);
+console.log(decoded);
 ```
 
 ## Notes
