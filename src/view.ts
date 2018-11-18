@@ -216,7 +216,7 @@ function createArrayProxy<T extends ArrayLike<any>>(
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
           // Check bounds
           if (!isNaN(index) && index >= 0 && index < length) {
-            return set(index, value) || true;
+            set(index, value);
           }
         }
         return true;
