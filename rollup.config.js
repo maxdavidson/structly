@@ -3,7 +3,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import nodeGlobals from 'rollup-plugin-node-globals';
 import nodeBuiltins from 'rollup-plugin-node-builtins';
 import commonjs from 'rollup-plugin-commonjs';
-import uglify from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
   input: 'es/index.js',
@@ -16,5 +16,5 @@ export default {
       id: 'structly',
     },
   },
-  plugins: [sourcemaps(), nodeResolve(), nodeGlobals(), nodeBuiltins(), commonjs(), uglify()],
+  plugins: [sourcemaps(), nodeResolve(), nodeGlobals(), nodeBuiltins(), commonjs(), terser()],
 };
