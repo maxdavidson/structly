@@ -216,7 +216,8 @@ function createArrayProxy<T extends ArrayLike<any>>(
           const index = typeof key === 'string' ? parseInt(key, 10) : key;
           // Check bounds
           if (!isNaN(index) && index >= 0 && index < length) {
-            return set(index, value) || true;
+            set(index, value);
+            return true;
           }
         }
         return true;
@@ -268,7 +269,7 @@ function createObjectProxy<T extends object>(object: T, { get, set }: ObjectProp
       configurable: false,
       enumerable: true,
       get: () => getKey(),
-      set: set.bind(undefined, key),
+      set: data => set(key, data),
     });
   }
 
