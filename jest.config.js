@@ -1,16 +1,11 @@
 module.exports = {
-  mapCoverage: true,
+  preset: 'ts-jest',
   testEnvironment: 'node',
-  moduleFileExtensions: ['js', 'json', 'ts'],
-  transform: {
-    '.ts': '<rootDir>/node_modules/ts-jest/preprocessor.js',
-  },
-  testMatch: ['**/__tests__/**/*.ts'],
   testPathIgnorePatterns: ['<rootDir>/(node_modules|dist)', '_\\w*.\\w+$'],
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/**/_*'],
   globals: {
     'ts-jest': {
-      tsConfigFile: './tsconfig.test.json'
+      target: 'es2015',
     },
   },
 };
