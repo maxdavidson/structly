@@ -4,11 +4,9 @@ node_js:
   - lts/carbon
   - lts/dubnium
   - stable
-cache:
-  directories:
-    - node_modules
+cache: npm
 script:
-  - npm test -- --coverage --maxWorkers=4
+  - npm test -- --coverage --runInBand
 after_success:
   - npm install -g coveralls
   - cat coverage/lcov.info | coveralls
