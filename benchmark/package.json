@@ -16,6 +16,6 @@
     "benchmark": "^2.1.1",
     "microtime": "^2.1.1",
     "schemapack": "^1.4.2",
-    "structly": "^0.3.3"
+    "structly": "^0.8.0"
   }
 }
